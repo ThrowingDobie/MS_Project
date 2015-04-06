@@ -2,11 +2,14 @@
 #include "cMain.h"
 #include "cCube.h"
 #include "cLandMark.h"
+#include "cSkull.h"
 
 cMain::cMain()
 	: m_pCube(NULL)
 	, m_pLandMark(NULL)
+    , m_pSkull(NULL)
 {
+
 }
 
 
@@ -14,29 +17,49 @@ cMain::~cMain()
 {
 	SAFE_DELETE(m_pCube);
 	SAFE_DELETE(m_pLandMark);
+    SAFE_DELETE(m_pSkull);
+
+    Effects::DestroyAll();
+    InputLayouts::DestroyAll();
+    RenderStates::DestroyAll();
 }
 
 void cMain::Setup()
 {
-	LightSetup();
+	//m_pCube = new cCube;
+	//m_pCube->Setup();
 
-	m_pCube = new cCube;
-	m_pCube->Setup();
+	//m_pLandMark = new cLandMark;
+	//m_pLandMark->Setup();
 
-	m_pLandMark = new cLandMark;
-	m_pLandMark->Setup();
+    m_pSkull = new cSkull;
+    m_pSkull->Setup();
+}
+
+void cMain::Init()
+{
+    Effects::InitAll(g_pD3DDevice->m_pDevice);
+    InputLayouts::InitAll(g_pD3DDevice->m_pDevice);
+    RenderStates::InitAll(g_pD3DDevice->m_pDevice);
+
+    m_pSkull->Init();
 }
 
 void cMain::Update(float fDelta)
 {
-	if (m_pCube)
-	{
-		m_pCube->Update(fDelta);
-	}
-	if (m_pLandMark)
-	{
-		m_pLandMark->Update(fDelta);
-	}
+	//if (m_pCube)
+	//{
+	//	m_pCube->Update(fDelta);
+	//}
+	//if (m_pLandMark)
+	//{
+	//	m_pLandMark->Update(fDelta);
+	//}
+
+    if (m_pSkull)
+    {
+        m_pSkull->Update(fDelta);
+    }
 }
 
 void cMain::Render()
@@ -46,35 +69,20 @@ void cMain::Render()
 	g_pD3DDevice->m_pDevCon->ClearDepthStencilView(g_pD3DDevice->m_pDepthStencilView,
 		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-	Effects::BasicFX->SetDirLights(m_DirLights);
 
-	if (m_pCube)
-	{
-		m_pCube->Render();
-	}
-	if (m_pLandMark)
-	{
-		m_pLandMark->Render();
-	}
+    if (m_pSkull)
+    {
+        m_pSkull->Render();
+    }
+
+	//if (m_pCube)
+	//{
+	//	m_pCube->Render();
+	//}
+	//if (m_pLandMark)
+	//{
+	//	m_pLandMark->Render();
+	//}
 
 	g_pD3DDevice->m_pSwapChain->Present(0, 0);
-}
-
-void cMain::LightSetup()
-{
-	m_DirLights[0].Ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	m_DirLights[0].Diffuse = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
-	m_DirLights[0].Specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
-	m_DirLights[0].Direction = XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
-
-	m_DirLights[1].Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	m_DirLights[1].Diffuse = XMFLOAT4(0.20f, 0.20f, 0.20f, 1.0f);
-	m_DirLights[1].Specular = XMFLOAT4(0.25f, 0.25f, 0.25f, 1.0f);
-	m_DirLights[1].Direction = XMFLOAT3(-0.57735f, -0.57735f, 0.57735f);
-
-	m_DirLights[2].Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	m_DirLights[2].Diffuse = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	m_DirLights[2].Specular = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	m_DirLights[2].Direction = XMFLOAT3(0.0f, -0.707f, -0.707f);
-
 }

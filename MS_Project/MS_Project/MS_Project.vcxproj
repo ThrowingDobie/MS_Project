@@ -91,6 +91,7 @@
     <ClInclude Include="cDeviceManager.h" />
     <ClInclude Include="cLandMark.h" />
     <ClInclude Include="cMain.h" />
+    <ClInclude Include="cSkull.h" />
     <ClInclude Include="cWaves.h" />
     <ClInclude Include="Effects.h" />
     <ClInclude Include="GameTimer.h" />
@@ -110,6 +111,7 @@
     <ClCompile Include="cDeviceManager.cpp" />
     <ClCompile Include="cLandMark.cpp" />
     <ClCompile Include="cMain.cpp" />
+    <ClCompile Include="cSkull.cpp" />
     <ClCompile Include="cWaves.cpp" />
     <ClCompile Include="Effects.cpp" />
     <ClCompile Include="GameTimer.cpp" />

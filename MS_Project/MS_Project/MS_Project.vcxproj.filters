@@ -81,6 +81,9 @@
     <ClInclude Include="cLandMark.h">
       <Filter>FrameWork</Filter>
     </ClInclude>
+    <ClInclude Include="cSkull.h">
+      <Filter>FrameWork</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -126,6 +129,9 @@
       <Filter>Practice</Filter>
     </ClCompile>
     <ClCompile Include="cLandMark.cpp">
+      <Filter>FrameWork</Filter>
+    </ClCompile>
+    <ClCompile Include="cSkull.cpp">
       <Filter>FrameWork</Filter>
     </ClCompile>
   </ItemGroup>

@@ -53,6 +53,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 
 	g_pMain = new cMain;
 	g_pMain->Setup();
+    g_pMain->Init();
 
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_MS_PROJECT));
 
