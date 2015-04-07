@@ -3,20 +3,39 @@
 
 
 cLandMark::cLandMark()
+	: m_pLandVertexBuffer(NULL)
+	, m_pLandIndexBuffer(NULL)
+	, m_pGrassMapSRV(NULL)
+	, m_pWavesVertexBuffer(NULL)
+	, m_pWavesIndexBuffer(NULL)
+	, m_pWavesMapSRV(NULL)
+	, m_pTreeSpritesVB(NULL)
+	, m_pTreeTextureMapArraySRV(NULL)
 {
 	m_nLandIndexCount = 0;
 	m_RenderOptions = Lighting;
+
+	m_isAlphaToCoverageOn = false;
 
 	XMMATRIX I = XMMatrixIdentity();
 	XMStoreFloat4x4(&m_matWaterTexTransform, I);
 	XMStoreFloat4x4(&m_matGrassTexTransform, I);
 	XMStoreFloat4x4(&m_matLandWorld, I);
 	XMStoreFloat4x4(&m_matWavesWorld, I);
+
 }
 
 
 cLandMark::~cLandMark()
 {
+	SAFE_RELESE(m_pLandVertexBuffer);
+	SAFE_RELESE(m_pLandIndexBuffer);
+	SAFE_RELESE(m_pGrassMapSRV);
+	SAFE_RELESE(m_pWavesVertexBuffer);
+	SAFE_RELESE(m_pWavesIndexBuffer);
+	SAFE_RELESE(m_pWavesMapSRV);
+	SAFE_RELESE(m_pTreeSpritesVB);
+	SAFE_RELESE(m_pTreeTextureMapArraySRV);
 }
 
 void cLandMark::BuildLandGeometryBuffers()
@@ -142,6 +161,21 @@ XMFLOAT3 cLandMark::GetHillNormal(float x, float z)const
 
 void cLandMark::Setup()
 {
+	m_DirLights[0].Ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	m_DirLights[0].Diffuse = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	m_DirLights[0].Specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	m_DirLights[0].Direction = XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
+
+	m_DirLights[1].Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	m_DirLights[1].Diffuse = XMFLOAT4(0.20f, 0.20f, 0.20f, 1.0f);
+	m_DirLights[1].Specular = XMFLOAT4(0.25f, 0.25f, 0.25f, 1.0f);
+	m_DirLights[1].Direction = XMFLOAT3(-0.57735f, -0.57735f, 0.57735f);
+
+	m_DirLights[2].Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	m_DirLights[2].Diffuse = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	m_DirLights[2].Specular = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	m_DirLights[2].Direction = XMFLOAT3(0.0f, -0.707f, -0.707f);
+
 	XMMATRIX grassTexScale = XMMatrixScaling(5.0f, 5.0f, 0.0f);
 	XMStoreFloat4x4(&m_matGrassTexTransform, grassTexScale);
 
@@ -155,19 +189,56 @@ void cLandMark::Setup()
 
 	m_Waves.Init(160, 160, 1.0f, 0.03f, 5.0f, 0.3f);
 
-	// Must init Effects first since InputLayouts depend on shader signatures.
-	Effects::InitAll(g_pD3DDevice->m_pDevice);
-	InputLayouts::InitAll(g_pD3DDevice->m_pDevice);
-	RenderStates::InitAll(g_pD3DDevice->m_pDevice);
-
 	HR(D3DX11CreateShaderResourceViewFromFile(g_pD3DDevice->m_pDevice,
 		L"Textures/grass.dds", 0, 0, &m_pGrassMapSRV, 0));
 
 	HR(D3DX11CreateShaderResourceViewFromFile(g_pD3DDevice->m_pDevice,
 		L"Textures/water2.dds", 0, 0, &m_pWavesMapSRV, 0));
 
+	m_mtTree.Ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	m_mtTree.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_mtTree.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
+
+	std::vector<std::wstring> treeFilenames;
+	treeFilenames.push_back(L"Textures/tree0.dds");
+	treeFilenames.push_back(L"Textures/tree1.dds");
+	treeFilenames.push_back(L"Textures/tree2.dds");
+	treeFilenames.push_back(L"Textures/tree3.dds");
+
+	m_pTreeTextureMapArraySRV = d3dHelper::CreateTexture2DArraySRV(
+		g_pD3DDevice->m_pDevice, g_pD3DDevice->m_pDevCon, treeFilenames, DXGI_FORMAT_R8G8B8A8_UNORM);
+
 	BuildLandGeometryBuffers();
 	BuildWaveGeometryBuffers();
+	BuildTreeSpritesBuffer();
+}
+
+void cLandMark::BuildTreeSpritesBuffer()
+{
+	Vertex::TreePointSprite v[m_nTreeCount];
+
+	for (UINT i = 0; i < m_nTreeCount; ++i)
+	{
+		float x = MathHelper::RandF(-35.0f, 35.0f);
+		float z = MathHelper::RandF(-35.0f, 35.0f);
+		float y = GetHillHeight(x, z);
+
+		// Move tree slightly above land height.
+		y += 10.0f;
+
+		v[i].Pos = XMFLOAT3(x, y, z);
+		v[i].Size = XMFLOAT2(24.0f, 24.0f);
+	}
+
+	D3D11_BUFFER_DESC vbd;
+	vbd.Usage = D3D11_USAGE_IMMUTABLE;
+	vbd.ByteWidth = sizeof(Vertex::TreePointSprite) * m_nTreeCount;
+	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vbd.CPUAccessFlags = 0;
+	vbd.MiscFlags = 0;
+	D3D11_SUBRESOURCE_DATA vinitData;
+	vinitData.pSysMem = v;
+	HR(g_pD3DDevice->m_pDevice->CreateBuffer(&vbd, &vinitData, &m_pTreeSpritesVB));
 }
 
 void cLandMark::Update(float fDelta)
@@ -233,6 +304,12 @@ void cLandMark::Update(float fDelta)
 
 	if (GetAsyncKeyState('3') & 0x8000)
 		m_RenderOptions = RenderOptions::TexturesAndFog;
+
+	if (GetAsyncKeyState('R') & 0x8000)
+		m_isAlphaToCoverageOn = true;
+
+	if (GetAsyncKeyState('T') & 0x8000)
+		m_isAlphaToCoverageOn = false;
 }
 
 void cLandMark::Render()
@@ -250,6 +327,7 @@ void cLandMark::Render()
 	XMMATRIX viewProj = view*proj;
 
 	// Set per frame constants.
+	Effects::BasicFX->SetDirLights(m_DirLights);
 	Effects::BasicFX->SetEyePosW(g_pCamera->m_vEyePosW);
 	Effects::BasicFX->SetFogColor(Colors::Silver);
 	Effects::BasicFX->SetFogStart(15.0f);
@@ -320,6 +398,59 @@ void cLandMark::Render()
 		g_pD3DDevice->m_pDevCon->DrawIndexed(3 * m_Waves.TriangleCount(), 0, 0);
 
 		// Restore default blend state
+		g_pD3DDevice->m_pDevCon->OMSetBlendState(0, blendFactor, 0xffffffff);
+	}
+}
+
+void cLandMark::DrawTreeSprites()
+{
+	XMMATRIX view = XMLoadFloat4x4(&g_pCamera->m_matView);
+	XMMATRIX proj = XMLoadFloat4x4(&g_pCamera->m_matProj);
+	XMMATRIX viewProj = view*proj;
+
+	Effects::TreeSpriteFX->SetDirLights(m_DirLights);
+	Effects::TreeSpriteFX->SetEyePosW(g_pCamera->m_vEyePosW);
+	Effects::TreeSpriteFX->SetFogColor(Colors::Silver);
+	Effects::TreeSpriteFX->SetFogStart(15.0f);
+	Effects::TreeSpriteFX->SetFogRange(175.0f);
+	Effects::TreeSpriteFX->SetViewProj(viewProj);
+	Effects::TreeSpriteFX->SetMaterial(m_mtTree);
+	Effects::TreeSpriteFX->SetTreeTextureMapArray(m_pTreeTextureMapArraySRV);
+
+	g_pD3DDevice->m_pDevCon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+	g_pD3DDevice->m_pDevCon->IASetInputLayout(InputLayouts::TreePointSprite);
+	UINT stride = sizeof(Vertex::TreePointSprite);
+	UINT offset = 0;
+
+	ID3DX11EffectTechnique* treeTech = nullptr;
+	switch (m_RenderOptions)
+	{
+	case RenderOptions::Lighting:
+		treeTech = Effects::TreeSpriteFX->Light3Tech;
+		break;
+	case RenderOptions::Textures:
+		treeTech = Effects::TreeSpriteFX->Light3TexAlphaClipTech;
+		break;
+	case RenderOptions::TexturesAndFog:
+		treeTech = Effects::TreeSpriteFX->Light3TexAlphaClipFogTech;
+		break;
+	}
+
+	D3DX11_TECHNIQUE_DESC techDesc;
+	treeTech->GetDesc(&techDesc);
+	for (UINT p = 0; p < techDesc.Passes; ++p)
+	{
+		g_pD3DDevice->m_pDevCon->IASetVertexBuffers(0, 1, &m_pTreeSpritesVB, &stride, &offset);
+
+		float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+
+		if (m_isAlphaToCoverageOn)
+		{
+			g_pD3DDevice->m_pDevCon->OMSetBlendState(RenderStates::AlphaToCoverageBS, blendFactor, 0xffffffff);
+		}
+		treeTech->GetPassByIndex(p)->Apply(0, g_pD3DDevice->m_pDevCon);
+		g_pD3DDevice->m_pDevCon->Draw(m_nTreeCount, 0);
+
 		g_pD3DDevice->m_pDevCon->OMSetBlendState(0, blendFactor, 0xffffffff);
 	}
 }

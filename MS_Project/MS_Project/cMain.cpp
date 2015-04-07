@@ -26,14 +26,14 @@ cMain::~cMain()
 
 void cMain::Setup()
 {
-	//m_pCube = new cCube;
-	//m_pCube->Setup();
+	m_pCube = new cCube;
+	m_pCube->Setup();
 
-	//m_pLandMark = new cLandMark;
-	//m_pLandMark->Setup();
+	m_pLandMark = new cLandMark;
+	m_pLandMark->Setup();
 
-    m_pSkull = new cSkull;
-    m_pSkull->Setup();
+    //m_pSkull = new cSkull;
+    //m_pSkull->Setup();
 }
 
 void cMain::Init()
@@ -42,24 +42,24 @@ void cMain::Init()
     InputLayouts::InitAll(g_pD3DDevice->m_pDevice);
     RenderStates::InitAll(g_pD3DDevice->m_pDevice);
 
-    m_pSkull->Init();
+    //m_pSkull->Init();
 }
 
 void cMain::Update(float fDelta)
 {
-	//if (m_pCube)
-	//{
-	//	m_pCube->Update(fDelta);
-	//}
-	//if (m_pLandMark)
-	//{
-	//	m_pLandMark->Update(fDelta);
-	//}
+	if (m_pCube)
+	{
+		m_pCube->Update(fDelta);
+	}
+	if (m_pLandMark)
+	{
+		m_pLandMark->Update(fDelta);
+	}
 
-    if (m_pSkull)
-    {
-        m_pSkull->Update(fDelta);
-    }
+    //if (m_pSkull)
+    //{
+    //    m_pSkull->Update(fDelta);
+    //}
 }
 
 void cMain::Render()
@@ -69,19 +69,19 @@ void cMain::Render()
 	g_pD3DDevice->m_pDevCon->ClearDepthStencilView(g_pD3DDevice->m_pDepthStencilView,
 		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
+	if (m_pCube)
+	{
+		m_pCube->Render();
+	}
+	if (m_pLandMark)
+	{
+		m_pLandMark->Render();
+		m_pLandMark->DrawTreeSprites();
+	}
 
-    if (m_pSkull)
-    {
-        m_pSkull->Render();
-    }
-
-	//if (m_pCube)
+	//if (m_pSkull)
 	//{
-	//	m_pCube->Render();
-	//}
-	//if (m_pLandMark)
-	//{
-	//	m_pLandMark->Render();
+	//	m_pSkull->Render();
 	//}
 
 	g_pD3DDevice->m_pSwapChain->Present(0, 0);

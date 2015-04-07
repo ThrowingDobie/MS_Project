@@ -12,9 +12,12 @@ public:
 	void Render();
 	void Update(float fDelta);
 
+	void DrawTreeSprites();
+
 private:
 	void BuildLandGeometryBuffers();
 	void BuildWaveGeometryBuffers();
+	void BuildTreeSpritesBuffer();
 
 	float GetHillHeight(float x, float z)const;
 	XMFLOAT3 GetHillNormal(float x, float z)const;
@@ -38,11 +41,24 @@ private:
 	XMFLOAT2 m_WaterTexOffset;
 
 private:
+	// Tree
+	ID3D11Buffer* m_pTreeSpritesVB;
+	Material m_mtTree;
+	ID3D11ShaderResourceView* m_pTreeTextureMapArraySRV;
+
+	static const UINT m_nTreeCount = 16;
+
+	bool m_isAlphaToCoverageOn;
+
+private:
 	XMFLOAT4X4 m_matWaterTexTransform;
 	XMFLOAT4X4 m_matGrassTexTransform;
 	XMFLOAT4X4 m_matLandWorld;
 	XMFLOAT4X4 m_matWavesWorld;
 
 	RenderOptions m_RenderOptions;
+
+	// Light
+	DirectionalLight m_DirLights[3];
 };
 

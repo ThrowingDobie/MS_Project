@@ -84,6 +84,9 @@
     <ClInclude Include="cSkull.h">
       <Filter>FrameWork</Filter>
     </ClInclude>
+    <ClInclude Include="d3dUtil.h">
+      <Filter>Practice</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -134,6 +137,9 @@
     <ClCompile Include="cSkull.cpp">
       <Filter>FrameWork</Filter>
     </ClCompile>
+    <ClCompile Include="d3dUtil.cpp">
+      <Filter>Practice</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MS_Project.rc">
@@ -155,6 +161,9 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="FX\Basic.fx">
+      <Filter>FX</Filter>
+    </CustomBuild>
+    <CustomBuild Include="FX\TreeSprite.fx">
       <Filter>FX</Filter>
     </CustomBuild>
   </ItemGroup>
