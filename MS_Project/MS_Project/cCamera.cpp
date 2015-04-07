@@ -10,7 +10,7 @@ cCamera::cCamera()
 	
 	m_fTheta = 1.5f*D3DX_PI;
 	m_fPhi = 0.25f*D3DX_PI;
-	m_fRadius = 300.0f;
+	m_fRadius = 80.f;
 
 	m_posLastMouse = { 0, 0 };
 }

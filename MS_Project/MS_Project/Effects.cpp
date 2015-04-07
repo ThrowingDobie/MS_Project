@@ -102,20 +102,66 @@ TreeSpriteEffect::~TreeSpriteEffect()
 }
 #pragma endregion
 
+#pragma region TessellationEffect
+TessellationEffect::TessellationEffect(ID3D11Device* device, const std::wstring& filename)
+	: Effect(device, filename)
+{
+	TessTech = mFX->GetTechniqueByName("Tess");
+
+	WorldViewProj = mFX->GetVariableByName("gWorldViewProj")->AsMatrix();
+	World = mFX->GetVariableByName("gWorld")->AsMatrix();
+	WorldInvTranspose = mFX->GetVariableByName("gWorldInvTranspose")->AsMatrix();
+	TexTransform = mFX->GetVariableByName("gTexTransform")->AsMatrix();
+	EyePosW = mFX->GetVariableByName("gEyePosW")->AsVector();
+	FogColor = mFX->GetVariableByName("gFogColor")->AsVector();
+	FogStart = mFX->GetVariableByName("gFogStart")->AsScalar();
+	FogRange = mFX->GetVariableByName("gFogRange")->AsScalar();
+	DirLights = mFX->GetVariableByName("gDirLights");
+	Mat = mFX->GetVariableByName("gMaterial");
+	DiffuseMap = mFX->GetVariableByName("gDiffuseMap")->AsShaderResource();
+}
+
+TessellationEffect::~TessellationEffect()
+{
+}
+#pragma endregion
+
+#pragma region BlurEffect
+BlurEffect::BlurEffect(ID3D11Device* device, const std::wstring& filename)
+	: Effect(device, filename)
+{
+	HorzBlurTech = mFX->GetTechniqueByName("HorzBlur");
+	VertBlurTech = mFX->GetTechniqueByName("VertBlur");
+
+	Weights = mFX->GetVariableByName("gWeights")->AsScalar();
+	InputMap = mFX->GetVariableByName("gInput")->AsShaderResource();
+	OutputMap = mFX->GetVariableByName("gOutput")->AsUnorderedAccessView();
+}
+
+BlurEffect::~BlurEffect()
+{
+}
+#pragma endregion
+
 #pragma region Effects
 
 BasicEffect*      Effects::BasicFX = 0;
 TreeSpriteEffect* Effects::TreeSpriteFX = 0;
+TessellationEffect* Effects::TessellationFX = 0;
+BlurEffect*         Effects::BlurFX = 0;
 
 void Effects::InitAll(ID3D11Device* device)
 {
 	BasicFX = new BasicEffect(device, L"FX/Basic.fxo");
 	TreeSpriteFX = new TreeSpriteEffect(device, L"FX/TreeSprite.fxo");
+	TessellationFX = new TessellationEffect(device, L"FX/Tessellation.fxo");
+	BlurFX = new BlurEffect(device, L"FX/Blur.fxo");
 }
 
 void Effects::DestroyAll()
 {
 	SafeDelete(BasicFX);
 	SafeDelete(TreeSpriteFX);
+	SafeDelete(TessellationFX);
 }
 #pragma endregion

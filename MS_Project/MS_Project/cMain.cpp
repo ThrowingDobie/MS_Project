@@ -15,6 +15,8 @@ cMain::cMain()
 
 cMain::~cMain()
 {
+	g_pD3DDevice->m_pDevCon->ClearState();
+
 	SAFE_DELETE(m_pCube);
 	SAFE_DELETE(m_pLandMark);
     SAFE_DELETE(m_pSkull);
@@ -42,15 +44,16 @@ void cMain::Init()
     InputLayouts::InitAll(g_pD3DDevice->m_pDevice);
     RenderStates::InitAll(g_pD3DDevice->m_pDevice);
 
+	m_pLandMark->Init();
     //m_pSkull->Init();
 }
 
 void cMain::Update(float fDelta)
 {
-	if (m_pCube)
-	{
-		m_pCube->Update(fDelta);
-	}
+	//if (m_pCube)
+	//{
+	//	m_pCube->Update(fDelta);
+	//}
 	if (m_pLandMark)
 	{
 		m_pLandMark->Update(fDelta);
@@ -69,14 +72,15 @@ void cMain::Render()
 	g_pD3DDevice->m_pDevCon->ClearDepthStencilView(g_pD3DDevice->m_pDepthStencilView,
 		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-	if (m_pCube)
-	{
-		m_pCube->Render();
-	}
+	//if (m_pCube)
+	//{
+	//	m_pCube->Render();
+	//}
 	if (m_pLandMark)
 	{
-		m_pLandMark->Render();
-		m_pLandMark->DrawTreeSprites();
+		//m_pLandMark->Render();
+		//m_pLandMark->DrawTreeSprites();
+		m_pLandMark->TessellationRender();
 	}
 
 	//if (m_pSkull)

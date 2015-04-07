@@ -11,6 +11,7 @@ cLandMark::cLandMark()
 	, m_pWavesMapSRV(NULL)
 	, m_pTreeSpritesVB(NULL)
 	, m_pTreeTextureMapArraySRV(NULL)
+	, m_pQuadPatchVertexBuffer(NULL)
 {
 	m_nLandIndexCount = 0;
 	m_RenderOptions = Lighting;
@@ -36,6 +37,7 @@ cLandMark::~cLandMark()
 	SAFE_RELESE(m_pWavesMapSRV);
 	SAFE_RELESE(m_pTreeSpritesVB);
 	SAFE_RELESE(m_pTreeTextureMapArraySRV);
+	SAFE_RELESE(m_pQuadPatchVertexBuffer);
 }
 
 void cLandMark::BuildLandGeometryBuffers()
@@ -208,9 +210,16 @@ void cLandMark::Setup()
 	m_pTreeTextureMapArraySRV = d3dHelper::CreateTexture2DArraySRV(
 		g_pD3DDevice->m_pDevice, g_pD3DDevice->m_pDevCon, treeFilenames, DXGI_FORMAT_R8G8B8A8_UNORM);
 
+
+
+}
+
+void cLandMark::Init()
+{
 	BuildLandGeometryBuffers();
 	BuildWaveGeometryBuffers();
 	BuildTreeSpritesBuffer();
+	BuildQuadPatchBuffer();
 }
 
 void cLandMark::BuildTreeSpritesBuffer()
@@ -453,4 +462,78 @@ void cLandMark::DrawTreeSprites()
 
 		g_pD3DDevice->m_pDevCon->OMSetBlendState(0, blendFactor, 0xffffffff);
 	}
+}
+
+void cLandMark::TessellationRender()
+{
+	g_pD3DDevice->m_pDevCon->ClearRenderTargetView(g_pD3DDevice->m_pRenderTargetView, reinterpret_cast<const float*>(&Colors::Silver));
+	g_pD3DDevice->m_pDevCon->ClearDepthStencilView(g_pD3DDevice->m_pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+	g_pD3DDevice->m_pDevCon->IASetInputLayout(InputLayouts::BasicTess);
+	g_pD3DDevice->m_pDevCon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	float blendFactor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+
+	XMMATRIX view = XMLoadFloat4x4(&g_pCamera->m_matView);
+	XMMATRIX proj = XMLoadFloat4x4(&g_pCamera->m_matProj);
+	XMMATRIX viewProj = view*proj;
+
+	g_pD3DDevice->m_pDevCon->IASetInputLayout(InputLayouts::Pos);
+	g_pD3DDevice->m_pDevCon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_4_CONTROL_POINT_PATCHLIST);
+
+	UINT stride = sizeof(Vertex::Pos);
+	UINT offset = 0;
+
+	// Set per frame constants.
+	Effects::TessellationFX->SetEyePosW(g_pCamera->m_vEyePosW);
+	Effects::TessellationFX->SetFogColor(Colors::Silver);
+	Effects::TessellationFX->SetFogStart(15.0f);
+	Effects::TessellationFX->SetFogRange(175.0f);
+
+	D3DX11_TECHNIQUE_DESC techDesc;
+	Effects::TessellationFX->TessTech->GetDesc(&techDesc);
+
+	for (UINT p = 0; p < techDesc.Passes; ++p)
+	{
+		g_pD3DDevice->m_pDevCon->IASetVertexBuffers(0, 1, &m_pQuadPatchVertexBuffer, &stride, &offset);
+
+		// Set per object constants.
+		XMMATRIX world = XMMatrixIdentity();
+		XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
+		XMMATRIX worldViewProj = world*view*proj;
+
+		Effects::TessellationFX->SetWorld(world);
+		Effects::TessellationFX->SetWorldInvTranspose(worldInvTranspose);
+		Effects::TessellationFX->SetWorldViewProj(worldViewProj);
+		Effects::TessellationFX->SetTexTransform(XMMatrixIdentity());
+		//Effects::TessellationFX->SetMaterial(0);
+		Effects::TessellationFX->SetDiffuseMap(0);
+
+		Effects::TessellationFX->TessTech->GetPassByIndex(p)->Apply(0, g_pD3DDevice->m_pDevCon);
+
+		g_pD3DDevice->m_pDevCon->RSSetState(RenderStates::WireframeRS);
+		g_pD3DDevice->m_pDevCon->Draw(4, 0);
+	}
+}
+
+void cLandMark::BuildQuadPatchBuffer()
+{
+	D3D11_BUFFER_DESC vbd;
+	vbd.Usage = D3D11_USAGE_IMMUTABLE;
+	vbd.ByteWidth = sizeof(XMFLOAT3) * 4;
+	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vbd.CPUAccessFlags = 0;
+	vbd.MiscFlags = 0;
+
+	XMFLOAT3 vertices[4] =
+	{
+		XMFLOAT3(-10.0f, 0.0f, +10.0f),
+		XMFLOAT3(+10.0f, 0.0f, +10.0f),
+		XMFLOAT3(-10.0f, 0.0f, -10.0f),
+		XMFLOAT3(+10.0f, 0.0f, -10.0f)
+	};
+
+	D3D11_SUBRESOURCE_DATA vinitData;
+	vinitData.pSysMem = vertices;
+	HR(g_pD3DDevice->m_pDevice->CreateBuffer(&vbd, &vinitData, &m_pQuadPatchVertexBuffer));
 }

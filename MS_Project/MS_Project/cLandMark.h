@@ -9,15 +9,18 @@ public:
 	~cLandMark();
 
 	void Setup();
+	void Init();
 	void Render();
 	void Update(float fDelta);
 
 	void DrawTreeSprites();
+	void TessellationRender();
 
 private:
 	void BuildLandGeometryBuffers();
 	void BuildWaveGeometryBuffers();
 	void BuildTreeSpritesBuffer();
+	void BuildQuadPatchBuffer();
 
 	float GetHillHeight(float x, float z)const;
 	XMFLOAT3 GetHillNormal(float x, float z)const;
@@ -60,5 +63,8 @@ private:
 
 	// Light
 	DirectionalLight m_DirLights[3];
+
+	// Tessellation
+	ID3D11Buffer* m_pQuadPatchVertexBuffer;
 };
 

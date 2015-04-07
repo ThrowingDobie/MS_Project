@@ -120,6 +120,61 @@ public:
 };
 #pragma endregion
 
+#pragma region TessellationEffect
+class TessellationEffect : public Effect
+{
+public:
+	TessellationEffect(ID3D11Device* device, const std::wstring& filename);
+	~TessellationEffect();
+
+	void SetWorldViewProj(CXMMATRIX M)                  { WorldViewProj->SetMatrix(reinterpret_cast<const float*>(&M)); }
+	void SetWorld(CXMMATRIX M)                          { World->SetMatrix(reinterpret_cast<const float*>(&M)); }
+	void SetWorldInvTranspose(CXMMATRIX M)              { WorldInvTranspose->SetMatrix(reinterpret_cast<const float*>(&M)); }
+	void SetTexTransform(CXMMATRIX M)                   { TexTransform->SetMatrix(reinterpret_cast<const float*>(&M)); }
+	void SetEyePosW(const XMFLOAT3& v)                  { EyePosW->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
+	void SetFogColor(const FXMVECTOR v)                 { FogColor->SetFloatVector(reinterpret_cast<const float*>(&v)); }
+	void SetFogStart(float f)                           { FogStart->SetFloat(f); }
+	void SetFogRange(float f)                           { FogRange->SetFloat(f); }
+	void SetDirLights(const DirectionalLight* lights)   { DirLights->SetRawValue(lights, 0, 3*sizeof(DirectionalLight)); }
+	void SetMaterial(const Material& mat)               { Mat->SetRawValue(&mat, 0, sizeof(Material)); }
+	void SetDiffuseMap(ID3D11ShaderResourceView* tex)   { DiffuseMap->SetResource(tex); }
+
+	ID3DX11EffectTechnique* TessTech;
+
+	ID3DX11EffectMatrixVariable* WorldViewProj;
+	ID3DX11EffectMatrixVariable* World;
+	ID3DX11EffectMatrixVariable* WorldInvTranspose;
+	ID3DX11EffectMatrixVariable* TexTransform;
+	ID3DX11EffectVectorVariable* EyePosW;
+	ID3DX11EffectVectorVariable* FogColor;
+	ID3DX11EffectScalarVariable* FogStart;
+	ID3DX11EffectScalarVariable* FogRange;
+	ID3DX11EffectVariable* DirLights;
+	ID3DX11EffectVariable* Mat;
+
+	ID3DX11EffectShaderResourceVariable* DiffuseMap;
+};
+#pragma endregion
+
+class BlurEffect : public Effect
+{
+public:
+	BlurEffect(ID3D11Device* device, const std::wstring& filename);
+	~BlurEffect();
+
+	void SetWeights(const float weights[9])           { Weights->SetFloatArray(weights, 0, 9); }
+	void SetInputMap(ID3D11ShaderResourceView* tex)   { InputMap->SetResource(tex); }
+	void SetOutputMap(ID3D11UnorderedAccessView* tex) { OutputMap->SetUnorderedAccessView(tex); }
+
+	ID3DX11EffectTechnique* HorzBlurTech;
+	ID3DX11EffectTechnique* VertBlurTech;
+
+	ID3DX11EffectScalarVariable* Weights;
+	ID3DX11EffectShaderResourceVariable* InputMap;
+	ID3DX11EffectUnorderedAccessViewVariable* OutputMap;
+};
+#pragma endregion
+
 #pragma region Effects
 class Effects
 {
@@ -129,6 +184,8 @@ public:
 
 	static BasicEffect* BasicFX;
 	static TreeSpriteEffect* TreeSpriteFX;
+	static TessellationEffect* TessellationFX;
+	static BlurEffect* BlurFX;
 };
 #pragma endregion
 
