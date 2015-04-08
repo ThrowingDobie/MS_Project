@@ -92,6 +92,7 @@
     <ClInclude Include="cLandMark.h" />
     <ClInclude Include="cMain.h" />
     <ClInclude Include="cSkull.h" />
+    <ClInclude Include="cTerrain.h" />
     <ClInclude Include="cWaves.h" />
     <ClInclude Include="d3dUtil.h" />
     <ClInclude Include="Effects.h" />
@@ -113,6 +114,7 @@
     <ClCompile Include="cLandMark.cpp" />
     <ClCompile Include="cMain.cpp" />
     <ClCompile Include="cSkull.cpp" />
+    <ClCompile Include="cTerrain.cpp" />
     <ClCompile Include="cWaves.cpp" />
     <ClCompile Include="d3dUtil.cpp" />
     <ClCompile Include="Effects.cpp" />

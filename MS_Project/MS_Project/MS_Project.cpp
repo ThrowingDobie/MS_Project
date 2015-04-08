@@ -50,7 +50,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	//g_pCamera->Setup();
 	//g_pCamera->OnResize();
 
-	g_pCamera->SetPosition(0.0f, 20.0f, -150.0f);
+	g_pCamera->SetPosition(0.0f, 130.0f, -150.0f);
 	g_pCamera->OnResize();
 
 	g_pMain = new cMain;

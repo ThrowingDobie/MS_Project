@@ -37,6 +37,13 @@ namespace Vertex
 		float y;
 		float z;
 	};
+
+	struct Terrain
+	{
+		XMFLOAT3 Pos;
+		XMFLOAT2 Tex;
+		XMFLOAT2 BoundsY;
+	};
 }
 
 class InputLayoutDesc
@@ -48,6 +55,8 @@ public:
 
 	static const D3D11_INPUT_ELEMENT_DESC Pos[1];
 	static const D3D11_INPUT_ELEMENT_DESC BasicTess[3];
+
+	static const D3D11_INPUT_ELEMENT_DESC Terrain[3];
 };
 
 class InputLayouts
@@ -61,6 +70,8 @@ public:
 
 	static ID3D11InputLayout* Pos;
 	static ID3D11InputLayout* BasicTess;
+
+	static ID3D11InputLayout* Terrain;
 };
 
 #endif // VERTEX_H

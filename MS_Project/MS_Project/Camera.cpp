@@ -12,7 +12,7 @@ Camera::Camera()
 {
 	SetLens(0.25f*MathHelper::Pi, 1.0f, 1.0f, 1000.0f);
 	m_posLastMouse = { 0, 0 };
-	m_fCameraSpeed = 30.f;
+	m_fCameraSpeed = 50.f;
 }
 
 Camera::~Camera()
