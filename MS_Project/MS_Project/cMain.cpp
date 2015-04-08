@@ -12,7 +12,6 @@ cMain::cMain()
 
 }
 
-
 cMain::~cMain()
 {
 	g_pD3DDevice->m_pDevCon->ClearState();
@@ -27,8 +26,8 @@ cMain::~cMain()
 
 void cMain::Setup()
 {
-	//m_pCube = new cCube;
-	//m_pCube->Setup();
+	m_pCube = new cCube;
+	m_pCube->Setup();
 
 	m_pLandMark = new cLandMark;
 	m_pLandMark->Setup();
@@ -49,10 +48,10 @@ void cMain::Init()
 
 void cMain::Update(float fDelta)
 {
-	//if (m_pCube)
-	//{
-	//	m_pCube->Update(fDelta);
-	//}
+	if (m_pCube)
+	{
+		m_pCube->Update(fDelta);
+	}
 	if (m_pLandMark)
 	{
 		m_pLandMark->Update(fDelta);
@@ -71,10 +70,10 @@ void cMain::Render()
 	g_pD3DDevice->m_pDevCon->ClearDepthStencilView(g_pD3DDevice->m_pDepthStencilView,
 		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-	//if (m_pCube)
-	//{
-	//	m_pCube->Render();
-	//}
+	if (m_pCube)
+	{
+		m_pCube->Render();
+	}
 	if (m_pLandMark)
 	{
 		m_pLandMark->Render();

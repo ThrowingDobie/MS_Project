@@ -277,11 +277,11 @@ void Camera::Update(float fDelta)
 	{
 		Strafe(m_fCameraSpeed*fDelta);
 	}
-	if (GetAsyncKeyState('Q') & 0x8000)
+	if (GetAsyncKeyState('E') & 0x8000)
 	{
 		SetPosition(GetPosition().x, GetPosition().y + m_fCameraSpeed*fDelta, GetPosition().z);
 	}
-	if (GetAsyncKeyState('E') & 0x8000)
+	if (GetAsyncKeyState('Q') & 0x8000)
 	{
 		SetPosition(GetPosition().x, GetPosition().y - m_fCameraSpeed*fDelta, GetPosition().z);
 	}

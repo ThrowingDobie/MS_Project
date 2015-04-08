@@ -85,7 +85,7 @@
       <Filter>Practice</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
-      <Filter>Practice</Filter>
+      <Filter>SINGLETONE</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -138,7 +138,7 @@
       <Filter>Practice</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
-      <Filter>Practice</Filter>
+      <Filter>SINGLETONE</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

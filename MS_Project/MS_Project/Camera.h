@@ -101,6 +101,5 @@ private:
 
 	// MS
 	POINT m_posLastMouse;
-
 	float m_fCameraSpeed;
 };
