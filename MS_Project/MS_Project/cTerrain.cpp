@@ -149,6 +149,7 @@ void cTerrain::LoadHeightmap()
 	{
 		m_vecHeightmap[i] = (in[i] / 255.0f)*m_Info.HeightScale;
 	}
+
 }
 
 void cTerrain::Smooth()

@@ -16,7 +16,6 @@ cMain::cMain()
 
 cMain::~cMain()
 {
-	g_pD3DDevice->m_pDevCon->ClearState();
 	SAFE_DELETE(m_pCube);
 	SAFE_DELETE(m_pLandMark);
     SAFE_DELETE(m_pSkull);
@@ -31,16 +30,8 @@ void cMain::Setup()
 {
 	LightSetup();
 
-	m_pCube = new cCube;
-	m_pCube->Setup();
-
-	m_pLandMark = new cLandMark;
-	m_pLandMark->Setup();
-
 	m_pTerrain = new cTerrain;
 
-    //m_pSkull = new cSkull;
-    //m_pSkull->Setup();
 }
 
 void cMain::Init()
@@ -48,9 +39,6 @@ void cMain::Init()
     Effects::InitAll(g_pD3DDevice->m_pDevice);
     InputLayouts::InitAll(g_pD3DDevice->m_pDevice);
     RenderStates::InitAll(g_pD3DDevice->m_pDevice);
-
-	m_pLandMark->Init();
-    //m_pSkull->Init();
 
 	cTerrain::InitInfo tii;
 	tii.HeightMapFilename = L"Textures/terrain.raw";
@@ -60,9 +48,9 @@ void cMain::Init()
 	tii.LayerMapFilename3 = L"Textures/lightdirt.dds";
 	tii.LayerMapFilename4 = L"Textures/snow.dds";
 	tii.BlendMapFilename = L"Textures/blend.dds";
-	tii.HeightScale = 50.0f;
+	tii.HeightScale = 50.f;
 	tii.HeightmapWidth = 2049;
-	tii.HeightmapHeight = 2049;
+    tii.HeightmapHeight = 2049;
 	tii.CellSpacing = 0.5f;
 
 	m_pTerrain->Init(g_pD3DDevice->m_pDevice, g_pD3DDevice->m_pDevCon, tii);
@@ -70,19 +58,14 @@ void cMain::Init()
 
 void cMain::Update(float fDelta)
 {
-	//if (m_pCube)
-	//{
-	//	m_pCube->Update(fDelta);
-	//}
-	//if (m_pLandMark)
-	//{
-	//	m_pLandMark->Update(fDelta);
-	//}
-
-    //if (m_pSkull)
-    //{
-    //    m_pSkull->Update(fDelta);
-    //}
+    if (GetAsyncKeyState('1') & 0x8000)
+    {
+        g_pD3DDevice->m_pDevCon->RSSetState(RenderStates::WireframeRS);
+    }
+    if (GetAsyncKeyState('2') & 0x8000)
+    {
+        g_pD3DDevice->m_pDevCon->RSSetState(NULL);
+    }
 }
 
 void cMain::Render()
@@ -92,28 +75,10 @@ void cMain::Render()
 	g_pD3DDevice->m_pDevCon->ClearDepthStencilView(g_pD3DDevice->m_pDepthStencilView,
 		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-	//if (m_pCube)
-	//{
-	//	m_pCube->Render();
-	//}
-	//if (m_pLandMark)
-	//{
-	//	m_pLandMark->Render();
-	//	m_pLandMark->DrawTreeSprites();
-	//	//m_pLandMark->TessellationRender();
-	//}
-
-	if (GetAsyncKeyState('1') & 0x8000)
-		g_pD3DDevice->m_pDevCon->RSSetState(RenderStates::WireframeRS);
 	if (m_pTerrain)
 	{
-		m_pTerrain->Render(g_pD3DDevice->m_pDevCon, *g_pCamera->GetInstance(), m_DirLights);
+		m_pTerrain->Render(g_pD3DDevice->m_pDevCon, *g_pCamera, m_DirLights);
 	}
-
-	//if (m_pSkull)
-	//{
-	//	m_pSkull->Render();
-	//}
 
 	g_pD3DDevice->m_pSwapChain->Present(0, 0);
 }
