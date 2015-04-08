@@ -331,13 +331,13 @@ void cLandMark::Render()
 	UINT stride = sizeof(Vertex::Basic32);
 	UINT offset = 0;
 
-	XMMATRIX view = XMLoadFloat4x4(&g_pCamera->m_matView);
-	XMMATRIX proj = XMLoadFloat4x4(&g_pCamera->m_matProj);
+	XMMATRIX view = g_pCamera->View();
+	XMMATRIX proj = g_pCamera->Proj();
 	XMMATRIX viewProj = view*proj;
 
 	// Set per frame constants.
 	Effects::BasicFX->SetDirLights(m_DirLights);
-	Effects::BasicFX->SetEyePosW(g_pCamera->m_vEyePosW);
+	Effects::BasicFX->SetEyePosW(g_pCamera->GetPosition());
 	Effects::BasicFX->SetFogColor(Colors::Silver);
 	Effects::BasicFX->SetFogStart(15.0f);
 	Effects::BasicFX->SetFogRange(175.0f);
@@ -413,12 +413,12 @@ void cLandMark::Render()
 
 void cLandMark::DrawTreeSprites()
 {
-	XMMATRIX view = XMLoadFloat4x4(&g_pCamera->m_matView);
-	XMMATRIX proj = XMLoadFloat4x4(&g_pCamera->m_matProj);
+	XMMATRIX view = g_pCamera->View();
+	XMMATRIX proj = g_pCamera->Proj();
 	XMMATRIX viewProj = view*proj;
 
 	Effects::TreeSpriteFX->SetDirLights(m_DirLights);
-	Effects::TreeSpriteFX->SetEyePosW(g_pCamera->m_vEyePosW);
+	Effects::TreeSpriteFX->SetEyePosW(g_pCamera->GetPosition());
 	Effects::TreeSpriteFX->SetFogColor(Colors::Silver);
 	Effects::TreeSpriteFX->SetFogStart(15.0f);
 	Effects::TreeSpriteFX->SetFogRange(175.0f);
@@ -474,8 +474,8 @@ void cLandMark::TessellationRender()
 
 	float blendFactor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
-	XMMATRIX view = XMLoadFloat4x4(&g_pCamera->m_matView);
-	XMMATRIX proj = XMLoadFloat4x4(&g_pCamera->m_matProj);
+	XMMATRIX view = g_pCamera->View();
+	XMMATRIX proj = g_pCamera->Proj();
 	XMMATRIX viewProj = view*proj;
 
 	g_pD3DDevice->m_pDevCon->IASetInputLayout(InputLayouts::Pos);
@@ -485,7 +485,7 @@ void cLandMark::TessellationRender()
 	UINT offset = 0;
 
 	// Set per frame constants.
-	Effects::TessellationFX->SetEyePosW(g_pCamera->m_vEyePosW);
+	Effects::TessellationFX->SetEyePosW(g_pCamera->GetPosition());
 	Effects::TessellationFX->SetFogColor(Colors::Silver);
 	Effects::TessellationFX->SetFogStart(15.0f);
 	Effects::TessellationFX->SetFogRange(175.0f);

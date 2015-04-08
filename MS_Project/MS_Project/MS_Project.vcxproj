@@ -86,7 +86,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cCamera.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="cCube.h" />
     <ClInclude Include="cDeviceManager.h" />
     <ClInclude Include="cLandMark.h" />
@@ -107,7 +107,7 @@
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="cCamera.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="cCube.cpp" />
     <ClCompile Include="cDeviceManager.cpp" />
     <ClCompile Include="cLandMark.cpp" />

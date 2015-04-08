@@ -16,7 +16,6 @@ cMain::cMain()
 cMain::~cMain()
 {
 	g_pD3DDevice->m_pDevCon->ClearState();
-
 	SAFE_DELETE(m_pCube);
 	SAFE_DELETE(m_pLandMark);
     SAFE_DELETE(m_pSkull);
@@ -28,8 +27,8 @@ cMain::~cMain()
 
 void cMain::Setup()
 {
-	m_pCube = new cCube;
-	m_pCube->Setup();
+	//m_pCube = new cCube;
+	//m_pCube->Setup();
 
 	m_pLandMark = new cLandMark;
 	m_pLandMark->Setup();
@@ -78,9 +77,9 @@ void cMain::Render()
 	//}
 	if (m_pLandMark)
 	{
-		//m_pLandMark->Render();
-		//m_pLandMark->DrawTreeSprites();
-		m_pLandMark->TessellationRender();
+		m_pLandMark->Render();
+		m_pLandMark->DrawTreeSprites();
+		//m_pLandMark->TessellationRender();
 	}
 
 	//if (m_pSkull)

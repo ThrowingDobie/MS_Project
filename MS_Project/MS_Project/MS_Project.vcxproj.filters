@@ -54,9 +54,6 @@
     <ClInclude Include="cCube.h">
       <Filter>FrameWork</Filter>
     </ClInclude>
-    <ClInclude Include="cCamera.h">
-      <Filter>SINGLETONE</Filter>
-    </ClInclude>
     <ClInclude Include="Vertex.h">
       <Filter>Practice</Filter>
     </ClInclude>
@@ -87,6 +84,9 @@
     <ClInclude Include="d3dUtil.h">
       <Filter>Practice</Filter>
     </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Practice</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -106,9 +106,6 @@
     </ClCompile>
     <ClCompile Include="cCube.cpp">
       <Filter>FrameWork</Filter>
-    </ClCompile>
-    <ClCompile Include="cCamera.cpp">
-      <Filter>SINGLETONE</Filter>
     </ClCompile>
     <ClCompile Include="Vertex.cpp">
       <Filter>Practice</Filter>
@@ -138,6 +135,9 @@
       <Filter>FrameWork</Filter>
     </ClCompile>
     <ClCompile Include="d3dUtil.cpp">
+      <Filter>Practice</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
       <Filter>Practice</Filter>
     </ClCompile>
   </ItemGroup>

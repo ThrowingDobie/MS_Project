@@ -1,7 +1,7 @@
 //***************************************************************************************
 // Camera.h by Frank Luna (C) 2011 All Rights Reserved.
 //***************************************************************************************
-
+#include "stdafx.h"
 #include "Camera.h"
 
 Camera::Camera()
@@ -11,6 +11,8 @@ Camera::Camera()
 	  mLook(0.0f, 0.0f, 1.0f)
 {
 	SetLens(0.25f*MathHelper::Pi, 1.0f, 1.0f, 1000.0f);
+	m_posLastMouse = { 0, 0 };
+	m_fCameraSpeed = 30.f;
 }
 
 Camera::~Camera()
@@ -247,4 +249,69 @@ void Camera::UpdateViewMatrix()
 	mView(3,3) = 1.0f;
 }
 
+// MS
 
+void Camera::OnResize()
+{
+	SetLens(0.25f*D3DX_PI,
+		g_pD3DDevice->m_nClientWidth / g_pD3DDevice->m_nClientHeight, 1.0f, 1000.0f);
+}
+
+void Camera::Update(float fDelta)
+{
+	UpdateViewMatrix();
+
+	if (GetAsyncKeyState('W') & 0x8000)
+	{
+		Walk(m_fCameraSpeed*fDelta);
+	}
+	if (GetAsyncKeyState('S') & 0x8000)
+	{
+		Walk(-m_fCameraSpeed*fDelta);
+	}
+	if (GetAsyncKeyState('A') & 0x8000)
+	{
+		Strafe(-m_fCameraSpeed*fDelta);
+	}
+	if (GetAsyncKeyState('D') & 0x8000)
+	{
+		Strafe(m_fCameraSpeed*fDelta);
+	}
+	if (GetAsyncKeyState('Q') & 0x8000)
+	{
+		SetPosition(GetPosition().x, GetPosition().y + m_fCameraSpeed*fDelta, GetPosition().z);
+	}
+	if (GetAsyncKeyState('E') & 0x8000)
+	{
+		SetPosition(GetPosition().x, GetPosition().y - m_fCameraSpeed*fDelta, GetPosition().z);
+	}
+}
+
+void Camera::MouseDown(WPARAM btnState, int nX, int nY)
+{
+	m_posLastMouse.x = nX;
+	m_posLastMouse.y = nY;
+
+	SetCapture(g_hWnd);
+}
+
+void Camera::MouseUp(WPARAM btnState, int nX, int nY)
+{
+	ReleaseCapture();
+}
+
+void Camera::MouseMove(WPARAM btnState, int nX, int nY)
+{
+	if ((btnState & MK_LBUTTON) != 0)
+	{
+		// Make each pixel correspond to a quarter of a degree.
+		float dx = XMConvertToRadians(0.25f*static_cast<float>(nX - m_posLastMouse.x));
+		float dy = XMConvertToRadians(0.25f*static_cast<float>(nY - m_posLastMouse.y));
+
+		Pitch(dy);
+		RotateY(dx);
+	}
+
+	m_posLastMouse.x = nX;
+	m_posLastMouse.y = nY;
+}

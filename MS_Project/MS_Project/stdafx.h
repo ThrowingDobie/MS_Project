@@ -64,7 +64,7 @@ public: static class_name* GetInstance() { static class_name instance; return &i
 
 #include "cDeviceManager.h"
 #include "GameTimer.h"
-#include "cCamera.h"
+#include "Camera.h"
 
 extern HWND g_hWnd;
 

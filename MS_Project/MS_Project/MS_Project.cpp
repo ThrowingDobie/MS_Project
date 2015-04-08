@@ -47,13 +47,16 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	g_pD3DDevice->Setup();
 	g_pD3DDevice->InitDevice();
 
-	g_pCamera->Setup();
-	g_pCamera->OnResize();
+	//g_pCamera->Setup();
+	//g_pCamera->OnResize();
 
+	g_pCamera->SetPosition(0.0f, 20.0f, -150.0f);
+	g_pCamera->OnResize();
 
 	g_pMain = new cMain;
 	g_pMain->Setup();
     g_pMain->Init();
+
 
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_MS_PROJECT));
 
@@ -82,7 +85,10 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 			if (!g_pD3DDevice->mAppPaused)
 			{
 				g_pD3DDevice->CalculateFrameStats();
+				//g_pCamera->Update(g_pTimer->DeltaTime());
+
 				g_pCamera->Update(g_pTimer->DeltaTime());
+
 				g_pMain->Update(g_pTimer->DeltaTime());
 				g_pMain->Render();
 			}

@@ -100,8 +100,8 @@ void cCube::Render()
 	UINT stride = sizeof(Vertex::Basic32);
 	UINT offset = 0;
 
-	XMMATRIX view = XMLoadFloat4x4(&g_pCamera->m_matView);
-	XMMATRIX proj = XMLoadFloat4x4(&g_pCamera->m_matProj);
+	XMMATRIX view = g_pCamera->View();
+	XMMATRIX proj = g_pCamera->Proj();
 	XMMATRIX viewProj = view*proj;
 
 

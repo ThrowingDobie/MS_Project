@@ -8,16 +8,17 @@
 //    matrix can be obtained.
 //***************************************************************************************
 
-#ifndef CAMERA_H
-#define CAMERA_H
+#pragma once
 
 #include "d3dUtil.h"
 
+#define g_pCamera Camera::GetInstance()
+
 class Camera
 {
+	SINGLETONE(Camera);
+
 public:
-	Camera();
-	~Camera();
 
 	// Get/Set world camera position.
 	XMVECTOR GetPositionXM()const;
@@ -69,6 +70,15 @@ public:
 	// After modifying camera position/orientation, call to rebuild the view matrix.
 	void UpdateViewMatrix();
 
+	// MS
+
+	void OnResize();
+	void Update(float fDelta);
+
+	void MouseDown(WPARAM btnState, int nX, int nY);
+	void MouseUp(WPARAM btnState, int nX, int nY);
+	void MouseMove(WPARAM btnState, int nX, int nY);
+
 private:
 
 	// Camera coordinate system with coordinates relative to world space.
@@ -88,6 +98,9 @@ private:
 	// Cache View/Proj matrices.
 	XMFLOAT4X4 mView;
 	XMFLOAT4X4 mProj;
-};
 
-#endif // CAMERA_H
+	// MS
+	POINT m_posLastMouse;
+
+	float m_fCameraSpeed;
+};

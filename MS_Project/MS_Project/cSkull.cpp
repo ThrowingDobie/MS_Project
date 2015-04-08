@@ -120,13 +120,13 @@ void cSkull::Render()
     UINT stride = sizeof(Vertex::Basic32);
     UINT offset = 0;
 
-    XMMATRIX view = XMLoadFloat4x4(&g_pCamera->m_matView);
-    XMMATRIX proj = XMLoadFloat4x4(&g_pCamera->m_matProj);
+	XMMATRIX view = g_pCamera->View();
+	XMMATRIX proj = g_pCamera->Proj();
     XMMATRIX viewProj = view*proj;
 
     // Set per frame constants.
     Effects::BasicFX->SetDirLights(m_DirLights);
-    Effects::BasicFX->SetEyePosW(g_pCamera->m_vEyePosW);
+	Effects::BasicFX->SetEyePosW(g_pCamera->GetPosition());
     Effects::BasicFX->SetFogColor(Colors::Black);
     Effects::BasicFX->SetFogStart(2.0f);
     Effects::BasicFX->SetFogRange(40.0f);
