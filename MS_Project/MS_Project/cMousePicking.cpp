@@ -12,14 +12,6 @@ cMousePicking::cMousePicking()
 	XMStoreFloat4x4(&m_matMeshWorld, I);
 
 	m_nPickedTriangle = -1;
-
-	//m_matMeshWorld._41 = 0.0f;
-	//m_matMeshWorld._42 = 130.f;
-	//m_matMeshWorld._43 = -140.f;
-
-	m_matMeshWorld._41 = -256.f;
-	m_matMeshWorld._42 = 0.f;
-	m_matMeshWorld._43 = 0.f;
 }
 
 cMousePicking::~cMousePicking()
@@ -83,7 +75,12 @@ void cMousePicking::Render(DirectionalLight lights[3])
 		g_pD3DDevice->m_pDevCon->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
 		g_pD3DDevice->m_pDevCon->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
-		XMMATRIX world = XMLoadFloat4x4(&m_matMeshWorld);
+		XMFLOAT4X4 matWorld;
+		XMMATRIX I = XMMatrixIdentity();
+		I = XMMatrixTranslation(m_vPickingPoint.x, m_vPickingPoint.y, m_vPickingPoint.z);
+		XMStoreFloat4x4(&matWorld, I);
+
+		XMMATRIX world = XMLoadFloat4x4(&matWorld);
 		XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
 		XMMATRIX worldViewProj = world*view*proj;
 
@@ -102,21 +99,21 @@ void cMousePicking::Render(DirectionalLight lights[3])
 
 		// Draw just the picked triangle again with a different material to highlight it.
 
-		if (m_nPickedTriangle != -1)
-		{
-			// Change depth test from < to <= so that if we draw the same triangle twice, it will still pass
-			// the depth test.  This is because we redraw the picked triangle with a different material
-			// to highlight it.  
+		//if (m_nPickedTriangle != -1)
+		//{
+		//	// Change depth test from < to <= so that if we draw the same triangle twice, it will still pass
+		//	// the depth test.  This is because we redraw the picked triangle with a different material
+		//	// to highlight it.  
 
-			g_pD3DDevice->m_pDevCon->OMSetDepthStencilState(RenderStates::LessEqualDSS, 0);
+		//	g_pD3DDevice->m_pDevCon->OMSetDepthStencilState(RenderStates::LessEqualDSS, 0);
 
-			Effects::BasicFX->SetMaterial(m_mtPickedTriangle);
-			activeMeshTech->GetPassByIndex(p)->Apply(0, g_pD3DDevice->m_pDevCon);
-			g_pD3DDevice->m_pDevCon->DrawIndexed(3, 3 * m_nPickedTriangle, 0);
+		//	Effects::BasicFX->SetMaterial(m_mtPickedTriangle);
+		//	activeMeshTech->GetPassByIndex(p)->Apply(0, g_pD3DDevice->m_pDevCon);
+		//	g_pD3DDevice->m_pDevCon->DrawIndexed(3, 3 * m_nPickedTriangle, 0);
 
-			// restore default
-			g_pD3DDevice->m_pDevCon->OMSetDepthStencilState(0, 0);
-		}
+		//	// restore default
+		//	g_pD3DDevice->m_pDevCon->OMSetDepthStencilState(0, 0);
+		//}
 	}
 }
 
@@ -124,8 +121,8 @@ void cMousePicking::OnMouseDown(WPARAM btnState, int nX, int nY)
 {
 	if ((btnState & MK_RBUTTON) != 0)
 	{
-		Pick(nX, nY);
-		//Test(nX, nY);
+		//Pick(nX, nY);
+		Test(nX, nY);
 	}
 }
 
@@ -334,6 +331,7 @@ void cMousePicking::Test(int nX, int nY)
 			{
 				XMVECTOR vPickingPoint;
 				vPickingPoint = rayOrigin + (fDist*rayDir);
+				XMStoreFloat3(&m_vPickingPoint, vPickingPoint);
 				return;
 			}
 
@@ -352,6 +350,7 @@ void cMousePicking::Test(int nX, int nY)
 			{
 				XMVECTOR vPickingPoint;
 				vPickingPoint = rayOrigin + (fDist*rayDir);
+				XMStoreFloat3(&m_vPickingPoint, vPickingPoint);
 				return;
 			}
 		}

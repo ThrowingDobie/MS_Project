@@ -42,6 +42,19 @@ void cMain::Init()
     InputLayouts::InitAll(g_pD3DDevice->m_pDevice);
     RenderStates::InitAll(g_pD3DDevice->m_pDevice);
 
+	//cTerrain::InitInfo tii;
+	//tii.HeightMapFilename = L"Textures/terrain.raw";
+	//tii.LayerMapFilename0 = L"Textures/grass.dds";
+	//tii.LayerMapFilename1 = L"Textures/darkdirt.dds";
+	//tii.LayerMapFilename2 = L"Textures/stone.dds";
+	//tii.LayerMapFilename3 = L"Textures/lightdirt.dds";
+	//tii.LayerMapFilename4 = L"Textures/snow.dds";
+	//tii.BlendMapFilename = L"Textures/blend.dds";
+	//tii.HeightScale = 50.f;
+	//tii.HeightmapWidth = 2049;
+	//tii.HeightmapHeight = 2049;
+	//tii.CellSpacing = 0.5f;
+
 	cTerrain::InitInfo tii;
 	tii.HeightMapFilename = L"Textures/test.raw";
 	tii.LayerMapFilename0 = L"Textures/snow.dds";
@@ -50,7 +63,7 @@ void cMain::Init()
 	tii.LayerMapFilename3 = L"Textures/lightdirt.dds";
 	tii.LayerMapFilename4 = L"Textures/grass.dds";
 	tii.BlendMapFilename = L"Textures/blend.dds";
-	tii.HeightScale = 50.f;
+	tii.HeightScale = 30.f;
 	tii.HeightmapWidth = 257;
 	tii.HeightmapHeight = 257;
 	tii.CellSpacing = 0.5f;

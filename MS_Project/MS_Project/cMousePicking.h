@@ -39,5 +39,7 @@ private:
 
 	std::vector<float> m_vecHeight;
 	std::vector<Vertex::ST_P_VERTEX> m_vecVertex;
+
+	XMFLOAT3 m_vPickingPoint;
 };
 

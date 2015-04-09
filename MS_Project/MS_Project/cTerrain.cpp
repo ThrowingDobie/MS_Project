@@ -9,7 +9,7 @@ cTerrain::cTerrain()
 	, m_pHeightMapSRV(NULL)
 {
 	XMMATRIX I = XMMatrixIdentity();
-	I = XMMatrixTranslation(0, 0, 0);
+	I = XMMatrixTranslation(128, 0, 0);
 	XMStoreFloat4x4(&m_matWorld, I);
 	
 	I = XMMatrixIdentity();
@@ -159,7 +159,6 @@ void cTerrain::LoadHeightmap()
 	{
 		m_vecHeightmap[i] = (in[i] / 255.0f)*m_Info.HeightScale;
 	}
-
 }
 
 void cTerrain::Smooth()
@@ -264,6 +263,9 @@ void cTerrain::CalcPatchBoundsY(UINT i, UINT j)
 void cTerrain::BuildQuadPatchVB(ID3D11Device* device)
 {
 	std::vector<Vertex::Terrain> patchVertices(m_nPatchVertRows*m_nPatchVertCols);
+
+	//float halfWidth = 0.5f*GetHorizon();
+	//float halfDepth = 0.5f*GetVertical();
 
 	float halfWidth = GetHorizon();
 	float halfDepth = GetVertical();
