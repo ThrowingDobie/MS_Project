@@ -33,11 +33,9 @@ void cMousePicking::Setup()
 
 void cMousePicking::Init(ID3D11Buffer* pVertexBuffer
 	, ID3D11Buffer* pIndexBuffer
-	, XMMATRIX* m_pmatWorld
 	, std::vector<float> vecHeight)
 {
 	BuildMeshGeometryBuffers();
-	//XMStoreFloat4x4(&m_matMeshWorld, *m_pmatWorld);
 	m_vecHeight = vecHeight;
 }
 
@@ -96,24 +94,6 @@ void cMousePicking::Render(DirectionalLight lights[3])
 		// Restore default
 		g_pD3DDevice->m_pDevCon->RSSetState(0);
 		//////////
-
-		// Draw just the picked triangle again with a different material to highlight it.
-
-		//if (m_nPickedTriangle != -1)
-		//{
-		//	// Change depth test from < to <= so that if we draw the same triangle twice, it will still pass
-		//	// the depth test.  This is because we redraw the picked triangle with a different material
-		//	// to highlight it.  
-
-		//	g_pD3DDevice->m_pDevCon->OMSetDepthStencilState(RenderStates::LessEqualDSS, 0);
-
-		//	Effects::BasicFX->SetMaterial(m_mtPickedTriangle);
-		//	activeMeshTech->GetPassByIndex(p)->Apply(0, g_pD3DDevice->m_pDevCon);
-		//	g_pD3DDevice->m_pDevCon->DrawIndexed(3, 3 * m_nPickedTriangle, 0);
-
-		//	// restore default
-		//	g_pD3DDevice->m_pDevCon->OMSetDepthStencilState(0, 0);
-		//}
 	}
 }
 
@@ -121,77 +101,10 @@ void cMousePicking::OnMouseDown(WPARAM btnState, int nX, int nY)
 {
 	if ((btnState & MK_RBUTTON) != 0)
 	{
-		//Pick(nX, nY);
-		Test(nX, nY);
+		Pick(nX, nY);
 	}
 }
 
-void cMousePicking::Pick(int nX, int nY)
-{
-	XMMATRIX P = g_pCamera->Proj();
-
-	// Compute picking ray in view space.
-	float vx = (+2.0f*nX / g_pD3DDevice->m_nClientWidth - 1.0f) / P(0, 0);
-	float vy = (-2.0f*nY / g_pD3DDevice->m_nClientHeight + 1.0f) / P(1, 1);
-
-	// Ray definition in view space.
-	XMVECTOR rayOrigin = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
-	XMVECTOR rayDir = XMVectorSet(vx, vy, 1.0f, 0.0f);
-
-	// Tranform ray to local space of Mesh.
-	XMMATRIX V = g_pCamera->View();
-	XMMATRIX invView = XMMatrixInverse(&XMMatrixDeterminant(V), V);
-
-	XMMATRIX W = XMLoadFloat4x4(&m_matMeshWorld);
-	XMMATRIX invWorld = XMMatrixInverse(&XMMatrixDeterminant(W), W);
-
-	XMMATRIX toLocal = XMMatrixMultiply(invView, invWorld);
-
-	rayOrigin = XMVector3TransformCoord(rayOrigin, toLocal);
-	rayDir = XMVector3TransformNormal(rayDir, toLocal);
-
-	// Make the ray direction unit length for the intersection tests.
-	rayDir = XMVector3Normalize(rayDir);
-
-	// If we hit the bounding box of the Mesh, then we might have picked a Mesh triangle,
-	// so do the ray/triangle tests.
-	//
-	// If we did not hit the bounding box, then it is impossible that we hit 
-	// the Mesh, so do not waste effort doing ray/triangle tests.
-
-	// Assume we have not picked anything yet, so init to -1.
-	m_nPickedTriangle = -1;
-	float tmin = 0.0f;
-	//if (XNA::IntersectRayAxisAlignedBox(rayOrigin, rayDir, &mMeshBox, &tmin))
-	{
-		// Find the nearest ray/triangle intersection.
-		tmin = MathHelper::Infinity;
-		for (UINT i = 0; i < m_vecMeshIndices.size() / 3; ++i)
-		{
-			// Indices for this triangle.
-			UINT i0 = m_vecMeshIndices[i * 3 + 0];
-			UINT i1 = m_vecMeshIndices[i * 3 + 1];
-			UINT i2 = m_vecMeshIndices[i * 3 + 2];
-
-			// Vertices for this triangle.
-			XMVECTOR v0 = XMLoadFloat3(&m_vecMeshVertices[i0].Pos);
-			XMVECTOR v1 = XMLoadFloat3(&m_vecMeshVertices[i1].Pos);
-			XMVECTOR v2 = XMLoadFloat3(&m_vecMeshVertices[i2].Pos);
-
-			// We have to iterate over all the triangles in order to find the nearest intersection.
-			float t = 0.0f;
-			if (XNA::IntersectRayTriangle(rayOrigin, rayDir, v0, v1, v2, &t))
-			{
-				if (t < tmin)
-				{
-					// This is the new nearest picked triangle.
-					tmin = t;
-					m_nPickedTriangle = i;
-				}
-			}
-		}
-	}
-}
 
 void cMousePicking::BuildMeshGeometryBuffers()
 {
@@ -269,7 +182,7 @@ void cMousePicking::BuildMeshGeometryBuffers()
 	HR(g_pD3DDevice->m_pDevice->CreateBuffer(&ibd, &iinitData, &m_pIndexBuffer));
 }
 
-void cMousePicking::Test(int nX, int nY)
+void cMousePicking::Pick(int nX, int nY)
 {
 	if (m_vecVertex.size() == 0)
 	{
@@ -286,8 +199,6 @@ void cMousePicking::Test(int nX, int nY)
 		}
 	}
 	
-
-	//
 	XMMATRIX P = g_pCamera->Proj();
 
 	float vx = (+2.0f*nX / g_pD3DDevice->m_nClientWidth - 1.0f) / P(0, 0);

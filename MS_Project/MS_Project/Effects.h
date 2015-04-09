@@ -191,6 +191,10 @@ public:
 	{
 		Scale->SetMatrix(reinterpret_cast<const float*>(&M));
 	}
+	void SetRot(CXMMATRIX M)
+	{
+		Rot->SetMatrix(reinterpret_cast<const float*>(&M));
+	}
 
 	void SetViewProj(CXMMATRIX M)                       { ViewProj->SetMatrix(reinterpret_cast<const float*>(&M)); }
 	void SetEyePosW(const XMFLOAT3& v)                  { EyePosW->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
@@ -223,6 +227,7 @@ public:
 
 	// MS
 	ID3DX11EffectMatrixVariable* Scale;
+	ID3DX11EffectMatrixVariable* Rot;
 
 	ID3DX11EffectMatrixVariable* ViewProj;
 	ID3DX11EffectMatrixVariable* World;

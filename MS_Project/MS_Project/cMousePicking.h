@@ -8,8 +8,7 @@ class cMousePicking
 
 public:
 	void Setup();
-	void Init(ID3D11Buffer* pVertexBuffer, ID3D11Buffer* pIndexBuffer, 
-		XMMATRIX* m_pmatWorld, std::vector<float> vecHeight);
+	void Init(ID3D11Buffer* pVertexBuffer, ID3D11Buffer* pIndexBuffer, std::vector<float> vecHeight);
 	void Update(float fDelta);
 	void Render(DirectionalLight lights[3]);
 
@@ -19,7 +18,6 @@ private:
 	void Pick(int nX, int nY);
 	void BuildMeshGeometryBuffers();
 
-	void Test(int nX, int nY);
 
 private:
 	ID3D11Buffer* m_pVertexBuffer;

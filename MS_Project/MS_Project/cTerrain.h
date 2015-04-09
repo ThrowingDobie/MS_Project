@@ -62,6 +62,7 @@ private:
 
 	XMFLOAT4X4 m_matWorld;
 	XMFLOAT4X4 m_matScale;
+	XMFLOAT4X4 m_matRot;
 
 	Material m_mtTerrain;
 

@@ -42,6 +42,7 @@ cbuffer cbPerObject
 
 	float4x4 gWorld;
 	float4x4 gScale;
+	float4x4 gRot;
 };
 
 // Nonnumeric values cannot be added to a cbuffer.
@@ -85,6 +86,11 @@ VertexOut VS(VertexIn vin)
 	
 	vout.PosW = mul(float4(vin.PosL, 1.0f), gWorld).xyz;
 	vout.PosW = mul(float4(vout.PosW, 1.0f), gScale).xyz;
+
+	//vout.PosW = mul(float4(vin.PosL, 1.0f), gRot).xyz;
+	//vout.PosW = mul(float4(vin.PosW, 1.0f), gWorld).xyz;
+	//vout.PosW = mul(float4(vout.PosW, 1.0f), gScale).xyz;
+
 
 	// Terrain specified directly in world space.
 	//vout.PosW = vin.PosL;

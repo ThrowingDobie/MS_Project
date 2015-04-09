@@ -16,6 +16,10 @@ cTerrain::cTerrain()
 	I = XMMatrixScaling(2.f, 1.f, 2.f);
 	XMStoreFloat4x4(&m_matScale, I);
 
+	I = XMMatrixIdentity();
+	I = XMMatrixRotationY(D3DX_PI);
+	XMStoreFloat4x4(&m_matRot, I);
+
 	m_mtTerrain.Ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	m_mtTerrain.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	m_mtTerrain.Specular = XMFLOAT4(0.0f, 0.0f, 0.0f, 64.0f);
@@ -94,6 +98,9 @@ void cTerrain::Render(ID3D11DeviceContext* dc, const Camera& cam, DirectionalLig
 
 	XMMATRIX scale = XMLoadFloat4x4(&m_matScale);
 	Effects::TerrainFX->SetScale(scale);
+
+	XMMATRIX rot = XMLoadFloat4x4(&m_matRot);
+	Effects::TerrainFX->SetScale(rot);
 
 	// Set per frame constants.
 	Effects::TerrainFX->SetViewProj(viewProj);

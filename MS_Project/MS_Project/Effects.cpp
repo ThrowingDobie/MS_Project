@@ -178,6 +178,7 @@ TerrainEffect::TerrainEffect(ID3D11Device* device, const std::wstring& filename)
 	// MS
 	World = mFX->GetVariableByName("gWorld")->AsMatrix();
 	Scale = mFX->GetVariableByName("gScale")->AsMatrix();
+	Rot = mFX->GetVariableByName("gRot")->AsMatrix();
 }
 
 TerrainEffect::~TerrainEffect()

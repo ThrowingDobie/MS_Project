@@ -72,7 +72,6 @@ void cMain::Init()
 
 	g_pMousePicking->Init(m_pTerrain->m_pQuadPatchVertexBuffer
 		, m_pTerrain->m_pQuadPatchIndexBuffer
-		, &m_pTerrain->GetWorld()
 		, m_pTerrain->m_vecHeightmap);
 }
 
