@@ -108,7 +108,7 @@ void cMousePicking::OnMouseDown(WPARAM btnState, int nX, int nY)
 
 void cMousePicking::BuildMeshGeometryBuffers()
 {
-	std::ifstream fin("Models/car.txt");
+	std::ifstream fin("Models/skull.txt");
 
 	if (!fin)
 	{
@@ -184,6 +184,14 @@ void cMousePicking::BuildMeshGeometryBuffers()
 
 void cMousePicking::Pick(int nX, int nY)
 {
+    XMMATRIX matRot = XMMatrixIdentity();
+    matRot = XMMatrixRotationY(D3DX_PI/2);
+
+    XMMATRIX matTrs = XMMatrixIdentity();
+    matTrs = XMMatrixTranslation(0, 0, 256);
+
+    XMMATRIX matWorld = matRot*matTrs;
+
 	if (m_vecVertex.size() == 0)
 	{
 		m_vecVertex.reserve(m_vecHeight.size());
@@ -191,9 +199,13 @@ void cMousePicking::Pick(int nX, int nY)
 		for (int i = 0; i < m_vecHeight.size(); i++)
 		{
 			Vertex::ST_P_VERTEX vertex;
-			vertex.Pos.x = (int)(i % MAP_SIZE);
 			vertex.Pos.z = (int)(i / MAP_SIZE);
+			vertex.Pos.x = (int)(i % MAP_SIZE);
 			vertex.Pos.y = m_vecHeight[i];
+
+            XMVECTOR vec = XMLoadFloat3(&vertex.Pos);
+            vec = XMVector3Transform(vec, matWorld);
+            XMStoreFloat3(&vertex.Pos, vec);
 
 			m_vecVertex.push_back(vertex);
 		}
@@ -215,8 +227,8 @@ void cMousePicking::Pick(int nX, int nY)
 
 	XMMATRIX toLocal = XMMatrixMultiply(invView, invWorld);
 
-	rayOrigin = XMVector3TransformCoord(rayOrigin, toLocal);
-	rayDir = XMVector3TransformNormal(rayDir, toLocal);
+    rayOrigin = XMVector3TransformCoord(rayOrigin, invView);
+    rayDir = XMVector3TransformNormal(rayDir, invView);
 
 	rayDir = XMVector3Normalize(rayDir);
 	//
@@ -226,10 +238,9 @@ void cMousePicking::Pick(int nX, int nY)
 	{
 		if (i % MAP_SIZE != MAP_SIZE - 1)
 		{
-			UINT i0 = (i + 0);
+			UINT i0 = (i + 0); 
 			UINT i1 = (i + 1);
 			UINT i2 = (i + 1) + MAP_SIZE;
-
 
 			XMVECTOR v0 = XMLoadFloat3(&m_vecVertex[i0].Pos);
 			XMVECTOR v1 = XMLoadFloat3(&m_vecVertex[i1].Pos);

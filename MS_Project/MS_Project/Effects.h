@@ -228,9 +228,9 @@ public:
 	// MS
 	ID3DX11EffectMatrixVariable* Scale;
 	ID3DX11EffectMatrixVariable* Rot;
+	ID3DX11EffectMatrixVariable* World;
 
 	ID3DX11EffectMatrixVariable* ViewProj;
-	ID3DX11EffectMatrixVariable* World;
 	ID3DX11EffectMatrixVariable* WorldInvTranspose;
 	ID3DX11EffectMatrixVariable* TexTransform;
 	ID3DX11EffectVectorVariable* EyePosW;

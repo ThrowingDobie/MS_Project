@@ -85,10 +85,10 @@ VertexOut VS(VertexIn vin)
 	VertexOut vout;
 	
 	vout.PosW = mul(float4(vin.PosL, 1.0f), gWorld).xyz;
-	vout.PosW = mul(float4(vout.PosW, 1.0f), gScale).xyz;
+	//vout.PosW = mul(float4(vout.PosW, 1.0f), gScale).xyz;
 
 	//vout.PosW = mul(float4(vin.PosL, 1.0f), gRot).xyz;
-	//vout.PosW = mul(float4(vin.PosW, 1.0f), gWorld).xyz;
+ //   vout.PosW = mul(float4(vout.PosW, 1.0f), gWorld).xyz;
 	//vout.PosW = mul(float4(vout.PosW, 1.0f), gScale).xyz;
 
 

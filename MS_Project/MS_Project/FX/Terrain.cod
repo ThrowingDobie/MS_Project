@@ -83,7 +83,7 @@ fxgroup
                 //
                 //   } gMaterial;                       // Offset:   64 Size:    64 [unused]
                 //   float4x4 gWorld;                   // Offset:  128 Size:    64
-                //   float4x4 gScale;                   // Offset:  192 Size:    64
+                //   float4x4 gScale;                   // Offset:  192 Size:    64 [unused]
                 //   float4x4 gRot;                     // Offset:  256 Size:    64 [unused]
                 //
                 // }
@@ -118,7 +118,7 @@ fxgroup
                 //
                 vs_5_0
                 dcl_globalFlags refactoringAllowed
-                dcl_constantbuffer cb0[15], immediateIndexed
+                dcl_constantbuffer cb0[11], immediateIndexed
                 dcl_sampler s0, mode_default
                 dcl_resource_texture2d (float,float,float,float) t0
                 dcl_input v0.xyz
@@ -129,29 +129,25 @@ fxgroup
                 dcl_output o1.zw
                 dcl_temps 2
                 
-                #line 87 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 87 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.xyz, v0.xyzx
                 mov r0.w, l(1.000000)
                 dp4 r1.x, r0.xyzw, cb0[8].xyzw  // vout<0:NaN:Inf>
-                dp4 r1.y, r0.xyzw, cb0[9].xyzw  // vout<1:NaN:Inf>
                 dp4 r1.z, r0.xyzw, cb0[10].xyzw  // vout<2:NaN:Inf>
-                mov r1.w, l(1.000000)
-                dp4 r0.x, r1.xyzw, cb0[12].xyzw  // vout<0:NaN:Inf>
-                dp4 r0.z, r1.xyzw, cb0[14].xyzw  // vout<2:NaN:Inf>
                 
                 #line 100
-                sample_l_indexable(texture2d)(float,float,float,float) r0.y, v1.xyxx, t0.yxzw, s0, l(0.000000)
-                mov r0.y, r0.y  // vout<1:Inf>
+                sample_l_indexable(texture2d)(float,float,float,float) r0.x, v1.xyxx, t0.xyzw, s0, l(0.000000)
+                mov r0.x, r0.x  // vout<1:Inf>
                 
                 #line 103
-                mov r1.xy, v1.xyxx  // vout<3,4>
-                mov r1.zw, v2.xxxy  // vout<5,6>
-                mov o1.xy, r1.xyxx  // VS<3,4>
-                mov o1.zw, r1.zzzw  // VS<5,6>
-                mov o0.xz, r0.xxzx  // VS<0:NaN:Inf,2:NaN:Inf>
-                mov o0.y, r0.y  // VS<1:Inf>
+                mov r0.yz, v1.xxyx  // vout<3,4>
+                mov r1.yw, v2.xxxy  // vout<5,6>
+                mov o1.xy, r0.yzyy  // VS<3,4>
+                mov o1.zw, r1.yyyw  // VS<5,6>
+                mov o0.xz, r1.xxzx  // VS<0:NaN:Inf,2:NaN:Inf>
+                mov o0.y, r0.x  // VS<1:Inf>
                 ret 
-                // Approximately 17 instruction slots used
+                // Approximately 13 instruction slots used
                             
             };
             HullShader = asm {
@@ -247,7 +243,7 @@ fxgroup
                 dcl_globalFlags refactoringAllowed
                 dcl_constantbuffer cb0[24], dynamicIndexed
                 
-                #line 238 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 238 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 hs_control_point_phase 
                 dcl_input vOutputControlPointID
                 dcl_input v[4][0].xyz
@@ -621,7 +617,7 @@ fxgroup
                 dcl_output o2.zw
                 dcl_temps 4
                 
-                #line 264 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 264 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.xy, -vicp[0][0].xzxx
                 add r0.xy, r0.xyxx, vicp[1][0].xzxx
                 mul r0.xy, r0.xyxx, vDomain.xxxx
@@ -776,7 +772,7 @@ fxgroup
                 dcl_output o0.xyzw
                 dcl_temps 10
                 
-                #line 296 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 296 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.x, -cb0[16].x
                 mov r0.y, l(0)
                 add r0.xy, r0.xyxx, v2.xyxx  // leftTex<0:Inf,1>
@@ -911,7 +907,7 @@ fxgroup
                 movc r4.xyzw, r1.wwww, r4.xyzw, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 movc r0.xyzw, r1.wwww, r0.xyzw, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 358 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 358 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r3.xyzw, r3.xyzw  // A<0:Inf,1:Inf,2:Inf,3:Inf>
                 mov r4.xyzw, r4.xyzw  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r0.xyzw, r0.xyzw  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
@@ -962,7 +958,7 @@ fxgroup
                 //
                 //   } gMaterial;                       // Offset:   64 Size:    64 [unused]
                 //   float4x4 gWorld;                   // Offset:  128 Size:    64
-                //   float4x4 gScale;                   // Offset:  192 Size:    64
+                //   float4x4 gScale;                   // Offset:  192 Size:    64 [unused]
                 //   float4x4 gRot;                     // Offset:  256 Size:    64 [unused]
                 //
                 // }
@@ -997,7 +993,7 @@ fxgroup
                 //
                 vs_5_0
                 dcl_globalFlags refactoringAllowed
-                dcl_constantbuffer cb0[15], immediateIndexed
+                dcl_constantbuffer cb0[11], immediateIndexed
                 dcl_sampler s0, mode_default
                 dcl_resource_texture2d (float,float,float,float) t0
                 dcl_input v0.xyz
@@ -1008,29 +1004,25 @@ fxgroup
                 dcl_output o1.zw
                 dcl_temps 2
                 
-                #line 87 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 87 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.xyz, v0.xyzx
                 mov r0.w, l(1.000000)
                 dp4 r1.x, r0.xyzw, cb0[8].xyzw  // vout<0:NaN:Inf>
-                dp4 r1.y, r0.xyzw, cb0[9].xyzw  // vout<1:NaN:Inf>
                 dp4 r1.z, r0.xyzw, cb0[10].xyzw  // vout<2:NaN:Inf>
-                mov r1.w, l(1.000000)
-                dp4 r0.x, r1.xyzw, cb0[12].xyzw  // vout<0:NaN:Inf>
-                dp4 r0.z, r1.xyzw, cb0[14].xyzw  // vout<2:NaN:Inf>
                 
                 #line 100
-                sample_l_indexable(texture2d)(float,float,float,float) r0.y, v1.xyxx, t0.yxzw, s0, l(0.000000)
-                mov r0.y, r0.y  // vout<1:Inf>
+                sample_l_indexable(texture2d)(float,float,float,float) r0.x, v1.xyxx, t0.xyzw, s0, l(0.000000)
+                mov r0.x, r0.x  // vout<1:Inf>
                 
                 #line 103
-                mov r1.xy, v1.xyxx  // vout<3,4>
-                mov r1.zw, v2.xxxy  // vout<5,6>
-                mov o1.xy, r1.xyxx  // VS<3,4>
-                mov o1.zw, r1.zzzw  // VS<5,6>
-                mov o0.xz, r0.xxzx  // VS<0:NaN:Inf,2:NaN:Inf>
-                mov o0.y, r0.y  // VS<1:Inf>
+                mov r0.yz, v1.xxyx  // vout<3,4>
+                mov r1.yw, v2.xxxy  // vout<5,6>
+                mov o1.xy, r0.yzyy  // VS<3,4>
+                mov o1.zw, r1.yyyw  // VS<5,6>
+                mov o0.xz, r1.xxzx  // VS<0:NaN:Inf,2:NaN:Inf>
+                mov o0.y, r0.x  // VS<1:Inf>
                 ret 
-                // Approximately 17 instruction slots used
+                // Approximately 13 instruction slots used
                             
             };
             HullShader = asm {
@@ -1126,7 +1118,7 @@ fxgroup
                 dcl_globalFlags refactoringAllowed
                 dcl_constantbuffer cb0[24], dynamicIndexed
                 
-                #line 238 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 238 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 hs_control_point_phase 
                 dcl_input vOutputControlPointID
                 dcl_input v[4][0].xyz
@@ -1500,7 +1492,7 @@ fxgroup
                 dcl_output o2.zw
                 dcl_temps 4
                 
-                #line 264 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 264 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.xy, -vicp[0][0].xzxx
                 add r0.xy, r0.xyxx, vicp[1][0].xzxx
                 mul r0.xy, r0.xyxx, vDomain.xxxx
@@ -1655,7 +1647,7 @@ fxgroup
                 dcl_output o0.xyzw
                 dcl_temps 13
                 
-                #line 296 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 296 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.x, -cb0[16].x
                 mov r0.y, l(0)
                 add r0.xy, r0.xyxx, v2.xyxx  // leftTex<0:Inf,1>
@@ -1790,7 +1782,7 @@ fxgroup
                 movc r7.xyzw, r1.wwww, r7.xyzw, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 movc r8.xyzw, r1.wwww, r8.xyzw, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 358 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 358 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r6.xyzw, r6.xyzw  // A<0:Inf,1:Inf,2:Inf,3:Inf>
                 mov r7.xyzw, r7.xyzw  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r8.xyzw, r8.xyzw  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
@@ -1838,7 +1830,7 @@ fxgroup
                 movc r4.xyzw, r1.wwww, r4.xyzw, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 movc r0.xyzw, r1.wwww, r0.xyzw, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 358 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 358 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r3.xyzw, r3.xyzw  // A<0:Inf,1:Inf,2:Inf,3:Inf>
                 mov r4.xyzw, r4.xyzw  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r0.xyzw, r0.xyzw  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
@@ -1889,7 +1881,7 @@ fxgroup
                 //
                 //   } gMaterial;                       // Offset:   64 Size:    64 [unused]
                 //   float4x4 gWorld;                   // Offset:  128 Size:    64
-                //   float4x4 gScale;                   // Offset:  192 Size:    64
+                //   float4x4 gScale;                   // Offset:  192 Size:    64 [unused]
                 //   float4x4 gRot;                     // Offset:  256 Size:    64 [unused]
                 //
                 // }
@@ -1924,7 +1916,7 @@ fxgroup
                 //
                 vs_5_0
                 dcl_globalFlags refactoringAllowed
-                dcl_constantbuffer cb0[15], immediateIndexed
+                dcl_constantbuffer cb0[11], immediateIndexed
                 dcl_sampler s0, mode_default
                 dcl_resource_texture2d (float,float,float,float) t0
                 dcl_input v0.xyz
@@ -1935,29 +1927,25 @@ fxgroup
                 dcl_output o1.zw
                 dcl_temps 2
                 
-                #line 87 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 87 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.xyz, v0.xyzx
                 mov r0.w, l(1.000000)
                 dp4 r1.x, r0.xyzw, cb0[8].xyzw  // vout<0:NaN:Inf>
-                dp4 r1.y, r0.xyzw, cb0[9].xyzw  // vout<1:NaN:Inf>
                 dp4 r1.z, r0.xyzw, cb0[10].xyzw  // vout<2:NaN:Inf>
-                mov r1.w, l(1.000000)
-                dp4 r0.x, r1.xyzw, cb0[12].xyzw  // vout<0:NaN:Inf>
-                dp4 r0.z, r1.xyzw, cb0[14].xyzw  // vout<2:NaN:Inf>
                 
                 #line 100
-                sample_l_indexable(texture2d)(float,float,float,float) r0.y, v1.xyxx, t0.yxzw, s0, l(0.000000)
-                mov r0.y, r0.y  // vout<1:Inf>
+                sample_l_indexable(texture2d)(float,float,float,float) r0.x, v1.xyxx, t0.xyzw, s0, l(0.000000)
+                mov r0.x, r0.x  // vout<1:Inf>
                 
                 #line 103
-                mov r1.xy, v1.xyxx  // vout<3,4>
-                mov r1.zw, v2.xxxy  // vout<5,6>
-                mov o1.xy, r1.xyxx  // VS<3,4>
-                mov o1.zw, r1.zzzw  // VS<5,6>
-                mov o0.xz, r0.xxzx  // VS<0:NaN:Inf,2:NaN:Inf>
-                mov o0.y, r0.y  // VS<1:Inf>
+                mov r0.yz, v1.xxyx  // vout<3,4>
+                mov r1.yw, v2.xxxy  // vout<5,6>
+                mov o1.xy, r0.yzyy  // VS<3,4>
+                mov o1.zw, r1.yyyw  // VS<5,6>
+                mov o0.xz, r1.xxzx  // VS<0:NaN:Inf,2:NaN:Inf>
+                mov o0.y, r0.x  // VS<1:Inf>
                 ret 
-                // Approximately 17 instruction slots used
+                // Approximately 13 instruction slots used
                             
             };
             HullShader = asm {
@@ -2053,7 +2041,7 @@ fxgroup
                 dcl_globalFlags refactoringAllowed
                 dcl_constantbuffer cb0[24], dynamicIndexed
                 
-                #line 238 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 238 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 hs_control_point_phase 
                 dcl_input vOutputControlPointID
                 dcl_input v[4][0].xyz
@@ -2427,7 +2415,7 @@ fxgroup
                 dcl_output o2.zw
                 dcl_temps 4
                 
-                #line 264 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 264 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.xy, -vicp[0][0].xzxx
                 add r0.xy, r0.xyxx, vicp[1][0].xzxx
                 mul r0.xy, r0.xyxx, vDomain.xxxx
@@ -2582,7 +2570,7 @@ fxgroup
                 dcl_output o0.xyzw
                 dcl_temps 14
                 
-                #line 296 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 296 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.x, -cb0[16].x
                 mov r0.y, l(0)
                 add r0.xy, r0.xyxx, v2.xyxx  // leftTex<0:Inf,1>
@@ -2717,7 +2705,7 @@ fxgroup
                 movc r7.xyzw, r1.wwww, r7.xyzw, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 movc r8.xyzw, r1.wwww, r8.xyzw, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 358 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 358 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r6.xyzw, r6.xyzw  // A<0:Inf,1:Inf,2:Inf,3:Inf>
                 mov r7.xyzw, r7.xyzw  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r8.xyzw, r8.xyzw  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
@@ -2765,7 +2753,7 @@ fxgroup
                 movc r10.xyzw, r1.wwww, r10.xyzw, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 movc r11.xyzw, r1.wwww, r11.xyzw, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 358 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 358 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r9.xyzw, r9.xyzw  // A<0:Inf,1:Inf,2:Inf,3:Inf>
                 mov r10.xyzw, r10.xyzw  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r11.xyzw, r11.xyzw  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
@@ -2813,7 +2801,7 @@ fxgroup
                 movc r4.xyzw, r1.wwww, r4.xyzw, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 movc r0.xyzw, r1.wwww, r0.xyzw, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 358 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 358 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r3.xyzw, r3.xyzw  // A<0:Inf,1:Inf,2:Inf,3:Inf>
                 mov r4.xyzw, r4.xyzw  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r0.xyzw, r0.xyzw  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
@@ -2864,7 +2852,7 @@ fxgroup
                 //
                 //   } gMaterial;                       // Offset:   64 Size:    64 [unused]
                 //   float4x4 gWorld;                   // Offset:  128 Size:    64
-                //   float4x4 gScale;                   // Offset:  192 Size:    64
+                //   float4x4 gScale;                   // Offset:  192 Size:    64 [unused]
                 //   float4x4 gRot;                     // Offset:  256 Size:    64 [unused]
                 //
                 // }
@@ -2899,7 +2887,7 @@ fxgroup
                 //
                 vs_5_0
                 dcl_globalFlags refactoringAllowed
-                dcl_constantbuffer cb0[15], immediateIndexed
+                dcl_constantbuffer cb0[11], immediateIndexed
                 dcl_sampler s0, mode_default
                 dcl_resource_texture2d (float,float,float,float) t0
                 dcl_input v0.xyz
@@ -2910,29 +2898,25 @@ fxgroup
                 dcl_output o1.zw
                 dcl_temps 2
                 
-                #line 87 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 87 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.xyz, v0.xyzx
                 mov r0.w, l(1.000000)
                 dp4 r1.x, r0.xyzw, cb0[8].xyzw  // vout<0:NaN:Inf>
-                dp4 r1.y, r0.xyzw, cb0[9].xyzw  // vout<1:NaN:Inf>
                 dp4 r1.z, r0.xyzw, cb0[10].xyzw  // vout<2:NaN:Inf>
-                mov r1.w, l(1.000000)
-                dp4 r0.x, r1.xyzw, cb0[12].xyzw  // vout<0:NaN:Inf>
-                dp4 r0.z, r1.xyzw, cb0[14].xyzw  // vout<2:NaN:Inf>
                 
                 #line 100
-                sample_l_indexable(texture2d)(float,float,float,float) r0.y, v1.xyxx, t0.yxzw, s0, l(0.000000)
-                mov r0.y, r0.y  // vout<1:Inf>
+                sample_l_indexable(texture2d)(float,float,float,float) r0.x, v1.xyxx, t0.xyzw, s0, l(0.000000)
+                mov r0.x, r0.x  // vout<1:Inf>
                 
                 #line 103
-                mov r1.xy, v1.xyxx  // vout<3,4>
-                mov r1.zw, v2.xxxy  // vout<5,6>
-                mov o1.xy, r1.xyxx  // VS<3,4>
-                mov o1.zw, r1.zzzw  // VS<5,6>
-                mov o0.xz, r0.xxzx  // VS<0:NaN:Inf,2:NaN:Inf>
-                mov o0.y, r0.y  // VS<1:Inf>
+                mov r0.yz, v1.xxyx  // vout<3,4>
+                mov r1.yw, v2.xxxy  // vout<5,6>
+                mov o1.xy, r0.yzyy  // VS<3,4>
+                mov o1.zw, r1.yyyw  // VS<5,6>
+                mov o0.xz, r1.xxzx  // VS<0:NaN:Inf,2:NaN:Inf>
+                mov o0.y, r0.x  // VS<1:Inf>
                 ret 
-                // Approximately 17 instruction slots used
+                // Approximately 13 instruction slots used
                             
             };
             HullShader = asm {
@@ -3028,7 +3012,7 @@ fxgroup
                 dcl_globalFlags refactoringAllowed
                 dcl_constantbuffer cb0[24], dynamicIndexed
                 
-                #line 238 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 238 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 hs_control_point_phase 
                 dcl_input vOutputControlPointID
                 dcl_input v[4][0].xyz
@@ -3402,7 +3386,7 @@ fxgroup
                 dcl_output o2.zw
                 dcl_temps 4
                 
-                #line 264 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 264 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.xy, -vicp[0][0].xzxx
                 add r0.xy, r0.xyxx, vicp[1][0].xzxx
                 mul r0.xy, r0.xyxx, vDomain.xxxx
@@ -3557,7 +3541,7 @@ fxgroup
                 dcl_output o0.xyzw
                 dcl_temps 10
                 
-                #line 296 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 296 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.x, -cb0[16].x
                 mov r0.y, l(0)
                 add r0.xy, r0.xyxx, v2.xyxx  // leftTex<0:Inf,1>
@@ -3692,7 +3676,7 @@ fxgroup
                 movc r1.xyzw, r6.xxxx, r1.xyzw, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 movc r4.xyzw, r6.xxxx, r4.xyzw, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 358 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 358 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r3.xyzw, r3.xyzw  // A<0:Inf,1:Inf,2:Inf,3:Inf>
                 mov r1.xyzw, r1.xyzw  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r4.xyzw, r4.xyzw  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
@@ -3756,7 +3740,7 @@ fxgroup
                 //
                 //   } gMaterial;                       // Offset:   64 Size:    64 [unused]
                 //   float4x4 gWorld;                   // Offset:  128 Size:    64
-                //   float4x4 gScale;                   // Offset:  192 Size:    64
+                //   float4x4 gScale;                   // Offset:  192 Size:    64 [unused]
                 //   float4x4 gRot;                     // Offset:  256 Size:    64 [unused]
                 //
                 // }
@@ -3791,7 +3775,7 @@ fxgroup
                 //
                 vs_5_0
                 dcl_globalFlags refactoringAllowed
-                dcl_constantbuffer cb0[15], immediateIndexed
+                dcl_constantbuffer cb0[11], immediateIndexed
                 dcl_sampler s0, mode_default
                 dcl_resource_texture2d (float,float,float,float) t0
                 dcl_input v0.xyz
@@ -3802,29 +3786,25 @@ fxgroup
                 dcl_output o1.zw
                 dcl_temps 2
                 
-                #line 87 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 87 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.xyz, v0.xyzx
                 mov r0.w, l(1.000000)
                 dp4 r1.x, r0.xyzw, cb0[8].xyzw  // vout<0:NaN:Inf>
-                dp4 r1.y, r0.xyzw, cb0[9].xyzw  // vout<1:NaN:Inf>
                 dp4 r1.z, r0.xyzw, cb0[10].xyzw  // vout<2:NaN:Inf>
-                mov r1.w, l(1.000000)
-                dp4 r0.x, r1.xyzw, cb0[12].xyzw  // vout<0:NaN:Inf>
-                dp4 r0.z, r1.xyzw, cb0[14].xyzw  // vout<2:NaN:Inf>
                 
                 #line 100
-                sample_l_indexable(texture2d)(float,float,float,float) r0.y, v1.xyxx, t0.yxzw, s0, l(0.000000)
-                mov r0.y, r0.y  // vout<1:Inf>
+                sample_l_indexable(texture2d)(float,float,float,float) r0.x, v1.xyxx, t0.xyzw, s0, l(0.000000)
+                mov r0.x, r0.x  // vout<1:Inf>
                 
                 #line 103
-                mov r1.xy, v1.xyxx  // vout<3,4>
-                mov r1.zw, v2.xxxy  // vout<5,6>
-                mov o1.xy, r1.xyxx  // VS<3,4>
-                mov o1.zw, r1.zzzw  // VS<5,6>
-                mov o0.xz, r0.xxzx  // VS<0:NaN:Inf,2:NaN:Inf>
-                mov o0.y, r0.y  // VS<1:Inf>
+                mov r0.yz, v1.xxyx  // vout<3,4>
+                mov r1.yw, v2.xxxy  // vout<5,6>
+                mov o1.xy, r0.yzyy  // VS<3,4>
+                mov o1.zw, r1.yyyw  // VS<5,6>
+                mov o0.xz, r1.xxzx  // VS<0:NaN:Inf,2:NaN:Inf>
+                mov o0.y, r0.x  // VS<1:Inf>
                 ret 
-                // Approximately 17 instruction slots used
+                // Approximately 13 instruction slots used
                             
             };
             HullShader = asm {
@@ -3920,7 +3900,7 @@ fxgroup
                 dcl_globalFlags refactoringAllowed
                 dcl_constantbuffer cb0[24], dynamicIndexed
                 
-                #line 238 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 238 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 hs_control_point_phase 
                 dcl_input vOutputControlPointID
                 dcl_input v[4][0].xyz
@@ -4294,7 +4274,7 @@ fxgroup
                 dcl_output o2.zw
                 dcl_temps 4
                 
-                #line 264 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 264 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.xy, -vicp[0][0].xzxx
                 add r0.xy, r0.xyxx, vicp[1][0].xzxx
                 mul r0.xy, r0.xyxx, vDomain.xxxx
@@ -4449,7 +4429,7 @@ fxgroup
                 dcl_output o0.xyzw
                 dcl_temps 13
                 
-                #line 296 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 296 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.x, -cb0[16].x
                 mov r0.y, l(0)
                 add r0.xy, r0.xyxx, v2.xyxx  // leftTex<0:Inf,1>
@@ -4584,7 +4564,7 @@ fxgroup
                 movc r7.xyzw, r9.wwww, r7.xyzw, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 movc r8.xyzw, r9.wwww, r8.xyzw, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 358 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 358 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r6.xyzw, r6.xyzw  // A<0:Inf,1:Inf,2:Inf,3:Inf>
                 mov r7.xyzw, r7.xyzw  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r8.xyzw, r8.xyzw  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
@@ -4632,7 +4612,7 @@ fxgroup
                 movc r1.xyzw, r9.xxxx, r1.xyzw, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 movc r4.xyzw, r9.xxxx, r4.xyzw, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 358 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 358 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r3.xyzw, r3.xyzw  // A<0:Inf,1:Inf,2:Inf,3:Inf>
                 mov r1.xyzw, r1.xyzw  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r4.xyzw, r4.xyzw  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
@@ -4696,7 +4676,7 @@ fxgroup
                 //
                 //   } gMaterial;                       // Offset:   64 Size:    64 [unused]
                 //   float4x4 gWorld;                   // Offset:  128 Size:    64
-                //   float4x4 gScale;                   // Offset:  192 Size:    64
+                //   float4x4 gScale;                   // Offset:  192 Size:    64 [unused]
                 //   float4x4 gRot;                     // Offset:  256 Size:    64 [unused]
                 //
                 // }
@@ -4731,7 +4711,7 @@ fxgroup
                 //
                 vs_5_0
                 dcl_globalFlags refactoringAllowed
-                dcl_constantbuffer cb0[15], immediateIndexed
+                dcl_constantbuffer cb0[11], immediateIndexed
                 dcl_sampler s0, mode_default
                 dcl_resource_texture2d (float,float,float,float) t0
                 dcl_input v0.xyz
@@ -4742,29 +4722,25 @@ fxgroup
                 dcl_output o1.zw
                 dcl_temps 2
                 
-                #line 87 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 87 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.xyz, v0.xyzx
                 mov r0.w, l(1.000000)
                 dp4 r1.x, r0.xyzw, cb0[8].xyzw  // vout<0:NaN:Inf>
-                dp4 r1.y, r0.xyzw, cb0[9].xyzw  // vout<1:NaN:Inf>
                 dp4 r1.z, r0.xyzw, cb0[10].xyzw  // vout<2:NaN:Inf>
-                mov r1.w, l(1.000000)
-                dp4 r0.x, r1.xyzw, cb0[12].xyzw  // vout<0:NaN:Inf>
-                dp4 r0.z, r1.xyzw, cb0[14].xyzw  // vout<2:NaN:Inf>
                 
                 #line 100
-                sample_l_indexable(texture2d)(float,float,float,float) r0.y, v1.xyxx, t0.yxzw, s0, l(0.000000)
-                mov r0.y, r0.y  // vout<1:Inf>
+                sample_l_indexable(texture2d)(float,float,float,float) r0.x, v1.xyxx, t0.xyzw, s0, l(0.000000)
+                mov r0.x, r0.x  // vout<1:Inf>
                 
                 #line 103
-                mov r1.xy, v1.xyxx  // vout<3,4>
-                mov r1.zw, v2.xxxy  // vout<5,6>
-                mov o1.xy, r1.xyxx  // VS<3,4>
-                mov o1.zw, r1.zzzw  // VS<5,6>
-                mov o0.xz, r0.xxzx  // VS<0:NaN:Inf,2:NaN:Inf>
-                mov o0.y, r0.y  // VS<1:Inf>
+                mov r0.yz, v1.xxyx  // vout<3,4>
+                mov r1.yw, v2.xxxy  // vout<5,6>
+                mov o1.xy, r0.yzyy  // VS<3,4>
+                mov o1.zw, r1.yyyw  // VS<5,6>
+                mov o0.xz, r1.xxzx  // VS<0:NaN:Inf,2:NaN:Inf>
+                mov o0.y, r0.x  // VS<1:Inf>
                 ret 
-                // Approximately 17 instruction slots used
+                // Approximately 13 instruction slots used
                             
             };
             HullShader = asm {
@@ -4860,7 +4836,7 @@ fxgroup
                 dcl_globalFlags refactoringAllowed
                 dcl_constantbuffer cb0[24], dynamicIndexed
                 
-                #line 238 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 238 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 hs_control_point_phase 
                 dcl_input vOutputControlPointID
                 dcl_input v[4][0].xyz
@@ -5234,7 +5210,7 @@ fxgroup
                 dcl_output o2.zw
                 dcl_temps 4
                 
-                #line 264 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 264 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.xy, -vicp[0][0].xzxx
                 add r0.xy, r0.xyxx, vicp[1][0].xzxx
                 mul r0.xy, r0.xyxx, vDomain.xxxx
@@ -5389,7 +5365,7 @@ fxgroup
                 dcl_output o0.xyzw
                 dcl_temps 14
                 
-                #line 296 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 296 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.x, -cb0[16].x
                 mov r0.y, l(0)
                 add r0.xy, r0.xyxx, v2.xyxx  // leftTex<0:Inf,1>
@@ -5524,7 +5500,7 @@ fxgroup
                 movc r7.xyzw, r9.wwww, r7.xyzw, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 movc r8.xyzw, r9.wwww, r8.xyzw, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 358 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 358 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r6.xyzw, r6.xyzw  // A<0:Inf,1:Inf,2:Inf,3:Inf>
                 mov r7.xyzw, r7.xyzw  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r8.xyzw, r8.xyzw  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
@@ -5572,7 +5548,7 @@ fxgroup
                 movc r10.xyzw, r12.wwww, r10.xyzw, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 movc r11.xyzw, r12.wwww, r11.xyzw, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 358 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 358 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r9.xyzw, r9.xyzw  // A<0:Inf,1:Inf,2:Inf,3:Inf>
                 mov r10.xyzw, r10.xyzw  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r11.xyzw, r11.xyzw  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
@@ -5620,7 +5596,7 @@ fxgroup
                 movc r1.xyzw, r9.xxxx, r1.xyzw, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 movc r4.xyzw, r9.xxxx, r4.xyzw, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 358 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 358 "C:\Users\Administrator\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r3.xyzw, r3.xyzw  // A<0:Inf,1:Inf,2:Inf,3:Inf>
                 mov r1.xyzw, r1.xyzw  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r4.xyzw, r4.xyzw  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>

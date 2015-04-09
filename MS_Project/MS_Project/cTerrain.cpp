@@ -9,7 +9,7 @@ cTerrain::cTerrain()
 	, m_pHeightMapSRV(NULL)
 {
 	XMMATRIX I = XMMatrixIdentity();
-	I = XMMatrixTranslation(128, 0, 0);
+	I = XMMatrixTranslation(0, 0, 0);
 	XMStoreFloat4x4(&m_matWorld, I);
 	
 	I = XMMatrixIdentity();
@@ -17,8 +17,13 @@ cTerrain::cTerrain()
 	XMStoreFloat4x4(&m_matScale, I);
 
 	I = XMMatrixIdentity();
-	I = XMMatrixRotationY(D3DX_PI);
+	I = XMMatrixRotationY(NULL);
 	XMStoreFloat4x4(&m_matRot, I);
+
+    I = XMMatrixIdentity();
+    I = XMMatrixTranslation(128, 0, 0);
+    XMStoreFloat4x4(&m_matTrs, I);
+
 
 	m_mtTerrain.Ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	m_mtTerrain.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -88,19 +93,25 @@ void cTerrain::Render(ID3D11DeviceContext* dc, const Camera& cam, DirectionalLig
 
 	XMMATRIX viewProj = cam.ViewProj();
 	XMMATRIX world = XMLoadFloat4x4(&m_matWorld);
-	XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
-	XMMATRIX worldViewProj = world*viewProj;
+    XMMATRIX trs = XMLoadFloat4x4(&m_matTrs);
+    XMMATRIX rot = XMLoadFloat4x4(&m_matRot);
+    XMMATRIX scale = XMLoadFloat4x4(&m_matScale);
+
+    XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
+    XMMATRIX worldViewProj = world*viewProj;
+
+    world = rot* trs* scale;
 
 	XMFLOAT4 worldPlanes[6];
 	ExtractFrustumPlanes(worldPlanes, viewProj);
 
 	Effects::TerrainFX->SetWorld(world);
 
-	XMMATRIX scale = XMLoadFloat4x4(&m_matScale);
-	Effects::TerrainFX->SetScale(scale);
+	//XMMATRIX scale = XMLoadFloat4x4(&m_matScale);
+	//Effects::TerrainFX->SetScale(scale);
 
-	XMMATRIX rot = XMLoadFloat4x4(&m_matRot);
-	Effects::TerrainFX->SetScale(rot);
+	//XMMATRIX rot = XMLoadFloat4x4(&m_matRot);
+	//Effects::TerrainFX->SetRot(rot);
 
 	// Set per frame constants.
 	Effects::TerrainFX->SetViewProj(viewProj);
