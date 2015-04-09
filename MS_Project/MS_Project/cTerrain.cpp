@@ -9,10 +9,12 @@ cTerrain::cTerrain()
 	, m_pHeightMapSRV(NULL)
 {
 	XMMATRIX I = XMMatrixIdentity();
-
-	I = XMMatrixTranslation(100, 0, 0);
+	I = XMMatrixTranslation(0, 0, 0);
 	XMStoreFloat4x4(&m_matWorld, I);
-
+	
+	I = XMMatrixIdentity();
+	I = XMMatrixScaling(2.f, 1.f, 2.f);
+	XMStoreFloat4x4(&m_matScale, I);
 
 	m_mtTerrain.Ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	m_mtTerrain.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -87,6 +89,11 @@ void cTerrain::Render(ID3D11DeviceContext* dc, const Camera& cam, DirectionalLig
 
 	XMFLOAT4 worldPlanes[6];
 	ExtractFrustumPlanes(worldPlanes, viewProj);
+
+	Effects::TerrainFX->SetWorld(world);
+
+	XMMATRIX scale = XMLoadFloat4x4(&m_matScale);
+	Effects::TerrainFX->SetScale(scale);
 
 	// Set per frame constants.
 	Effects::TerrainFX->SetViewProj(viewProj);
@@ -258,8 +265,8 @@ void cTerrain::BuildQuadPatchVB(ID3D11Device* device)
 {
 	std::vector<Vertex::Terrain> patchVertices(m_nPatchVertRows*m_nPatchVertCols);
 
-	float halfWidth = 0.5f*GetHorizon();
-	float halfDepth = 0.5f*GetVertical();
+	float halfWidth = GetHorizon();
+	float halfDepth = GetVertical();
 
 	float patchWidth = GetHorizon() / (m_nPatchVertCols - 1);
 	float patchDepth = GetVertical() / (m_nPatchVertRows - 1);

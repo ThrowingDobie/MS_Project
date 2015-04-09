@@ -17,7 +17,7 @@ cMousePicking::cMousePicking()
 	//m_matMeshWorld._42 = 130.f;
 	//m_matMeshWorld._43 = -140.f;
 
-	m_matMeshWorld._41 = 100.f;
+	m_matMeshWorld._41 = -256.f;
 	m_matMeshWorld._42 = 0.f;
 	m_matMeshWorld._43 = 0.f;
 }

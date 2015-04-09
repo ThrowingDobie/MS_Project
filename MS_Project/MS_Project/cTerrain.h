@@ -61,6 +61,7 @@ private:
 	UINT m_nPatchVertCols;
 
 	XMFLOAT4X4 m_matWorld;
+	XMFLOAT4X4 m_matScale;
 
 	Material m_mtTerrain;
 

@@ -182,6 +182,16 @@ public:
 	TerrainEffect(ID3D11Device* device, const std::wstring& filename);
 	~TerrainEffect();
 
+	// MS
+	void SetWorld(CXMMATRIX M)                    
+	{ 
+		World->SetMatrix(reinterpret_cast<const float*>(&M)); 
+	}
+	void SetScale(CXMMATRIX M)
+	{
+		Scale->SetMatrix(reinterpret_cast<const float*>(&M));
+	}
+
 	void SetViewProj(CXMMATRIX M)                       { ViewProj->SetMatrix(reinterpret_cast<const float*>(&M)); }
 	void SetEyePosW(const XMFLOAT3& v)                  { EyePosW->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
 	void SetFogColor(const FXMVECTOR v)                 { FogColor->SetFloatVector(reinterpret_cast<const float*>(&v)); }
@@ -210,6 +220,9 @@ public:
 	ID3DX11EffectTechnique* Light1FogTech;
 	ID3DX11EffectTechnique* Light2FogTech;
 	ID3DX11EffectTechnique* Light3FogTech;
+
+	// MS
+	ID3DX11EffectMatrixVariable* Scale;
 
 	ID3DX11EffectMatrixVariable* ViewProj;
 	ID3DX11EffectMatrixVariable* World;

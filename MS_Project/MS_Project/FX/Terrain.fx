@@ -37,6 +37,11 @@ cbuffer cbPerObject
 	
 	float4x4 gViewProj;
 	Material gMaterial;
+
+	// MS
+
+	float4x4 gWorld;
+	float4x4 gScale;
 };
 
 // Nonnumeric values cannot be added to a cbuffer.
@@ -78,8 +83,11 @@ VertexOut VS(VertexIn vin)
 {
 	VertexOut vout;
 	
+	vout.PosW = mul(float4(vin.PosL, 1.0f), gWorld).xyz;
+	vout.PosW = mul(float4(vout.PosW, 1.0f), gScale).xyz;
+
 	// Terrain specified directly in world space.
-	vout.PosW = vin.PosL;
+	//vout.PosW = vin.PosL;
 
 	// Displace the patch corners to world space.  This is to make 
 	// the eye to patch distance calculation more accurate.

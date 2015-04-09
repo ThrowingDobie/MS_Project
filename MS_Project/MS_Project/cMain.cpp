@@ -50,9 +50,9 @@ void cMain::Init()
 	tii.LayerMapFilename3 = L"Textures/lightdirt.dds";
 	tii.LayerMapFilename4 = L"Textures/grass.dds";
 	tii.BlendMapFilename = L"Textures/blend.dds";
-	tii.HeightScale = 30.f;
+	tii.HeightScale = 50.f;
 	tii.HeightmapWidth = 257;
-    tii.HeightmapHeight = 257;
+	tii.HeightmapHeight = 257;
 	tii.CellSpacing = 0.5f;
 
 	m_pTerrain->Init(g_pD3DDevice->m_pDevice, g_pD3DDevice->m_pDevCon, tii);
