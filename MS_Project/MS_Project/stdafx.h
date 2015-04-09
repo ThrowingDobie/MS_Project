@@ -36,12 +36,13 @@
 #include "Effects.h"
 #include "Vertex.h"
 #include "RenderStates.h"
+#include "xnacollision.h"
 
 
 #define SINGLETONE(class_name) private: class_name(void); ~class_name(void); \
 public: static class_name* GetInstance() { static class_name instance; return &instance; }
 
-#define SAFE_RELESE(p) if(p){p->Release(); p = NULL;}
+#define SAFE_RELEASE(p) if(p){p->Release(); p = NULL;}
 #define SAFE_DELETE(p) if(p){delete p; p = NULL;}
 
 #if defined(DEBUG) | defined(_DEBUG)
@@ -65,6 +66,7 @@ public: static class_name* GetInstance() { static class_name instance; return &i
 #include "cDeviceManager.h"
 #include "GameTimer.h"
 #include "Camera.h"
+#include "cMousePicking.h"
 
 extern HWND g_hWnd;
 

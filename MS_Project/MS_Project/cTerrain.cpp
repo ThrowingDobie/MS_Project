@@ -9,7 +9,10 @@ cTerrain::cTerrain()
 	, m_pHeightMapSRV(NULL)
 {
 	XMMATRIX I = XMMatrixIdentity();
+
+	I = XMMatrixTranslation(100, 0, 0);
 	XMStoreFloat4x4(&m_matWorld, I);
+
 
 	m_mtTerrain.Ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	m_mtTerrain.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -19,11 +22,11 @@ cTerrain::cTerrain()
 
 cTerrain::~cTerrain()
 {
-	SAFE_RELESE(m_pQuadPatchVertexBuffer);
-	SAFE_RELESE(m_pQuadPatchIndexBuffer);
-	SAFE_RELESE(m_pLayerMapArraySRV);
-	SAFE_RELESE(m_pBlendMapSRV);
-	SAFE_RELESE(m_pHeightMapSRV);
+	SAFE_RELEASE(m_pQuadPatchVertexBuffer);
+	SAFE_RELEASE(m_pQuadPatchIndexBuffer);
+	SAFE_RELEASE(m_pLayerMapArraySRV);
+	SAFE_RELEASE(m_pBlendMapSRV);
+	SAFE_RELEASE(m_pHeightMapSRV);
 }
 
 void cTerrain::Setup()

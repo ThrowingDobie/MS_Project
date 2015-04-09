@@ -29,15 +29,15 @@ cLandMark::cLandMark()
 
 cLandMark::~cLandMark()
 {
-	SAFE_RELESE(m_pLandVertexBuffer);
-	SAFE_RELESE(m_pLandIndexBuffer);
-	SAFE_RELESE(m_pGrassMapSRV);
-	SAFE_RELESE(m_pWavesVertexBuffer);
-	SAFE_RELESE(m_pWavesIndexBuffer);
-	SAFE_RELESE(m_pWavesMapSRV);
-	SAFE_RELESE(m_pTreeSpritesVB);
-	SAFE_RELESE(m_pTreeTextureMapArraySRV);
-	SAFE_RELESE(m_pQuadPatchVertexBuffer);
+	SAFE_RELEASE(m_pLandVertexBuffer);
+	SAFE_RELEASE(m_pLandIndexBuffer);
+	SAFE_RELEASE(m_pGrassMapSRV);
+	SAFE_RELEASE(m_pWavesVertexBuffer);
+	SAFE_RELEASE(m_pWavesIndexBuffer);
+	SAFE_RELEASE(m_pWavesMapSRV);
+	SAFE_RELEASE(m_pTreeSpritesVB);
+	SAFE_RELEASE(m_pTreeTextureMapArraySRV);
+	SAFE_RELEASE(m_pQuadPatchVertexBuffer);
 }
 
 void cLandMark::BuildLandGeometryBuffers()

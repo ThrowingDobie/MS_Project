@@ -18,6 +18,11 @@ namespace Vertex
 		XMFLOAT2 Tex;
 	};
 
+	struct ST_P_VERTEX
+	{
+		XMFLOAT3 Pos;
+	};
+
 	struct TreePointSprite
 	{
 		XMFLOAT3 Pos;

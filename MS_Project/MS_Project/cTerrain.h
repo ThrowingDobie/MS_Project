@@ -47,8 +47,6 @@ private:
 private:
 	static const int CellsPerPatch = 64;
 
-	ID3D11Buffer* m_pQuadPatchVertexBuffer;
-	ID3D11Buffer* m_pQuadPatchIndexBuffer;
 
 	ID3D11ShaderResourceView* m_pLayerMapArraySRV;
 	ID3D11ShaderResourceView* m_pBlendMapSRV;
@@ -67,6 +65,11 @@ private:
 	Material m_mtTerrain;
 
 	std::vector<XMFLOAT2> m_vecPatchBoundsY;
+public:
+
+	ID3D11Buffer* m_pQuadPatchVertexBuffer;
+	ID3D11Buffer* m_pQuadPatchIndexBuffer;
+
 	std::vector<float> m_vecHeightmap;
 };
 

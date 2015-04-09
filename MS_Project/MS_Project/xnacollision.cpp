@@ -8,6 +8,8 @@
 //-------------------------------------------------------------------------------------
 
 //#include "DXUT.h"
+#include "stdafx.h"
+
 #include <Windows.h>
 #include <cfloat>
 #include "xnacollision.h"

@@ -18,12 +18,12 @@ cSkull::cSkull()
 
 cSkull::~cSkull()
 {
-    SAFE_RELESE(m_pRoomVertexBuffer);
-    SAFE_RELESE(m_pSkullVertexBuffer);
-    SAFE_RELESE(m_pSkullIndexBuffer);
-    SAFE_RELESE(m_pFloorDiffuseMapSRV);
-    SAFE_RELESE(m_pWallDiffuseMapSRV);
-    SAFE_RELESE(m_pMirrorDiffuseMapSRV);
+    SAFE_RELEASE(m_pRoomVertexBuffer);
+    SAFE_RELEASE(m_pSkullVertexBuffer);
+    SAFE_RELEASE(m_pSkullIndexBuffer);
+    SAFE_RELEASE(m_pFloorDiffuseMapSRV);
+    SAFE_RELEASE(m_pWallDiffuseMapSRV);
+    SAFE_RELEASE(m_pMirrorDiffuseMapSRV);
 }
 
 void cSkull::Setup()

@@ -90,6 +90,12 @@
     <ClInclude Include="cTerrain.h">
       <Filter>FrameWork</Filter>
     </ClInclude>
+    <ClInclude Include="cMousePicking.h">
+      <Filter>FrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="xnacollision.h">
+      <Filter>Practice</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -145,6 +151,12 @@
     </ClCompile>
     <ClCompile Include="cTerrain.cpp">
       <Filter>FrameWork</Filter>
+    </ClCompile>
+    <ClCompile Include="cMousePicking.cpp">
+      <Filter>FrameWork</Filter>
+    </ClCompile>
+    <ClCompile Include="xnacollision.cpp">
+      <Filter>Practice</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

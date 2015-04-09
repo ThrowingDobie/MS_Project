@@ -39,12 +39,12 @@ void cDeviceManager::Destroy()
 		m_pDevCon->ClearState();
 	}
 
-	SAFE_RELESE(m_pDevice);
-	SAFE_RELESE(m_pDevCon);
-	SAFE_RELESE(m_pSwapChain);
-	SAFE_RELESE(m_pStencilBuffer);
-	SAFE_RELESE(m_pRenderTargetView);
-	SAFE_RELESE(m_pDepthStencilView);
+	SAFE_RELEASE(m_pDevice);
+	SAFE_RELEASE(m_pDevCon);
+	SAFE_RELEASE(m_pSwapChain);
+	SAFE_RELEASE(m_pStencilBuffer);
+	SAFE_RELEASE(m_pRenderTargetView);
+	SAFE_RELEASE(m_pDepthStencilView);
 
 }
 
@@ -136,9 +136,9 @@ bool cDeviceManager::InitDevice()
 
 	HR(dxgiFactory->CreateSwapChain(m_pDevice, &sd, &m_pSwapChain));
 
-	SAFE_RELESE(dxgiDevice);
-	SAFE_RELESE(dxgiAdapter);
-	SAFE_RELESE(dxgiFactory);
+	SAFE_RELEASE(dxgiDevice);
+	SAFE_RELEASE(dxgiAdapter);
+	SAFE_RELEASE(dxgiFactory);
 
 	// The remaining steps that need to be carried out for d3d creation
 	// also need to be executed every time the window is resized.  So
@@ -155,7 +155,7 @@ void cDeviceManager::OnResize()
 	ID3D11Texture2D* backBuffer;
 	HR(m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backBuffer)));
 	HR(m_pDevice->CreateRenderTargetView(backBuffer, 0, &m_pRenderTargetView));
-	SAFE_RELESE(backBuffer);
+	SAFE_RELEASE(backBuffer);
 	// Create the depth/stencil buffer and view.
 
 	D3D11_TEXTURE2D_DESC depthStencilDesc;
