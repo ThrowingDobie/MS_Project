@@ -41,11 +41,17 @@ void cMousePicking::Init(ID3D11Buffer* pVertexBuffer
 
 void cMousePicking::Update(float fDelta)
 {
-
+	HeightEdit();
 }
 
 void cMousePicking::Render(DirectionalLight lights[3])
 {
+	std::wostringstream outs;
+	outs.precision(3);
+	outs << L"X = " << m_vPickingPoint.x << L"   Z = " << m_vPickingPoint.z
+		<< L"   Y = " << m_vPickingPoint.y;
+	SetWindowText(g_hWnd, outs.str().c_str());
+
 	g_pD3DDevice->m_pDevCon->IASetInputLayout(InputLayouts::Basic32);
 	g_pD3DDevice->m_pDevCon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -184,14 +190,6 @@ void cMousePicking::BuildMeshGeometryBuffers()
 
 void cMousePicking::Pick(int nX, int nY)
 {
-    XMMATRIX matRot = XMMatrixIdentity();
-    matRot = XMMatrixRotationY(D3DX_PI/2);
-
-    XMMATRIX matTrs = XMMatrixIdentity();
-    matTrs = XMMatrixTranslation(0, 0, 256);
-
-    XMMATRIX matWorld = matRot*matTrs;
-
 	if (m_vecVertex.size() == 0)
 	{
 		m_vecVertex.reserve(m_vecHeight.size());
@@ -199,23 +197,18 @@ void cMousePicking::Pick(int nX, int nY)
 		for (int i = 0; i < m_vecHeight.size(); i++)
 		{
 			Vertex::ST_P_VERTEX vertex;
-			vertex.Pos.z = (int)(i / MAP_SIZE);
 			vertex.Pos.x = (int)(i % MAP_SIZE);
+			vertex.Pos.z = MAP_SIZE - (int)(i / MAP_SIZE) - 1;
 			vertex.Pos.y = m_vecHeight[i];
-
-            XMVECTOR vec = XMLoadFloat3(&vertex.Pos);
-            vec = XMVector3Transform(vec, matWorld);
-            XMStoreFloat3(&vertex.Pos, vec);
-
 			m_vecVertex.push_back(vertex);
 		}
 	}
-	
 	XMMATRIX P = g_pCamera->Proj();
 
 	float vx = (+2.0f*nX / g_pD3DDevice->m_nClientWidth - 1.0f) / P(0, 0);
 	float vy = (-2.0f*nY / g_pD3DDevice->m_nClientHeight + 1.0f) / P(1, 1);
 
+	
 	XMVECTOR rayOrigin = XMVectorSet(0.f, 0.f, 0.f, 1.f);
 	XMVECTOR rayDir = XMVectorSet(vx, vy, 1.0f, 0.0f);
 
@@ -227,12 +220,11 @@ void cMousePicking::Pick(int nX, int nY)
 
 	XMMATRIX toLocal = XMMatrixMultiply(invView, invWorld);
 
-    rayOrigin = XMVector3TransformCoord(rayOrigin, invView);
-    rayDir = XMVector3TransformNormal(rayDir, invView);
+	rayOrigin = XMVector3TransformCoord(rayOrigin, toLocal);
+	rayDir = XMVector3TransformNormal(rayDir, toLocal);
 
 	rayDir = XMVector3Normalize(rayDir);
 	//
-
 
 	for (int i = 0; i < m_vecVertex.size() - (MAP_SIZE + 2); i++)
 	{
@@ -247,7 +239,8 @@ void cMousePicking::Pick(int nX, int nY)
 			XMVECTOR v2 = XMLoadFloat3(&m_vecVertex[i2].Pos);
 
 			float fDist = 0.f;
-			bool isColliedTri = XNA::IntersectRayTriangle(rayOrigin, rayDir, v0, v1, v2, &fDist);
+			bool isColliedTri = false;
+			isColliedTri = XNA::IntersectRayTriangle(rayOrigin, rayDir, v0, v1, v2, &fDist);
 
 			if (isColliedTri == true)
 			{
@@ -277,5 +270,22 @@ void cMousePicking::Pick(int nX, int nY)
 			}
 		}
 	}
+}
 
+bool cMousePicking::HeightEdit()
+{
+	if (GetAsyncKeyState('N') & 0x8000)
+	{
+		m_vecVertex[(m_vPickingPoint.x) + (int)(MAP_SIZE - m_vPickingPoint.z) * MAP_SIZE].Pos.y += 1.f;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+std::vector<Vertex::ST_P_VERTEX> cMousePicking::GetHeight()
+{
+	return m_vecVertex;
 }

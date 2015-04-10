@@ -33,6 +33,8 @@ public:
 	XMMATRIX GetWorld()const;
 	void SetWorld(CXMMATRIX M);
 
+	void ChangeHeightData(std::vector<Vertex::ST_P_VERTEX> vecVertex);
+
 private:
 	void LoadHeightmap();
 	void Smooth();
@@ -46,7 +48,6 @@ private:
 
 private:
 	static const int CellsPerPatch = 64;
-
 
 	ID3D11ShaderResourceView* m_pLayerMapArraySRV;
 	ID3D11ShaderResourceView* m_pBlendMapSRV;

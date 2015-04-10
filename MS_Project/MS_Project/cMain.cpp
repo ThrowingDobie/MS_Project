@@ -4,14 +4,15 @@
 #include "cLandMark.h"
 #include "cSkull.h"
 #include "cTerrain.h"
+#include "cMousePicking.h"
 
 cMain::cMain()
 	: m_pCube(NULL)
 	, m_pLandMark(NULL)
     , m_pSkull(NULL)
 	, m_pTerrain(NULL)
+	, m_pMouse(NULL)
 {
-
 }
 
 cMain::~cMain()
@@ -20,6 +21,7 @@ cMain::~cMain()
 	SAFE_DELETE(m_pLandMark);
     SAFE_DELETE(m_pSkull);
 	SAFE_DELETE(m_pTerrain);
+	SAFE_DELETE(m_pMouse);
 
     Effects::DestroyAll();
     InputLayouts::DestroyAll();
@@ -32,7 +34,8 @@ void cMain::Setup()
 
 	m_pTerrain = new cTerrain;
 
-	g_pMousePicking->Setup();
+	m_pMouse = new cMousePicking;
+	m_pMouse->Setup();
 
 }
 
@@ -50,7 +53,7 @@ void cMain::Init()
 	//tii.LayerMapFilename3 = L"Textures/lightdirt.dds";
 	//tii.LayerMapFilename4 = L"Textures/snow.dds";
 	//tii.BlendMapFilename = L"Textures/blend.dds";
-	//tii.HeightScale = 50.f;
+	//tii.HeightScale = 80.f;
 	//tii.HeightmapWidth = 2049;
 	//tii.HeightmapHeight = 2049;
 	//tii.CellSpacing = 0.5f;
@@ -63,14 +66,14 @@ void cMain::Init()
 	tii.LayerMapFilename3 = L"Textures/lightdirt.dds";
 	tii.LayerMapFilename4 = L"Textures/grass.dds";
 	tii.BlendMapFilename = L"Textures/blend.dds";
-	tii.HeightScale = 30.f;
+	tii.HeightScale = 50.f;
 	tii.HeightmapWidth = 257;
 	tii.HeightmapHeight = 257;
-	tii.CellSpacing = 0.5f;
+	tii.CellSpacing = 1.0f;
 
 	m_pTerrain->Init(g_pD3DDevice->m_pDevice, g_pD3DDevice->m_pDevCon, tii);
 
-	g_pMousePicking->Init(m_pTerrain->m_pQuadPatchVertexBuffer
+	m_pMouse->Init(m_pTerrain->m_pQuadPatchVertexBuffer
 		, m_pTerrain->m_pQuadPatchIndexBuffer
 		, m_pTerrain->m_vecHeightmap);
 }
@@ -85,6 +88,14 @@ void cMain::Update(float fDelta)
     {
         g_pD3DDevice->m_pDevCon->RSSetState(NULL);
     }
+
+	if (m_pMouse->HeightEdit())
+	{
+		m_pTerrain->ChangeHeightData(m_pMouse->GetHeight());
+	}
+
+	m_pTerrain->Update(fDelta);
+	m_pMouse->Update(fDelta);
 }
 
 void cMain::Render()
@@ -99,9 +110,21 @@ void cMain::Render()
 		m_pTerrain->Render(g_pD3DDevice->m_pDevCon, *g_pCamera, m_DirLights);
 	}
 
-	g_pMousePicking->Render(m_DirLights);
+	m_pMouse->Render(m_DirLights);
 
 	g_pD3DDevice->m_pSwapChain->Present(0, 0);
+}
+
+void cMain::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message)
+	{
+	case WM_LBUTTONDOWN:
+	case WM_MBUTTONDOWN:
+	case WM_RBUTTONDOWN:
+		m_pMouse->OnMouseDown(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		break;
+	}
 }
 
 void cMain::LightSetup()

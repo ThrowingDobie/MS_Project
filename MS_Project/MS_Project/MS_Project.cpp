@@ -47,16 +47,12 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	g_pD3DDevice->Setup();
 	g_pD3DDevice->InitDevice();
 
-	//g_pCamera->Setup();
-	//g_pCamera->OnResize();
-
-	g_pCamera->SetPosition(128.f, 50.0f, 128.f);
+	g_pCamera->SetPosition(0.f, 50.0f, 0.f);
 	g_pCamera->OnResize();
 
 	g_pMain = new cMain;
 	g_pMain->Setup();
     g_pMain->Init();
-
 
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_MS_PROJECT));
 
@@ -98,7 +94,6 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 			}
 		}
 	}
-
 	g_pD3DDevice->Destroy();
 	delete g_pMain;
 
@@ -181,6 +176,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	PAINTSTRUCT ps;
 	HDC hdc;
 
+	g_pMain->WndProc(hWnd, message, wParam, lParam);
+
 	switch (message)
 	{
 	case WM_ACTIVATE:
@@ -229,7 +226,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_MBUTTONDOWN:
 	case WM_RBUTTONDOWN:
 		g_pCamera->MouseDown(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-		g_pMousePicking->OnMouseDown(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		return 0;
 	case WM_LBUTTONUP:
 	case WM_MBUTTONUP:
@@ -239,7 +235,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_MOUSEMOVE:
 		g_pCamera->MouseMove(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		return 0;
-
 	case WM_COMMAND:
 		wmId    = LOWORD(wParam);
 		wmEvent = HIWORD(wParam);

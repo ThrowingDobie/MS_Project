@@ -13,7 +13,7 @@ cTerrain::cTerrain()
 	XMStoreFloat4x4(&m_matWorld, I);
 	
 	I = XMMatrixIdentity();
-	I = XMMatrixScaling(2.f, 1.f, 2.f);
+	I = XMMatrixScaling(1.f, 1.f, 1.f);
 	XMStoreFloat4x4(&m_matScale, I);
 
 	I = XMMatrixIdentity();
@@ -21,9 +21,8 @@ cTerrain::cTerrain()
 	XMStoreFloat4x4(&m_matRot, I);
 
     I = XMMatrixIdentity();
-    I = XMMatrixTranslation(128, 0, 0);
+    I = XMMatrixTranslation(0, 0, 0);
     XMStoreFloat4x4(&m_matTrs, I);
-
 
 	m_mtTerrain.Ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	m_mtTerrain.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -78,7 +77,9 @@ void cTerrain::Init(ID3D11Device* device, ID3D11DeviceContext* dc, const InitInf
 
 void cTerrain::Update(float fDelta)
 {
-
+	BuildQuadPatchVB(g_pD3DDevice->m_pDevice);
+	BuildQuadPatchIB(g_pD3DDevice->m_pDevice);
+	BuildHeightmapSRV(g_pD3DDevice->m_pDevice);
 }
 
 void cTerrain::Render(ID3D11DeviceContext* dc, const Camera& cam, DirectionalLight lights[3])
@@ -179,21 +180,7 @@ void cTerrain::LoadHeightmap()
 	}
 }
 
-void cTerrain::Smooth()
-{
-	std::vector<float> dest(m_vecHeightmap.size());
 
-	for (UINT i = 0; i < m_Info.HeightmapHeight; ++i)
-	{
-		for (UINT j = 0; j < m_Info.HeightmapWidth; ++j)
-		{
-			dest[i*m_Info.HeightmapWidth + j] = Average(i, j);
-		}
-	}
-
-	// Replace the old heightmap with the filtered one.
-	m_vecHeightmap = dest;
-}
 
 bool cTerrain::InBounds(int i, int j)
 {
@@ -238,55 +225,68 @@ float cTerrain::Average(int i, int j)
 	return avg / num;
 }
 
-void cTerrain::CalcAllPatchBoundsY()
+void cTerrain::Smooth()
 {
-	m_vecPatchBoundsY.resize(m_nPatchQuadFaces);
+	std::vector<float> dest(m_vecHeightmap.size());
 
-	// For each patch
-	for (UINT i = 0; i < m_nPatchVertRows - 1; ++i)
+	for (UINT i = 0; i < m_Info.HeightmapHeight; ++i)
 	{
-		for (UINT j = 0; j < m_nPatchVertCols - 1; ++j)
+		for (UINT j = 0; j < m_Info.HeightmapWidth; ++j)
 		{
-			CalcPatchBoundsY(i, j);
+			dest[i*m_Info.HeightmapWidth + j] = Average(i, j);
 		}
 	}
+	// Replace the old heightmap with the filtered one.
+	m_vecHeightmap = dest;
 }
 
-void cTerrain::CalcPatchBoundsY(UINT i, UINT j)
+void cTerrain::BuildHeightmapSRV(ID3D11Device* device)
 {
-	// Scan the heightmap values this patch covers and compute the min/max height.
+	D3D11_TEXTURE2D_DESC texDesc;
+	texDesc.Width = m_Info.HeightmapWidth;
+	texDesc.Height = m_Info.HeightmapHeight;
+	texDesc.MipLevels = 1;
+	texDesc.ArraySize = 1;
+	texDesc.Format = DXGI_FORMAT_R16_FLOAT;
+	texDesc.SampleDesc.Count = 1;
+	texDesc.SampleDesc.Quality = 0;
+	texDesc.Usage = D3D11_USAGE_DEFAULT;
+	texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	texDesc.CPUAccessFlags = 0;
+	texDesc.MiscFlags = 0;
 
-	UINT x0 = j*CellsPerPatch;
-	UINT x1 = (j + 1)*CellsPerPatch;
+	// HALF is defined in xnamath.h, for storing 16-bit float.
+	std::vector<HALF> hmap(m_vecHeightmap.size());
+	std::transform(m_vecHeightmap.begin(), m_vecHeightmap.end(), hmap.begin(), XMConvertFloatToHalf);
 
-	UINT y0 = i*CellsPerPatch;
-	UINT y1 = (i + 1)*CellsPerPatch;
+	D3D11_SUBRESOURCE_DATA data;
+	data.pSysMem = &hmap[0];
+	data.SysMemPitch = m_Info.HeightmapWidth*sizeof(HALF);
+	data.SysMemSlicePitch = 0;
 
-	float minY = +MathHelper::Infinity;
-	float maxY = -MathHelper::Infinity;
-	for (UINT y = y0; y <= y1; ++y)
-	{
-		for (UINT x = x0; x <= x1; ++x)
-		{
-			UINT k = y*m_Info.HeightmapWidth + x;
-			minY = MathHelper::Min(minY, m_vecHeightmap[k]);
-			maxY = MathHelper::Max(maxY, m_vecHeightmap[k]);
-		}
-	}
+	ID3D11Texture2D* hmapTex = 0;
+	HR(device->CreateTexture2D(&texDesc, &data, &hmapTex));
 
-	UINT patchID = i*(m_nPatchVertCols - 1) + j;
-	m_vecPatchBoundsY[patchID] = XMFLOAT2(minY, maxY);
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	srvDesc.Format = texDesc.Format;
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+	srvDesc.Texture2D.MipLevels = -1;
+	HR(device->CreateShaderResourceView(hmapTex, &srvDesc, &m_pHeightMapSRV));
+
+	// SRV saves reference.
+	ReleaseCOM(hmapTex);
 }
 
 void cTerrain::BuildQuadPatchVB(ID3D11Device* device)
 {
 	std::vector<Vertex::Terrain> patchVertices(m_nPatchVertRows*m_nPatchVertCols);
 
-	//float halfWidth = 0.5f*GetHorizon();
-	//float halfDepth = 0.5f*GetVertical();
+	float halfWidth = 0.5f*GetHorizon();
+	float halfDepth = 0.5f*GetVertical();
 
-	float halfWidth = GetHorizon();
-	float halfDepth = GetVertical();
+	//float halfWidth = GetHorizon();
+	//float halfDepth = GetVertical();
 
 	float patchWidth = GetHorizon() / (m_nPatchVertCols - 1);
 	float patchDepth = GetVertical() / (m_nPatchVertRows - 1);
@@ -295,10 +295,10 @@ void cTerrain::BuildQuadPatchVB(ID3D11Device* device)
 
 	for (UINT i = 0; i < m_nPatchVertRows; ++i)
 	{
-		float z = halfDepth - i*patchDepth;
+		float z = /*halfDepth*/GetVertical() - (i*patchDepth);
 		for (UINT j = 0; j < m_nPatchVertCols; ++j)
 		{
-			float x = -halfWidth + j*patchWidth;
+			float x = /*-halfWidth +*/ j*patchWidth;
 
 			patchVertices[i*m_nPatchVertCols + j].Pos = XMFLOAT3(x, 0.0f, z);
 
@@ -366,42 +366,44 @@ void cTerrain::BuildQuadPatchIB(ID3D11Device* device)
 	HR(device->CreateBuffer(&ibd, &iinitData, &m_pQuadPatchIndexBuffer));
 }
 
-void cTerrain::BuildHeightmapSRV(ID3D11Device* device)
+void cTerrain::CalcAllPatchBoundsY()
 {
-	D3D11_TEXTURE2D_DESC texDesc;
-	texDesc.Width = m_Info.HeightmapWidth;
-	texDesc.Height = m_Info.HeightmapHeight;
-	texDesc.MipLevels = 1;
-	texDesc.ArraySize = 1;
-	texDesc.Format = DXGI_FORMAT_R16_FLOAT;
-	texDesc.SampleDesc.Count = 1;
-	texDesc.SampleDesc.Quality = 0;
-	texDesc.Usage = D3D11_USAGE_DEFAULT;
-	texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-	texDesc.CPUAccessFlags = 0;
-	texDesc.MiscFlags = 0;
+	m_vecPatchBoundsY.resize(m_nPatchQuadFaces);
 
-	// HALF is defined in xnamath.h, for storing 16-bit float.
-	std::vector<HALF> hmap(m_vecHeightmap.size());
-	std::transform(m_vecHeightmap.begin(), m_vecHeightmap.end(), hmap.begin(), XMConvertFloatToHalf);
+	// For each patch
+	for (UINT i = 0; i < m_nPatchVertRows - 1; ++i)
+	{
+		for (UINT j = 0; j < m_nPatchVertCols - 1; ++j)
+		{
+			CalcPatchBoundsY(i, j);
+		}
+	}
+}
 
-	D3D11_SUBRESOURCE_DATA data;
-	data.pSysMem = &hmap[0];
-	data.SysMemPitch = m_Info.HeightmapWidth*sizeof(HALF);
-	data.SysMemSlicePitch = 0;
+void cTerrain::CalcPatchBoundsY(UINT i, UINT j)
+{
+	// Scan the heightmap values this patch covers and compute the min/max height.
 
-	ID3D11Texture2D* hmapTex = 0;
-	HR(device->CreateTexture2D(&texDesc, &data, &hmapTex));
+	UINT x0 = j*CellsPerPatch;
+	UINT x1 = (j + 1)*CellsPerPatch;
 
-	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-	srvDesc.Format = texDesc.Format;
-	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	srvDesc.Texture2D.MostDetailedMip = 0;
-	srvDesc.Texture2D.MipLevels = -1;
-	HR(device->CreateShaderResourceView(hmapTex, &srvDesc, &m_pHeightMapSRV));
+	UINT y0 = i*CellsPerPatch;
+	UINT y1 = (i + 1)*CellsPerPatch;
 
-	// SRV saves reference.
-	ReleaseCOM(hmapTex);
+	float minY = +MathHelper::Infinity;
+	float maxY = -MathHelper::Infinity;
+	for (UINT y = y0; y <= y1; ++y)
+	{
+		for (UINT x = x0; x <= x1; ++x)
+		{
+			UINT k = y*m_Info.HeightmapWidth + x;
+			minY = MathHelper::Min(minY, m_vecHeightmap[k]);
+			maxY = MathHelper::Max(maxY, m_vecHeightmap[k]);
+		}
+	}
+
+	UINT patchID = i*(m_nPatchVertCols - 1) + j;
+	m_vecPatchBoundsY[patchID] = XMFLOAT2(minY, maxY);
 }
 
 float cTerrain::GetHorizon()const
@@ -463,4 +465,15 @@ XMMATRIX cTerrain::GetWorld()const
 void cTerrain::SetWorld(CXMMATRIX M)
 {
 	XMStoreFloat4x4(&m_matWorld, M);
+}
+
+void cTerrain::ChangeHeightData(std::vector<Vertex::ST_P_VERTEX> vecVertex)
+{
+	m_vecHeightmap.clear();
+	m_vecHeightmap.resize(vecVertex.size());
+
+	for (int i = 0; i < vecVertex.size(); i++)
+	{
+		m_vecHeightmap[i] = vecVertex[i].Pos.y;
+	}
 }

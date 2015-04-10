@@ -1,23 +1,23 @@
 #pragma once
 
-#define g_pMousePicking cMousePicking::GetInstance()
-
 class cMousePicking
 {
-	SINGLETONE(cMousePicking);
-
 public:
+	cMousePicking::cMousePicking();
+	cMousePicking::~cMousePicking();
+
 	void Setup();
 	void Init(ID3D11Buffer* pVertexBuffer, ID3D11Buffer* pIndexBuffer, std::vector<float> vecHeight);
 	void Update(float fDelta);
 	void Render(DirectionalLight lights[3]);
-
 	void OnMouseDown(WPARAM btnState, int nX, int nY);
 
+	std::vector<Vertex::ST_P_VERTEX> GetHeight();
+
+	bool HeightEdit();
 private:
 	void Pick(int nX, int nY);
 	void BuildMeshGeometryBuffers();
-
 
 private:
 	ID3D11Buffer* m_pVertexBuffer;
