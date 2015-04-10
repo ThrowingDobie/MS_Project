@@ -320,11 +320,11 @@ void cMousePicking::CalGauss(int nX, int nZ, float fDelta)
 			nGaussX++;
 			fSizeCheck = GetGaussian(nGaussX, nGaussZ, 1.f + sqrt(sqrt(fDelta)));
 
-			if (m_vecVertex[x + z*(MAP_SIZE)].Pos.y + fSizeCheck * sqrt(fDelta) >= 25.5f)
-			{
-				m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y = 25.5f;
-			}
-			else
+			//if (m_vecVertex[x + z*(MAP_SIZE)].Pos.y + fSizeCheck * sqrt(fDelta) >= 25.5f)
+			//{
+			//	m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y = 25.5f;
+			//}
+			//else
 			{
 				m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y += fSizeCheck * sqrt(fDelta);
 			}
