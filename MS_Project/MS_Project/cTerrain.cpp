@@ -131,7 +131,7 @@ void cTerrain::Render(ID3D11DeviceContext* dc, const Camera& cam, DirectionalLig
 	Effects::TerrainFX->SetWorldFrustumPlanes(worldPlanes);
 
 	Effects::TerrainFX->SetLayerMapArray(m_pLayerMapArraySRV);
-	Effects::TerrainFX->SetBlendMap(m_pBlendMapSRV);
+	//Effects::TerrainFX->SetBlendMap(m_pBlendMapSRV);
 	Effects::TerrainFX->SetHeightMap(m_pHeightMapSRV);
 
 	Effects::TerrainFX->SetMaterial(m_mtTerrain);

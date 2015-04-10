@@ -19,6 +19,11 @@ private:
 	void Pick(int nX, int nY);
 	void BuildMeshGeometryBuffers();
 
+	float GetGaussian(float fX, float fZ, float fRho);
+	void CalGauss(int nX, int nZ, float fDelta);
+
+	float m_fRho;
+
 private:
 	ID3D11Buffer* m_pVertexBuffer;
 	ID3D11Buffer* m_pIndexBuffer;

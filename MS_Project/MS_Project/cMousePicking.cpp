@@ -12,6 +12,8 @@ cMousePicking::cMousePicking()
 	XMStoreFloat4x4(&m_matMeshWorld, I);
 
 	m_nPickedTriangle = -1;
+
+	m_fRho = 0.f;
 }
 
 cMousePicking::~cMousePicking()
@@ -276,7 +278,8 @@ bool cMousePicking::HeightEdit()
 {
 	if (GetAsyncKeyState('N') & 0x8000)
 	{
-		m_vecVertex[(m_vPickingPoint.x) + (int)(MAP_SIZE - m_vPickingPoint.z) * MAP_SIZE].Pos.y += 1.f;
+		m_fRho += 2.0f;
+		CalGauss(m_vPickingPoint.x, m_vPickingPoint.z, m_fRho);
 		return true;
 	}
 	else
@@ -288,4 +291,45 @@ bool cMousePicking::HeightEdit()
 std::vector<Vertex::ST_P_VERTEX> cMousePicking::GetHeight()
 {
 	return m_vecVertex;
+}
+
+float cMousePicking::GetGaussian(float fX, float fZ, float fRho)
+{
+	float g = 1.0f / sqrt(2.0f * D3DX_PI * fRho * fRho);
+	return g * exp(-(fX * fX + fZ * fZ) / (2 * fRho * fRho));
+}
+
+void cMousePicking::CalGauss(int nX, int nZ, float fDelta)
+{
+	float fSizeCheck = 1.f;
+	int nRange = 0.f;
+	while (fSizeCheck > 0.0001f)
+	{
+		nRange++;
+		fSizeCheck = GetGaussian(nRange, 0.f, 1.f + sqrt(sqrt(fDelta)));
+	}
+
+	int nGaussX = -nRange;
+	int nGaussZ = -nRange;
+
+	for (int z = nZ - nRange; z <= nZ + nRange; z++)
+	{
+		nGaussZ++;
+		for (int x = nX - nRange; x < nX + nRange; x++)
+		{
+			nGaussX++;
+			fSizeCheck = GetGaussian(nGaussX, nGaussZ, 1.f + sqrt(sqrt(fDelta)));
+
+			if (m_vecVertex[x + z*(MAP_SIZE)].Pos.y + fSizeCheck * sqrt(fDelta) >= 25.5f)
+			{
+				m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y = 25.5f;
+			}
+			else
+			{
+				m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y += fSizeCheck * sqrt(fDelta);
+			}
+
+		}
+		nGaussX = -nRange;
+	}
 }
