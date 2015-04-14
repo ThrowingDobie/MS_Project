@@ -17,7 +17,7 @@ cTerrain::cTerrain()
 	XMStoreFloat4x4(&m_matScale, I);
 
 	I = XMMatrixIdentity();
-	I = XMMatrixRotationY(NULL);
+	I = XMMatrixRotationY(0);
 	XMStoreFloat4x4(&m_matRot, I);
 
     I = XMMatrixIdentity();

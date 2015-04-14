@@ -11,9 +11,16 @@ cMousePicking::cMousePicking()
 	XMMATRIX I = XMMatrixIdentity();
 	XMStoreFloat4x4(&m_matMeshWorld, I);
 
+	I = XMMatrixIdentity();
+	I = XMMatrixScaling(0.3f, 0.3f, 0.3f);
+	XMStoreFloat4x4(&m_matScale, I);
+
+	m_vPickingPoint = { 0.f, 0.f, 0.f };
+
 	m_nPickedTriangle = -1;
 
-	m_fRho = 0.f;
+	m_fRho = 50.f;
+	m_eEditType = E_EMPTY;
 }
 
 cMousePicking::~cMousePicking()
@@ -39,11 +46,29 @@ void cMousePicking::Init(ID3D11Buffer* pVertexBuffer
 {
 	BuildMeshGeometryBuffers();
 	m_vecHeight = vecHeight;
+
+	if (m_vecVertex.size() == 0)
+	{
+		m_vecVertex.reserve(m_vecHeight.size());
+
+		for (int i = 0; i < m_vecHeight.size(); i++)
+		{
+			Vertex::ST_P_VERTEX vertex;
+			vertex.Pos.x = (int)(i % MAP_SIZE);
+			vertex.Pos.z = 256 - (int)(i / 257);
+			vertex.Pos.y = m_vecHeight[i];
+			m_vecVertex.push_back(vertex);
+		}
+	}
 }
 
 void cMousePicking::Update(float fDelta)
 {
-	HeightEdit();
+	if (HeightEdit())
+	{
+		m_vecSave = m_vecVertex;
+	}
+	
 }
 
 void cMousePicking::Render(DirectionalLight lights[3])
@@ -52,6 +77,7 @@ void cMousePicking::Render(DirectionalLight lights[3])
 	outs.precision(3);
 	outs << L"X = " << m_vPickingPoint.x << L"   Z = " << m_vPickingPoint.z
 		<< L"   Y = " << m_vPickingPoint.y;
+
 	SetWindowText(g_hWnd, outs.str().c_str());
 
 	g_pD3DDevice->m_pDevCon->IASetInputLayout(InputLayouts::Basic32);
@@ -84,6 +110,11 @@ void cMousePicking::Render(DirectionalLight lights[3])
 		XMFLOAT4X4 matWorld;
 		XMMATRIX I = XMMatrixIdentity();
 		I = XMMatrixTranslation(m_vPickingPoint.x, m_vPickingPoint.y, m_vPickingPoint.z);
+		
+		
+		XMMATRIX scale = XMLoadFloat4x4(&m_matScale);
+		I = scale * I;
+		
 		XMStoreFloat4x4(&matWorld, I);
 
 		XMMATRIX world = XMLoadFloat4x4(&matWorld);
@@ -192,25 +223,11 @@ void cMousePicking::BuildMeshGeometryBuffers()
 
 void cMousePicking::Pick(int nX, int nY)
 {
-	if (m_vecVertex.size() == 0)
-	{
-		m_vecVertex.reserve(m_vecHeight.size());
-
-		for (int i = 0; i < m_vecHeight.size(); i++)
-		{
-			Vertex::ST_P_VERTEX vertex;
-			vertex.Pos.x = (int)(i % MAP_SIZE);
-			vertex.Pos.z = MAP_SIZE - (int)(i / MAP_SIZE) - 1;
-			vertex.Pos.y = m_vecHeight[i];
-			m_vecVertex.push_back(vertex);
-		}
-	}
 	XMMATRIX P = g_pCamera->Proj();
 
 	float vx = (+2.0f*nX / g_pD3DDevice->m_nClientWidth - 1.0f) / P(0, 0);
 	float vy = (-2.0f*nY / g_pD3DDevice->m_nClientHeight + 1.0f) / P(1, 1);
 
-	
 	XMVECTOR rayOrigin = XMVectorSet(0.f, 0.f, 0.f, 1.f);
 	XMVECTOR rayDir = XMVectorSet(vx, vy, 1.0f, 0.0f);
 
@@ -249,7 +266,7 @@ void cMousePicking::Pick(int nX, int nY)
 				XMVECTOR vPickingPoint;
 				vPickingPoint = rayOrigin + (fDist*rayDir);
 				XMStoreFloat3(&m_vPickingPoint, vPickingPoint);
-				return;
+				//return;
 			}
 
 			i0 = (i + 1) + MAP_SIZE;
@@ -268,7 +285,7 @@ void cMousePicking::Pick(int nX, int nY)
 				XMVECTOR vPickingPoint;
 				vPickingPoint = rayOrigin + (fDist*rayDir);
 				XMStoreFloat3(&m_vPickingPoint, vPickingPoint);
-				return;
+				//return;
 			}
 		}
 	}
@@ -276,11 +293,38 @@ void cMousePicking::Pick(int nX, int nY)
 
 bool cMousePicking::HeightEdit()
 {
+	if (GetAsyncKeyState('P') & 0x8000)
+	{
+		m_vecVertex = m_vecSave;
+		return true;
+	}
 	if (GetAsyncKeyState('N') & 0x8000)
 	{
-		m_fRho += 2.0f;
-		CalGauss(m_vPickingPoint.x, m_vPickingPoint.z, m_fRho);
-		return true;
+		m_eEditType = E_INCREASE;
+	}
+	if (GetAsyncKeyState('M') & 0x8000)
+	{
+		m_eEditType = E_DECREASE;
+	}
+	if (GetAsyncKeyState('B') & 0x8000)
+	{
+		m_eEditType = E_ERASE;
+	}
+	if (GetAsyncKeyState(VK_ESCAPE) & 0x8000)
+	{
+		m_eEditType = E_EMPTY;
+	}
+	if (m_eEditType != E_EMPTY)
+	{
+		if (GetAsyncKeyState(VK_SPACE) & 0x8000)
+		{
+			CalGauss(m_vPickingPoint.x, m_vPickingPoint.z, m_fRho);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 	else
 	{
@@ -315,21 +359,37 @@ void cMousePicking::CalGauss(int nX, int nZ, float fDelta)
 	for (int z = nZ - nRange; z <= nZ + nRange; z++)
 	{
 		nGaussZ++;
-		for (int x = nX - nRange; x < nX + nRange; x++)
+		for (int x = nX - nRange; x <= nX + nRange; x++)
 		{
 			nGaussX++;
 			fSizeCheck = GetGaussian(nGaussX, nGaussZ, 1.f + sqrt(sqrt(fDelta)));
-
-			//if (m_vecVertex[x + z*(MAP_SIZE)].Pos.y + fSizeCheck * sqrt(fDelta) >= 25.5f)
-			//{
-			//	m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y = 25.5f;
-			//}
-			//else
+			if (x + (MAP_SIZE - z)*MAP_SIZE < MAP_SIZE*MAP_SIZE)
 			{
-				m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y += fSizeCheck * sqrt(fDelta);
+				if (m_eEditType == E_INCREASE)
+				{
+					m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y += fSizeCheck * sqrt(fDelta);
+				}
+				if (m_eEditType == E_DECREASE)
+				{
+					if (m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y - fSizeCheck * sqrt(fDelta) >= fSizeCheck * sqrt(fDelta))
+					{
+						m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y -= fSizeCheck * sqrt(fDelta);
+					}
+				}
+				if (m_eEditType == E_ERASE)
+				{
+					m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y = 0;
+				}
 			}
-
 		}
 		nGaussX = -nRange;
 	}
 }
+//if (m_vecVertex[x + z*(MAP_SIZE)].Pos.y + fSizeCheck * sqrt(fDelta) >= 25.5f)
+//{
+//	m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y = 25.5f;
+//}
+//else
+//{
+//	m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y += fSizeCheck * sqrt(fDelta);
+//}

@@ -2,6 +2,14 @@
 
 class cMousePicking
 {
+	enum TerrainEditType
+	{
+		E_INCREASE,
+		E_DECREASE,
+		E_ERASE,
+		E_EMPTY,
+		E_MAX
+	};
 public:
 	cMousePicking::cMousePicking();
 	cMousePicking::~cMousePicking();
@@ -23,6 +31,7 @@ private:
 	void CalGauss(int nX, int nZ, float fDelta);
 
 	float m_fRho;
+	TerrainEditType m_eEditType;
 
 private:
 	ID3D11Buffer* m_pVertexBuffer;
@@ -33,6 +42,7 @@ private:
 	XNA::AxisAlignedBox mMeshBox;
 
 	XMFLOAT4X4 m_matMeshWorld;
+	XMFLOAT4X4 m_matScale;
 
 	Material m_mtMesh;
 	Material m_mtPickedTriangle;
@@ -42,6 +52,8 @@ private:
 
 	std::vector<float> m_vecHeight;
 	std::vector<Vertex::ST_P_VERTEX> m_vecVertex;
+
+	std::vector<Vertex::ST_P_VERTEX> m_vecSave;
 
 	XMFLOAT3 m_vPickingPoint;
 };
