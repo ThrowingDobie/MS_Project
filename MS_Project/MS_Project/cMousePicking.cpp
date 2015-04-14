@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "cMousePicking.h"
+#include "cTerrain.h"
 
 #define MAP_SIZE 257
-
 
 cMousePicking::cMousePicking()
 	: m_pVertexBuffer(NULL)
@@ -21,6 +21,9 @@ cMousePicking::cMousePicking()
 
 	m_fRho = 50.f;
 	m_eEditType = E_EMPTY;
+
+    m_eKeyTest = E_UP;
+    m_eKeyReturn = E_UP;
 }
 
 cMousePicking::~cMousePicking()
@@ -62,13 +65,59 @@ void cMousePicking::Init(ID3D11Buffer* pVertexBuffer
 	}
 }
 
+void cMousePicking::KeyUpdate(bool isUpdate)
+{
+    if (GetAsyncKeyState(VK_SPACE) & 0x8000)
+    {
+        if (m_eKeyTest == E_UP)
+        {
+            m_eKeyTest = E_KEYDOWN;
+        }
+        else if (m_eKeyTest == E_KEYDOWN)
+        {
+            m_eKeyTest = E_DOWN;
+        }
+    }
+    else
+    {
+        if (m_eKeyTest == E_DOWN)
+        {
+            m_eKeyTest = E_KEYUP;
+        }
+        else if (m_eKeyTest == E_KEYUP)
+        {
+            m_eKeyTest = E_UP;
+        }
+    }
+
+    if (GetAsyncKeyState('P') & 0x8000)
+    {
+        if (m_eKeyReturn == E_UP)
+        {
+            m_eKeyReturn = E_KEYDOWN;
+        }
+        else if (m_eKeyReturn == E_KEYDOWN)
+        {
+            m_eKeyReturn = E_DOWN;
+        }
+    }
+    else
+    {
+        if (m_eKeyReturn == E_DOWN)
+        {
+            m_eKeyReturn = E_KEYUP;
+        }
+        else if (m_eKeyReturn == E_KEYUP)
+        {
+            m_eKeyReturn = E_UP;
+        }
+    }
+}
+
 void cMousePicking::Update(float fDelta)
 {
-	if (HeightEdit())
-	{
-		m_vecSave = m_vecVertex;
-	}
-	
+    KeyUpdate(true);
+    HeightEdit();
 }
 
 void cMousePicking::Render(DirectionalLight lights[3])
@@ -141,7 +190,7 @@ void cMousePicking::OnMouseDown(WPARAM btnState, int nX, int nY)
 	if ((btnState & MK_RBUTTON) != 0)
 	{
 		Pick(nX, nY);
-	}
+    }
 }
 
 
@@ -293,23 +342,36 @@ void cMousePicking::Pick(int nX, int nY)
 
 bool cMousePicking::HeightEdit()
 {
-	if (GetAsyncKeyState('P') & 0x8000)
-	{
-		m_vecVertex = m_vecSave;
-		return true;
-	}
-	if (GetAsyncKeyState('N') & 0x8000)
+    if (m_eKeyReturn == E_KEYDOWN)
+    {
+        if (m_StackPrve.size() > 0)
+        {
+            m_vecVertex = m_StackPrve.top();
+            m_StackPrve.pop();
+        }
+        return true;
+    }
+
+    if (GetAsyncKeyState('N') & 0x8000)
 	{
 		m_eEditType = E_INCREASE;
 	}
-	if (GetAsyncKeyState('M') & 0x8000)
+    else if(GetAsyncKeyState('M') & 0x8000)
 	{
 		m_eEditType = E_DECREASE;
 	}
-	if (GetAsyncKeyState('B') & 0x8000)
+    else if(GetAsyncKeyState('B') & 0x8000)
 	{
 		m_eEditType = E_ERASE;
 	}
+    else if(GetAsyncKeyState('V') & 0x8000)
+    {
+        m_eEditType = E_NORMALIZE;
+    }
+    else if (GetAsyncKeyState('C') & 0x8000)
+    {
+        m_eEditType = E_TEST;
+    }
 	if (GetAsyncKeyState(VK_ESCAPE) & 0x8000)
 	{
 		m_eEditType = E_EMPTY;
@@ -318,7 +380,19 @@ bool cMousePicking::HeightEdit()
 	{
 		if (GetAsyncKeyState(VK_SPACE) & 0x8000)
 		{
-			CalGauss(m_vPickingPoint.x, m_vPickingPoint.z, m_fRho);
+            if (m_eKeyTest == E_KEYDOWN)
+            {
+                m_StackPrve.push(m_vecVertex);
+            }
+            if (m_eEditType == E_ERASE)
+            {
+                EraseHeight(10);
+            }
+            else
+            {
+                CalGauss(m_vPickingPoint.x, m_vPickingPoint.z, m_fRho);
+            }
+
 			return true;
 		}
 		else
@@ -356,6 +430,20 @@ void cMousePicking::CalGauss(int nX, int nZ, float fDelta)
 	int nGaussX = -nRange;
 	int nGaussZ = -nRange;
 
+
+    float fAverage = 0.f;
+    int nSize = 0;
+    for (int z = nZ - nRange; z <= nZ + nRange; z++)
+    {
+        for (int x = nX - nRange; x <= nX + nRange; x++)
+        {
+            fAverage += m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y;
+            nSize++;
+        }
+    }
+    fAverage /= nSize;
+
+
 	for (int z = nZ - nRange; z <= nZ + nRange; z++)
 	{
 		nGaussZ++;
@@ -376,20 +464,83 @@ void cMousePicking::CalGauss(int nX, int nZ, float fDelta)
 						m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y -= fSizeCheck * sqrt(fDelta);
 					}
 				}
-				if (m_eEditType == E_ERASE)
-				{
-					m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y = 0;
-				}
+                if (m_eEditType == E_NORMALIZE)
+                {
+                    if (m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y + fSizeCheck * sqrt(fDelta) > fAverage)
+                    {
+                        m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y -=
+                            fSizeCheck * sqrt(fDelta)*0.03f;
+                    }
+                    else if (m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y - fSizeCheck * sqrt(fDelta) < fAverage)
+                    {
+                        m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y += 
+                            fSizeCheck * sqrt(fDelta)*0.03f;
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
 			}
 		}
 		nGaussX = -nRange;
 	}
 }
-//if (m_vecVertex[x + z*(MAP_SIZE)].Pos.y + fSizeCheck * sqrt(fDelta) >= 25.5f)
-//{
-//	m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y = 25.5f;
-//}
-//else
-//{
-//	m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y += fSizeCheck * sqrt(fDelta);
-//}
+
+std::vector<D3DXVECTOR3> cMousePicking::SelectCircle(int nX, int nZ, int nRange)
+{
+    int nSize = (nRange * 2+1)*(nRange * 2+1);
+    std::vector<D3DXVECTOR3> vecVertex;
+    vecVertex.reserve(nSize);
+
+    for (int z = nZ - nRange+1; z < nZ + nRange; ++z)
+    {
+        for (int x = nX - nRange+1; x < nX + nRange; ++x)
+        {
+            D3DXVECTOR3 vec3(0.f, 0.f, 0.f);
+            vec3.x = x;
+            vec3.z = z;
+            vecVertex.push_back(vec3);
+        }
+    }
+
+    std::vector<D3DXVECTOR3> vecReturn;
+
+    for (int i = 0; i < vecVertex.size(); i++)
+    {
+        D3DXVECTOR3 vFrom(0.f, 0.f, 0.f);
+        D3DXVECTOR3 vTo(0.f, 0.f, 0.f);
+        D3DXVECTOR3 vDist(0.f, 0.f, 0.f);
+
+        vFrom.x = nX;
+        vFrom.z = nZ;
+
+        vTo.x = vecVertex[i].x;
+        vTo.z = vecVertex[i].z;
+
+        vDist = vFrom - vTo;
+
+        float fDist = D3DXVec3Length(&vDist);
+
+        if (fDist <= nRange)
+        {
+            D3DXVECTOR3 v(0.f, 0.f, 0.f);
+            v = vecVertex[i];
+
+            vecReturn.push_back(v);
+        }
+    }
+
+    return vecReturn;
+}
+
+void cMousePicking::EraseHeight(int nRange)
+{
+    std::vector<D3DXVECTOR3> vecVertex;
+    vecVertex = SelectCircle(m_vPickingPoint.x, m_vPickingPoint.z, nRange);
+
+    for (int i = 0; i < vecVertex.size(); i++)
+    {
+        m_vecVertex[vecVertex[i].x + (MAP_SIZE - vecVertex[i].z)*MAP_SIZE].Pos.y = 0.f;
+    }
+}

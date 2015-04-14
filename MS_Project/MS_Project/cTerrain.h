@@ -35,11 +35,11 @@ public:
 
 	void ChangeHeightData(std::vector<Vertex::ST_P_VERTEX> vecVertex);
 
+	float Average(int i, int j);
 private:
 	void LoadHeightmap();
 	void Smooth();
 	bool InBounds(int i, int j);
-	float Average(int i, int j);
 	void CalcAllPatchBoundsY();
 	void CalcPatchBoundsY(UINT i, UINT j);
 	void BuildQuadPatchVB(ID3D11Device* device);
