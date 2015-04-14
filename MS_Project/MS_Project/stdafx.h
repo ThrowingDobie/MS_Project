@@ -17,6 +17,8 @@
 #include <memory.h>
 #include <tchar.h>
 
+
+#include <dxgi1_2.h>
 #include <d3d11.h>
 #include <d3dx11.h>
 #include <d3dx10.h>
@@ -41,7 +43,7 @@
 #include "Vertex.h"
 #include "RenderStates.h"
 #include "xnacollision.h"
-
+#include "DDSTextureLoader.h"
 
 #define SINGLETONE(class_name) private: class_name(void); ~class_name(void); \
 public: static class_name* GetInstance() { static class_name instance; return &instance; }
@@ -70,6 +72,7 @@ public: static class_name* GetInstance() { static class_name instance; return &i
 #include "cDeviceManager.h"
 #include "GameTimer.h"
 #include "Camera.h"
+#include "cDDSLoader.h"
 
 extern HWND g_hWnd;
 

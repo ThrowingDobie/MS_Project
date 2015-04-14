@@ -33,6 +33,7 @@ void cMain::Setup()
 	LightSetup();
 
 	m_pTerrain = new cTerrain;
+    m_pTerrain->Setup();
 
 	m_pMouse = new cMousePicking;
 	m_pMouse->Setup();
@@ -66,6 +67,7 @@ void cMain::Init()
 	tii.LayerMapFilename3 = L"Textures/lightdirt.dds";
 	tii.LayerMapFilename4 = L"Textures/grass.dds";
 	tii.BlendMapFilename = L"Textures/blend.dds";
+    tii.BlendMapFilename = L"Image/asd.dds";
 	tii.HeightScale = 50.f;
 	tii.HeightmapWidth = 257;
 	tii.HeightmapHeight = 257;

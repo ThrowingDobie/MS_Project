@@ -22,8 +22,14 @@
     <Filter Include="FX">
       <UniqueIdentifier>{47a32447-d1b1-40e7-a975-21396eeace05}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Practice">
+    <Filter Include="DirectX Tex">
+      <UniqueIdentifier>{2dd01197-7d2b-4f96-8052-604f13ffd41f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
       <UniqueIdentifier>{b332b408-8680-43f1-8a30-6b46855c1736}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Practice">
+      <UniqueIdentifier>{121f7368-dabe-41f9-9257-6d3d4a2d018b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -55,25 +61,25 @@
       <Filter>FrameWork</Filter>
     </ClInclude>
     <ClInclude Include="Vertex.h">
-      <Filter>Practice</Filter>
+      <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="Effects.h">
-      <Filter>Practice</Filter>
+      <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="cWaves.h">
-      <Filter>Practice</Filter>
+      <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="RenderStates.h">
-      <Filter>Practice</Filter>
+      <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="GeometryGenerator.h">
-      <Filter>Practice</Filter>
+      <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="MathHelper.h">
-      <Filter>Practice</Filter>
+      <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="LightHelper.h">
-      <Filter>Practice</Filter>
+      <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="cLandMark.h">
       <Filter>FrameWork</Filter>
@@ -82,7 +88,7 @@
       <Filter>FrameWork</Filter>
     </ClInclude>
     <ClInclude Include="d3dUtil.h">
-      <Filter>Practice</Filter>
+      <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>SINGLETONE</Filter>
@@ -94,7 +100,13 @@
       <Filter>FrameWork</Filter>
     </ClInclude>
     <ClInclude Include="xnacollision.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="cDDSLoader.h">
       <Filter>Practice</Filter>
+    </ClInclude>
+    <ClInclude Include="DDSTextureLoader.h">
+      <Filter>DirectX Tex</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -117,25 +129,25 @@
       <Filter>FrameWork</Filter>
     </ClCompile>
     <ClCompile Include="Vertex.cpp">
-      <Filter>Practice</Filter>
+      <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="Effects.cpp">
-      <Filter>Practice</Filter>
+      <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="cWaves.cpp">
-      <Filter>Practice</Filter>
+      <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="RenderStates.cpp">
-      <Filter>Practice</Filter>
+      <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="GeometryGenerator.cpp">
-      <Filter>Practice</Filter>
+      <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="MathHelper.cpp">
-      <Filter>Practice</Filter>
+      <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="LightHelper.cpp">
-      <Filter>Practice</Filter>
+      <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="cLandMark.cpp">
       <Filter>FrameWork</Filter>
@@ -144,7 +156,7 @@
       <Filter>FrameWork</Filter>
     </ClCompile>
     <ClCompile Include="d3dUtil.cpp">
-      <Filter>Practice</Filter>
+      <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>SINGLETONE</Filter>
@@ -156,7 +168,13 @@
       <Filter>FrameWork</Filter>
     </ClCompile>
     <ClCompile Include="xnacollision.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="cDDSLoader.cpp">
       <Filter>Practice</Filter>
+    </ClCompile>
+    <ClCompile Include="DDSTextureLoader.cpp">
+      <Filter>DirectX Tex</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

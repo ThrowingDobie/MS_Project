@@ -41,7 +41,39 @@ cTerrain::~cTerrain()
 
 void cTerrain::Setup()
 {
+    DXGI_FORMAT format = DXGI_FORMAT_FROM_FILE;
+    //format = DXGI_FORMAT_R8G8B8A8_UINT;
+    UINT filter = D3DX11_FILTER_NONE;
+    UINT mipFilter = D3DX11_FILTER_LINEAR;
 
+    D3DX11_IMAGE_LOAD_INFO loadInfo;
+
+    //loadInfo.Width = 1024;
+    //loadInfo.Height = 1024;
+    loadInfo.Width = D3DX11_FROM_FILE;
+    loadInfo.Height = D3DX11_FROM_FILE;
+    loadInfo.Depth = D3DX11_FROM_FILE;
+    loadInfo.FirstMipLevel = 0;
+    loadInfo.MipLevels = D3DX11_FROM_FILE;
+    loadInfo.Usage = D3D11_USAGE_STAGING;
+    loadInfo.BindFlags = 0;
+    loadInfo.CpuAccessFlags = D3D11_CPU_ACCESS_WRITE | D3D11_CPU_ACCESS_READ;
+    loadInfo.MiscFlags = 0;
+    loadInfo.Format = format;
+    loadInfo.Filter = filter;
+    loadInfo.MipFilter = mipFilter;
+    loadInfo.pSrcInfo = 0;
+
+    ID3D11Resource* Test = nullptr;
+
+    // png->dds
+    D3DX11CreateTextureFromFile(g_pD3DDevice->m_pDevice, L"./Image/test_png.png", &loadInfo, 0
+        , &Test, 0);
+    D3DX11SaveTextureToFile(g_pD3DDevice->m_pDevCon, Test, D3DX11_IFF_DDS, L"./Image/asd.dds");
+
+    //// dds->png
+    //D3DX11CreateTextureFromFile(g_pD3DDevice->m_pDevice, L"./Textures/blend.dds", &loadInfo, 0, &Test, 0);
+    //D3DX11SaveTextureToFile(g_pD3DDevice->m_pDevCon, Test, D3DX11_IFF_PNG, L"./Textures/asdpng.png");
 }
 
 void cTerrain::Init(ID3D11Device* device, ID3D11DeviceContext* dc, const InitInfo& initInfo)
@@ -73,6 +105,8 @@ void cTerrain::Init(ID3D11Device* device, ID3D11DeviceContext* dc, const InitInf
 
 	HR(D3DX11CreateShaderResourceViewFromFile(device,
 		m_Info.BlendMapFilename.c_str(), 0, 0, &m_pBlendMapSRV, 0));
+
+
 }
 
 void cTerrain::Update(float fDelta)
@@ -131,7 +165,7 @@ void cTerrain::Render(ID3D11DeviceContext* dc, const Camera& cam, DirectionalLig
 	Effects::TerrainFX->SetWorldFrustumPlanes(worldPlanes);
 
 	Effects::TerrainFX->SetLayerMapArray(m_pLayerMapArraySRV);
-	//Effects::TerrainFX->SetBlendMap(m_pBlendMapSRV);
+	Effects::TerrainFX->SetBlendMap(m_pBlendMapSRV);
 	Effects::TerrainFX->SetHeightMap(m_pHeightMapSRV);
 
 	Effects::TerrainFX->SetMaterial(m_mtTerrain);

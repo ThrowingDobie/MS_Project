@@ -88,6 +88,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="cCube.h" />
+    <ClInclude Include="cDDSLoader.h" />
     <ClInclude Include="cDeviceManager.h" />
     <ClInclude Include="cLandMark.h" />
     <ClInclude Include="cMain.h" />
@@ -96,6 +97,7 @@
     <ClInclude Include="cTerrain.h" />
     <ClInclude Include="cWaves.h" />
     <ClInclude Include="d3dUtil.h" />
+    <ClInclude Include="DDSTextureLoader.h" />
     <ClInclude Include="Effects.h" />
     <ClInclude Include="GameTimer.h" />
     <ClInclude Include="GeometryGenerator.h" />
@@ -112,6 +114,7 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="cCube.cpp" />
+    <ClCompile Include="cDDSLoader.cpp" />
     <ClCompile Include="cDeviceManager.cpp" />
     <ClCompile Include="cLandMark.cpp" />
     <ClCompile Include="cMain.cpp" />
@@ -120,6 +123,12 @@
     <ClCompile Include="cTerrain.cpp" />
     <ClCompile Include="cWaves.cpp" />
     <ClCompile Include="d3dUtil.cpp" />
+    <ClCompile Include="DDSTextureLoader.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Effects.cpp" />
     <ClCompile Include="GameTimer.cpp" />
     <ClCompile Include="GeometryGenerator.cpp" />
