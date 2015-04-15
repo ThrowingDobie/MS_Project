@@ -88,7 +88,6 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="cCube.h" />
-    <ClInclude Include="cDDSLoader.h" />
     <ClInclude Include="cDeviceManager.h" />
     <ClInclude Include="cLandMark.h" />
     <ClInclude Include="cMain.h" />
@@ -114,7 +113,6 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="cCube.cpp" />
-    <ClCompile Include="cDDSLoader.cpp" />
     <ClCompile Include="cDeviceManager.cpp" />
     <ClCompile Include="cLandMark.cpp" />
     <ClCompile Include="cMain.cpp" />
