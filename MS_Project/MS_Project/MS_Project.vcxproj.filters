@@ -105,6 +105,15 @@
     <ClInclude Include="DDSTextureLoader.h">
       <Filter>DirectX Tex</Filter>
     </ClInclude>
+    <ClInclude Include="..\practice\asdxILoadable.h">
+      <Filter>Practice</Filter>
+    </ClInclude>
+    <ClInclude Include="..\practice\asdxISaveable.h">
+      <Filter>Practice</Filter>
+    </ClInclude>
+    <ClInclude Include="..\practice\asdxResDDS.h">
+      <Filter>Practice</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
