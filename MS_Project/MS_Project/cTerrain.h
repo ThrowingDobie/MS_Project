@@ -17,6 +17,7 @@ public:
 		float CellSpacing;
 	};
 
+
 public:
 	cTerrain();
 	~cTerrain();

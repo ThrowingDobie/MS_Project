@@ -74,6 +74,8 @@ void cTerrain::Setup()
     //// dds->png
     //D3DX11CreateTextureFromFile(g_pD3DDevice->m_pDevice, L"./Textures/blend.dds", &loadInfo, 0, &Test, 0);
     //D3DX11SaveTextureToFile(g_pD3DDevice->m_pDevCon, Test, D3DX11_IFF_PNG, L"./Textures/asdpng.png");
+
+
 }
 
 void cTerrain::Init(ID3D11Device* device, ID3D11DeviceContext* dc, const InitInfo& initInfo)
@@ -106,6 +108,41 @@ void cTerrain::Init(ID3D11Device* device, ID3D11DeviceContext* dc, const InitInf
 	HR(D3DX11CreateShaderResourceViewFromFile(device,
 		m_Info.BlendMapFilename.c_str(), 0, 0, &m_pBlendMapSRV, 0));
 
+	//DDS_PIXELFORMAT	pixelformat;
+	//pixelformat.dwSize = 32;
+	//pixelformat.dwFlags = DDPF_ALPHA | DDPF_RGB;
+	//pixelformat.dwFourCC = DXGI_FORMAT_R8G8B8A8_TYPELESS;
+	//pixelformat.dwRGBBitCount = 32;
+	//pixelformat.dwRBitMask = 0x00ff0000;
+	//pixelformat.dwGBitMask = 0x0000ff00;
+	//pixelformat.dwBBitMask = 0x000000ff;
+	//pixelformat.dwABitMask = 0xFF000000;
+
+	//DDS_HEADER header;
+	//header.dwSize = 124;
+	//header.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT | DDSD_DEPTH;
+	//header.dwHeight = 1024;
+	//header.dwWidth = 1024;
+	//header.dwPitchOrLinearSize = ((1024 + 1) >> 1) * 4;
+	//header.dwDepth = 0;
+	//header.dwMipMapCount = 10;
+	//header.ddspf = pixelformat;
+	//header.dwCaps = DDSCAPS_TEXTURE;
+
+	//DDS_HEADER_DXT10 header10;
+	//header10.dxgiFormat = DXGI_FORMAT_R8G8B8A8_TYPELESS;
+	//header10.resourceDimension = D3D10_RESOURCE_DIMENSION_TEXTURE2D;
+	//header10.miscFlag = 0;
+	//header10.arraySize = sizeof(ID3D11ShaderResourceView) * 6;
+	//header10.miscFlags2 = DDS_ALPHA_MODE_UNKNOWN;
+
+	//ID3D11ShaderResourceView* iArrayElement = m_pBlendMapSRV;
+	//for (UINT iArrayElement = 0; iArrayElement < header10.arraySize; iArrayElement++)
+	//{
+	//	for (UINT iMipLevel = 0; iMipLevel < header.dwMipMapCount; iMipLevel++)
+	//	{
+	//	}
+	//}
 
 }
 
@@ -506,7 +543,7 @@ void cTerrain::ChangeHeightData(std::vector<Vertex::ST_P_VERTEX> vecVertex)
 	m_vecHeightmap.clear();
 	m_vecHeightmap.resize(vecVertex.size());
 
-	for (int i = 0; i < vecVertex.size(); i++)
+	for (UINT i = 0; i < vecVertex.size(); i++)
 	{
 		m_vecHeightmap[i] = vecVertex[i].Pos.y;
 	}
