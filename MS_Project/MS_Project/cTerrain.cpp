@@ -68,7 +68,7 @@ void cTerrain::Setup()
 	ID3D11ShaderResourceView* TestSRV = nullptr;
 
 	DirectX::CreateDDSTextureFromFile(g_pD3DDevice->m_pDevice,
-		L"./Image/Image/asd.dds", &Test, &TestSRV, 0, 0);
+		L"./Image/asd.dds", &Test, &TestSRV, 0, 0);
 
     // png->dds
     D3DX11CreateTextureFromFile(g_pD3DDevice->m_pDevice, L"./Image/test_png.png", &loadInfo, 0

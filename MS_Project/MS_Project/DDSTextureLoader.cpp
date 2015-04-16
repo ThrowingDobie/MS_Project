@@ -1351,8 +1351,8 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
 	UINT iHeight = header->height;
 	UINT iDepth = header->depth;
 
-	bool swaprgb = false;
-	bool seta = false;
+	bool swaprgb = true;
+	bool seta = true;
 
 	UINT index = 0;
 	for (UINT j = 0; j < arraySize; j++)
@@ -1864,10 +1864,10 @@ HRESULT DirectX::CreateDDSTextureFromFileEx( ID3D11Device* d3dDevice,
                                           &bitData,
                                           &bitSize
                                         );
-    //if (FAILED(hr))
-    //{
-    //    return hr;
-    //}
+    if (FAILED(hr))
+    {
+        return hr;
+    }
 
     hr = CreateTextureFromDDS( d3dDevice, d3dContext, header,
                                bitData, bitSize, maxsize,
