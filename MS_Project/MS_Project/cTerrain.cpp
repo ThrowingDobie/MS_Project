@@ -106,10 +106,12 @@ void cTerrain::Init(ID3D11Device* device, ID3D11DeviceContext* dc, const InitInf
 	layerFilenames.push_back(m_Info.LayerMapFilename4);
 	m_pLayerMapArraySRV = d3dHelper::CreateTexture2DArraySRV(device, dc, layerFilenames);
 
+    //HR(D3DX11CreateShaderResourceViewFromFile(device,
+    //    m_Info.BlendMapFilename.c_str(), 0, 0, &m_pBlendMapSRV, 0));
+
     DirectX::CreateDDSTextureFromFile(g_pD3DDevice->m_pDevice,
         L"./Image/blend.dds", 0, &m_pBlendMapSRV, 0, 0);
-	//HR(D3DX11CreateShaderResourceViewFromFile(device,
-	//	m_Info.BlendMapFilename.c_str(), 0, 0, &m_pBlendMapSRV, 0));
+
 }
 
 void cTerrain::Update(float fDelta)
@@ -156,7 +158,7 @@ void cTerrain::Render(ID3D11DeviceContext* dc, const Camera& cam, DirectionalLig
 
 	// Set per frame constants.
 	Effects::TerrainFX->SetViewProj(viewProj);
-	//Effects::TerrainFX->SetEyePosW(cam.GetPosition());
+	Effects::TerrainFX->SetEyePosW(cam.GetPosition());
 	Effects::TerrainFX->SetDirLights(lights);
 	Effects::TerrainFX->SetFogColor(Colors::Silver);
 	Effects::TerrainFX->SetFogStart(15.0f);

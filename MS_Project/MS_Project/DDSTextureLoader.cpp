@@ -1402,9 +1402,9 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
                         if (ptr + 4 <= pEndBits)
                         {
                             ptr[0] = 255; // blue
-                            //ptr[1] = 255; // green
-                            //ptr[2] = 255; // red
-                            //ptr[3] = 255; // alpha
+                            ptr[1] = 255; // green
+                            ptr[2] = 255; // red
+                            ptr[3] = 255; // alpha
 
                             //BYTE bluecolor = *ptr;
                             //BYTE greencolor = *(ptr + 1);

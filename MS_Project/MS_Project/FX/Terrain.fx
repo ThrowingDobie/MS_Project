@@ -333,10 +333,10 @@ float4 PS(DomainOut pin,
     
     // Blend the layers on top of each other.
     float4 texColor = c0;
-    //texColor = lerp(texColor, c1, t.r);
-    //texColor = lerp(texColor, c2, t.g);
+    texColor = lerp(texColor, c1, t.r);
+    texColor = lerp(texColor, c2, t.g);
     texColor = lerp(texColor, c3, t.b);
-    //texColor = lerp(texColor, c4, t.a);
+    texColor = lerp(texColor, c4, t.a);
  
 	//
 	// Lighting.

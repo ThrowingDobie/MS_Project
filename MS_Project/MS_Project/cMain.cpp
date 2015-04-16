@@ -66,7 +66,7 @@ void cMain::Init()
 	tii.LayerMapFilename2 = L"Textures/stone.dds";
 	tii.LayerMapFilename3 = L"Textures/lightdirt.dds";
 	tii.LayerMapFilename4 = L"Textures/snow.dds";
-    tii.BlendMapFilename = L"Image/Test.dds";
+    tii.BlendMapFilename = L"Image/blend.dds";
 	tii.HeightScale = 50.f;
 	tii.HeightmapWidth = 257;
 	tii.HeightmapHeight = 257;
