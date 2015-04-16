@@ -18,6 +18,11 @@
 // http://go.microsoft.com/fwlink/?LinkId=248929
 //--------------------------------------------------------------------------------------
 
+#define SAFE_RELEASE(p) if(p){p->Release(); p = NULL;}
+#define SAFE_DELETE(p) if(p){delete p; p = NULL;}
+#define SAFE_DELETE_ARRAY(p) if(p){delete [] p; p = NULL;}
+#define SAFE_ADD_REF(p) if(p){p->AddRef();}
+
 #ifdef _MSC_VER
 #pragma once
 #endif
@@ -147,4 +152,5 @@ namespace DirectX
                                         _Outptr_opt_ ID3D11ShaderResourceView** textureView,
                                         _Out_opt_ DDS_ALPHA_MODE* alphaMode = nullptr
                                     );
+
 }

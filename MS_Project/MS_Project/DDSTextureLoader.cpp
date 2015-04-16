@@ -17,7 +17,6 @@
 // http://go.microsoft.com/fwlink/?LinkId=248926
 // http://go.microsoft.com/fwlink/?LinkId=248929
 //--------------------------------------------------------------------------------------
-
 #include <assert.h>
 #include <algorithm>
 #include <memory>
@@ -1329,6 +1328,129 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
         }
     }
 
+
+
+	/////////////////
+	UINT iMipCount = mipCount;
+	BYTE* pBitData = (BYTE*)bitData;
+	size_t BitSize = bitSize;
+
+	D3D11_SUBRESOURCE_DATA* pInitData = new D3D11_SUBRESOURCE_DATA[iMipCount * arraySize];
+
+	if (!pInitData)
+	{
+		return E_OUTOFMEMORY;
+	}
+
+	UINT NumBytes = 0;
+	UINT RowBytes = 0;
+	UINT NumRows = 0;
+	BYTE* pSrcBits = pBitData;
+	const BYTE *pEndBits = pBitData + BitSize;
+	UINT iWidth = header->width;
+	UINT iHeight = header->height;
+	UINT iDepth = header->depth;
+
+	bool swaprgb = false;
+	bool seta = false;
+
+	UINT index = 0;
+	for (UINT j = 0; j < arraySize; j++)
+	{
+		UINT w = iWidth;
+		UINT h = iHeight;
+		UINT d = iDepth;
+		for (UINT i = 0; i < iMipCount; i++)
+		{
+			GetSurfaceInfo(w, h, format, &NumBytes, &RowBytes, &NumRows);
+
+			pInitData[index].pSysMem = (void*)pSrcBits;
+			pInitData[index].SysMemPitch = RowBytes;
+			pInitData[index].SysMemSlicePitch = NumBytes;
+			++index;
+
+			if (pSrcBits + (NumBytes*d) > pEndBits)
+			{
+				SAFE_DELETE_ARRAY(pInitData);
+				return HRESULT_FROM_WIN32(ERROR_HANDLE_EOF);
+			}
+
+			if (swaprgb || seta)
+			{
+				switch (format)
+				{
+				case DXGI_FORMAT_R8G8B8A8_UNORM:
+				{
+					BYTE *sptr = pSrcBits;
+					for (UINT slice = 0; slice < d; ++slice)
+					{
+						BYTE *rptr = sptr;
+						for (UINT row = 0; row < NumRows; ++row)
+						{
+							BYTE *ptr = rptr;
+							for (UINT x = 0; x < w; ++x, ptr += 4)
+							{
+								if (ptr + 4 <= pEndBits)
+								{
+									if (swaprgb)
+									{
+										BYTE a = ptr[0];
+										ptr[0] = ptr[2];
+										ptr[2] = a;
+									}
+									if (seta)
+										ptr[3] = 255;
+								}
+							}
+							rptr += RowBytes;
+						}
+						sptr += NumBytes;
+					}
+				}
+				break;
+
+				case DXGI_FORMAT_R10G10B10A2_UNORM:
+				{
+					BYTE *sptr = pSrcBits;
+					for (UINT slice = 0; slice < d; ++slice)
+					{
+						const BYTE *rptr = sptr;
+						for (UINT row = 0; row < NumRows; ++row)
+						{
+							DWORD *ptr = (DWORD*)rptr;
+							for (UINT x = 0; x < w; ++x, ++ptr)
+							{
+								if (ptr + 1 <= (DWORD*)pEndBits)
+								{
+									DWORD t = *ptr;
+									DWORD u = (t & 0x3ff00000) >> 20;
+									DWORD v = (t & 0x000003ff) << 20;
+									*ptr = (t & ~0x3ff003ff) | u | v;
+								}
+							}
+							rptr += RowBytes;
+						}
+						sptr += NumBytes;
+					}
+				}
+				break;
+				}
+			}
+
+			pSrcBits += NumBytes * d;
+
+			w = w >> 1;
+			h = h >> 1;
+			d = d >> 1;
+			if (w == 0)
+				w = 1;
+			if (h == 0)
+				h = 1;
+			if (d == 0)
+				d = 1;
+		}
+	}
+
     if ( autogen )
     {
         // Create texture with auto-generated mipmaps
@@ -1742,10 +1864,10 @@ HRESULT DirectX::CreateDDSTextureFromFileEx( ID3D11Device* d3dDevice,
                                           &bitData,
                                           &bitSize
                                         );
-    if (FAILED(hr))
-    {
-        return hr;
-    }
+    //if (FAILED(hr))
+    //{
+    //    return hr;
+    //}
 
     hr = CreateTextureFromDDS( d3dDevice, d3dContext, header,
                                bitData, bitSize, maxsize,

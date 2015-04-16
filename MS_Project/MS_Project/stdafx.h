@@ -51,6 +51,8 @@ public: static class_name* GetInstance() { static class_name instance; return &i
 
 #define SAFE_RELEASE(p) if(p){p->Release(); p = NULL;}
 #define SAFE_DELETE(p) if(p){delete p; p = NULL;}
+#define SAFE_DELETE_ARRAY(p) if(p){delete [] p; p = NULL;}
+#define SAFE_ADD_REF(p) if(p){p->AddRef();}
 
 #if defined(DEBUG) | defined(_DEBUG)
 #ifndef HR
