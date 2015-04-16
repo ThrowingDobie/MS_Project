@@ -41,39 +41,36 @@ cTerrain::~cTerrain()
 
 void cTerrain::Setup()
 {
-    DXGI_FORMAT format = DXGI_FORMAT_FROM_FILE;
-    //format = DXGI_FORMAT_R8G8B8A8_UINT;
-    UINT filter = D3DX11_FILTER_NONE;
-    UINT mipFilter = D3DX11_FILTER_LINEAR;
+    //DXGI_FORMAT format = DXGI_FORMAT_FROM_FILE;
+    //UINT filter = D3DX11_FILTER_NONE;
+    //UINT mipFilter = D3DX11_FILTER_LINEAR;
 
-    D3DX11_IMAGE_LOAD_INFO loadInfo;
+    //D3DX11_IMAGE_LOAD_INFO loadInfo;
 
-    //loadInfo.Width = 1024;
-    //loadInfo.Height = 1024;
-    loadInfo.Width = D3DX11_FROM_FILE;
-    loadInfo.Height = D3DX11_FROM_FILE;
-    loadInfo.Depth = D3DX11_FROM_FILE;
-    loadInfo.FirstMipLevel = 0;
-    loadInfo.MipLevels = D3DX11_FROM_FILE;
-    loadInfo.Usage = D3D11_USAGE_STAGING;
-    loadInfo.BindFlags = 0;
-    loadInfo.CpuAccessFlags = D3D11_CPU_ACCESS_WRITE | D3D11_CPU_ACCESS_READ;
-    loadInfo.MiscFlags = 0;
-    loadInfo.Format = format;
-    loadInfo.Filter = filter;
-    loadInfo.MipFilter = mipFilter;
-    loadInfo.pSrcInfo = 0;
+    ////loadInfo.Width = 1024;
+    ////loadInfo.Height = 1024;
+    //loadInfo.Width = D3DX11_FROM_FILE;
+    //loadInfo.Height = D3DX11_FROM_FILE;
+    //loadInfo.Depth = D3DX11_FROM_FILE;
+    //loadInfo.FirstMipLevel = 0;
+    //loadInfo.MipLevels = D3DX11_FROM_FILE;
+    //loadInfo.Usage = D3D11_USAGE_STAGING;
+    //loadInfo.BindFlags = 0;
+    //loadInfo.CpuAccessFlags = D3D11_CPU_ACCESS_WRITE | D3D11_CPU_ACCESS_READ;
+    //loadInfo.MiscFlags = 0;
+    //loadInfo.Format = format;
+    //loadInfo.Filter = filter;
+    //loadInfo.MipFilter = mipFilter;
+    //loadInfo.pSrcInfo = 0;
 
-    ID3D11Resource* Test = nullptr;
-	ID3D11ShaderResourceView* TestSRV = nullptr;
 
-	DirectX::CreateDDSTextureFromFile(g_pD3DDevice->m_pDevice,
-		L"./Image/asd.dds", &Test, &TestSRV, 0, 0);
 
-    // png->dds
-    D3DX11CreateTextureFromFile(g_pD3DDevice->m_pDevice, L"./Image/test_png.png", &loadInfo, 0
-        , &Test, 0);
-    D3DX11SaveTextureToFile(g_pD3DDevice->m_pDevCon, Test, D3DX11_IFF_DDS, L"./Image/asd.dds");
+
+
+    //// png->dds
+    //D3DX11CreateTextureFromFile(g_pD3DDevice->m_pDevice, L"./Image/test_png.png", &loadInfo, 0
+    //    , &Test, 0);
+    //D3DX11SaveTextureToFile(g_pD3DDevice->m_pDevCon, Test, D3DX11_IFF_DDS, L"./Image/asd.dds");
 
     //// dds->png
     //D3DX11CreateTextureFromFile(g_pD3DDevice->m_pDevice, L"./Textures/blend.dds", &loadInfo, 0, &Test, 0);
@@ -109,51 +106,16 @@ void cTerrain::Init(ID3D11Device* device, ID3D11DeviceContext* dc, const InitInf
 	layerFilenames.push_back(m_Info.LayerMapFilename4);
 	m_pLayerMapArraySRV = d3dHelper::CreateTexture2DArraySRV(device, dc, layerFilenames);
 
-	HR(D3DX11CreateShaderResourceViewFromFile(device,
-		m_Info.BlendMapFilename.c_str(), 0, 0, &m_pBlendMapSRV, 0));
-
-	//DDS_PIXELFORMAT	pixelformat;
-	//pixelformat.dwSize = 32;
-	//pixelformat.dwFlags = DDPF_ALPHA | DDPF_RGB;
-	//pixelformat.dwFourCC = DXGI_FORMAT_R8G8B8A8_TYPELESS;
-	//pixelformat.dwRGBBitCount = 32;
-	//pixelformat.dwRBitMask = 0x00ff0000;
-	//pixelformat.dwGBitMask = 0x0000ff00;
-	//pixelformat.dwBBitMask = 0x000000ff;
-	//pixelformat.dwABitMask = 0xFF000000;
-
-	//DDS_HEADER header;
-	//header.dwSize = 124;
-	//header.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT | DDSD_DEPTH;
-	//header.dwHeight = 1024;
-	//header.dwWidth = 1024;
-	//header.dwPitchOrLinearSize = ((1024 + 1) >> 1) * 4;
-	//header.dwDepth = 0;
-	//header.dwMipMapCount = 10;
-	//header.ddspf = pixelformat;
-	//header.dwCaps = DDSCAPS_TEXTURE;
-
-	//DDS_HEADER_DXT10 header10;
-	//header10.dxgiFormat = DXGI_FORMAT_R8G8B8A8_TYPELESS;
-	//header10.resourceDimension = D3D10_RESOURCE_DIMENSION_TEXTURE2D;
-	//header10.miscFlag = 0;
-	//header10.arraySize = sizeof(ID3D11ShaderResourceView) * 6;
-	//header10.miscFlags2 = DDS_ALPHA_MODE_UNKNOWN;
-
-	//ID3D11ShaderResourceView* iArrayElement = m_pBlendMapSRV;
-	//for (UINT iArrayElement = 0; iArrayElement < header10.arraySize; iArrayElement++)
-	//{
-	//	for (UINT iMipLevel = 0; iMipLevel < header.dwMipMapCount; iMipLevel++)
-	//	{
-	//	}
-	//}
-
+    DirectX::CreateDDSTextureFromFile(g_pD3DDevice->m_pDevice,
+        L"./Image/blend.dds", 0, &m_pBlendMapSRV, 0, 0);
+	//HR(D3DX11CreateShaderResourceViewFromFile(device,
+	//	m_Info.BlendMapFilename.c_str(), 0, 0, &m_pBlendMapSRV, 0));
 }
 
 void cTerrain::Update(float fDelta)
 {
-	BuildQuadPatchVB(g_pD3DDevice->m_pDevice);
-	BuildQuadPatchIB(g_pD3DDevice->m_pDevice);
+	//BuildQuadPatchVB(g_pD3DDevice->m_pDevice);
+	//BuildQuadPatchIB(g_pD3DDevice->m_pDevice);
 	BuildHeightmapSRV(g_pD3DDevice->m_pDevice);
 }
 
@@ -189,9 +151,12 @@ void cTerrain::Render(ID3D11DeviceContext* dc, const Camera& cam, DirectionalLig
 	//XMMATRIX rot = XMLoadFloat4x4(&m_matRot);
 	//Effects::TerrainFX->SetRot(rot);
 
+    XMFLOAT3 test(0.f, 0.f, 0.f);
+    Effects::TerrainFX->SetEyePosW(test);
+
 	// Set per frame constants.
 	Effects::TerrainFX->SetViewProj(viewProj);
-	Effects::TerrainFX->SetEyePosW(cam.GetPosition());
+	//Effects::TerrainFX->SetEyePosW(cam.GetPosition());
 	Effects::TerrainFX->SetDirLights(lights);
 	Effects::TerrainFX->SetFogColor(Colors::Silver);
 	Effects::TerrainFX->SetFogStart(15.0f);

@@ -62,7 +62,7 @@ SamplerState samHeightmap
 {
 	Filter = MIN_MAG_LINEAR_MIP_POINT;
 
-	AddressU = CLAMP;
+	AddressU = CLAMP; 
 	AddressV = CLAMP;
 };
 

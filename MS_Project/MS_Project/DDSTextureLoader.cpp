@@ -20,6 +20,7 @@
 #include <assert.h>
 #include <algorithm>
 #include <memory>
+#include <vector>
 
 #include "DDSTextureLoader.h"
 
@@ -1328,128 +1329,101 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
         }
     }
 
-
-
 	/////////////////
-	UINT iMipCount = mipCount;
-	BYTE* pBitData = (BYTE*)bitData;
-	size_t BitSize = bitSize;
+    UINT iMipCount = mipCount;
+    BYTE* pBitData = (BYTE*)bitData;
+    size_t BitSize = bitSize;
 
-	D3D11_SUBRESOURCE_DATA* pInitData = new D3D11_SUBRESOURCE_DATA[iMipCount * arraySize];
+    D3D11_SUBRESOURCE_DATA* pInitData = new D3D11_SUBRESOURCE_DATA[iMipCount * arraySize];
 
-	if (!pInitData)
-	{
-		return E_OUTOFMEMORY;
-	}
+    std::unique_ptr<D3D11_SUBRESOURCE_DATA[]> initData(new (std::nothrow) D3D11_SUBRESOURCE_DATA[mipCount * arraySize]);
 
-	UINT NumBytes = 0;
-	UINT RowBytes = 0;
-	UINT NumRows = 0;
-	BYTE* pSrcBits = pBitData;
-	const BYTE *pEndBits = pBitData + BitSize;
-	UINT iWidth = header->width;
-	UINT iHeight = header->height;
-	UINT iDepth = header->depth;
+    size_t skipMip = 0;
+    size_t twidth = 0;
+    size_t theight = 0;
+    size_t tdepth = 0;
+    hr = FillInitData(width, height, depth, mipCount, arraySize, format, maxsize, bitSize, bitData,
+        twidth, theight, tdepth, skipMip, initData.get());
 
-	bool swaprgb = true;
-	bool seta = true;
 
-	UINT index = 0;
-	for (UINT j = 0; j < arraySize; j++)
-	{
-		UINT w = iWidth;
-		UINT h = iHeight;
-		UINT d = iDepth;
-		for (UINT i = 0; i < iMipCount; i++)
-		{
-			GetSurfaceInfo(w, h, format, &NumBytes, &RowBytes, &NumRows);
+    UINT NumBytes = 0;
+    UINT RowBytes = 0;
+    UINT NumRows = 0;
+    BYTE* pSrcBits = pBitData;
+    const BYTE *pEndBits = pBitData + BitSize;
+    UINT iWidth = header->width;
+    UINT iHeight = header->height;
+    UINT iDepth = header->depth;
 
-			pInitData[index].pSysMem = (void*)pSrcBits;
-			pInitData[index].SysMemPitch = RowBytes;
-			pInitData[index].SysMemSlicePitch = NumBytes;
-			++index;
+    iWidth = twidth;
+    iHeight = theight;
+    iDepth = tdepth;
 
-			if (pSrcBits + (NumBytes*d) > pEndBits)
-			{
-				SAFE_DELETE_ARRAY(pInitData);
-				return HRESULT_FROM_WIN32(ERROR_HANDLE_EOF);
-			}
+    std::vector<BYTE> vecBlue;
+    std::vector<BYTE> vecGreen;
+    std::vector<BYTE> vecRed;
+    std::vector<BYTE> vecAlpha;
 
-			if (swaprgb || seta)
-			{
-				switch (format)
-				{
-				case DXGI_FORMAT_R8G8B8A8_UNORM:
-				{
-					BYTE *sptr = pSrcBits;
-					for (UINT slice = 0; slice < d; ++slice)
-					{
-						BYTE *rptr = sptr;
-						for (UINT row = 0; row < NumRows; ++row)
-						{
-							BYTE *ptr = rptr;
-							for (UINT x = 0; x < w; ++x, ptr += 4)
-							{
-								if (ptr + 4 <= pEndBits)
-								{
-									if (swaprgb)
-									{
-										BYTE a = ptr[0];
-										ptr[0] = ptr[2];
-										ptr[2] = a;
-									}
-									if (seta)
-										ptr[3] = 255;
-								}
-							}
-							rptr += RowBytes;
-						}
-						sptr += NumBytes;
-					}
-				}
-				break;
+    vecBlue.reserve(iWidth*iHeight*iMipCount);
+    vecGreen.reserve(iWidth*iHeight*iMipCount);
+    vecRed.reserve(iWidth*iHeight*iMipCount);
+    vecAlpha.reserve(iWidth*iHeight*iMipCount);
 
-				case DXGI_FORMAT_R10G10B10A2_UNORM:
-				{
-					BYTE *sptr = pSrcBits;
-					for (UINT slice = 0; slice < d; ++slice)
-					{
-						const BYTE *rptr = sptr;
-						for (UINT row = 0; row < NumRows; ++row)
-						{
-							DWORD *ptr = (DWORD*)rptr;
-							for (UINT x = 0; x < w; ++x, ++ptr)
-							{
-								if (ptr + 1 <= (DWORD*)pEndBits)
-								{
-									DWORD t = *ptr;
-									DWORD u = (t & 0x3ff00000) >> 20;
-									DWORD v = (t & 0x000003ff) << 20;
-									*ptr = (t & ~0x3ff003ff) | u | v;
-								}
-							}
-							rptr += RowBytes;
-						}
-						sptr += NumBytes;
-					}
-				}
-				break;
-				}
-			}
+    UINT index = 0;
+    for (UINT j = 0; j < arraySize; j++)
+    {
+        UINT w = iWidth;
+        UINT h = iHeight;
+        UINT d = iDepth;
+        for (UINT i = 0; i < iMipCount; i++)
+        {
+            GetSurfaceInfo(w, h, format, &NumBytes, &RowBytes, &NumRows);
 
-			pSrcBits += NumBytes * d;
+            pInitData[index].pSysMem = (void*)pSrcBits;
+            pInitData[index].SysMemPitch = RowBytes;
+            pInitData[index].SysMemSlicePitch = NumBytes;
+            ++index;
 
-			w = w >> 1;
-			h = h >> 1;
-			d = d >> 1;
-			if (w == 0)
-				w = 1;
-			if (h == 0)
-				h = 1;
-			if (d == 0)
-				d = 1;
-		}
-	}
+            if (pSrcBits + (NumBytes*d) > pEndBits)
+            {
+                SAFE_DELETE_ARRAY(pInitData);
+                return HRESULT_FROM_WIN32(ERROR_HANDLE_EOF);
+            }
+
+            BYTE* sptr = pSrcBits;
+            for (UINT slice = 0; slice < d; ++slice)
+            {
+                BYTE* rptr = sptr;
+                for (UINT row = 0; row < NumRows; ++row)
+                {
+                    BYTE* ptr = rptr;
+                    for (UINT x = 0; x < w; ++x, ptr += 4)
+                    {
+                        if (ptr + 4 <= pEndBits)
+                        {
+                            ptr[0] = 255; // blue
+                            //ptr[1] = 255; // green
+                            //ptr[2] = 255; // red
+                            //ptr[3] = 255; // alpha
+
+                            //BYTE bluecolor = *ptr;
+                            //BYTE greencolor = *(ptr + 1);
+                            //BYTE redcolor = *(ptr + 2);
+                            //BYTE alphacolor = *(ptr + 3);
+                            //vecBlue.push_back(bluecolor);
+                            //vecRed.push_back(redcolor);
+                            //vecGreen.push_back(greencolor);
+                            //vecAlpha.push_back(alphacolor);
+                        }
+                    }
+                    rptr += RowBytes;
+                }
+                sptr += NumBytes;
+            }
+        }
+    }
+
+
 
     if ( autogen )
     {
@@ -1547,6 +1521,7 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
         size_t tdepth = 0;
         hr = FillInitData( width, height, depth, mipCount, arraySize, format, maxsize, bitSize, bitData,
                            twidth, theight, tdepth, skipMip, initData.get() );
+
 
         if ( SUCCEEDED(hr) )
         {

@@ -61,13 +61,12 @@ void cMain::Init()
 
 	cTerrain::InitInfo tii;
 	tii.HeightMapFilename = L"Textures/test.raw";
-	tii.LayerMapFilename0 = L"Textures/darkdirt.dds";
-	tii.LayerMapFilename1 = L"Textures/snow.dds";
+	tii.LayerMapFilename0 = L"Textures/grass.dds";
+	tii.LayerMapFilename1 = L"Textures/darkdirt.dds";
 	tii.LayerMapFilename2 = L"Textures/stone.dds";
 	tii.LayerMapFilename3 = L"Textures/lightdirt.dds";
-	tii.LayerMapFilename4 = L"Textures/grass.dds";
-	tii.BlendMapFilename = L"Textures/blend.dds";
-    tii.BlendMapFilename = L"Image/asd.dds";
+	tii.LayerMapFilename4 = L"Textures/snow.dds";
+    tii.BlendMapFilename = L"Image/Test.dds";
 	tii.HeightScale = 50.f;
 	tii.HeightmapWidth = 257;
 	tii.HeightmapHeight = 257;
@@ -75,9 +74,13 @@ void cMain::Init()
 
 	m_pTerrain->Init(g_pD3DDevice->m_pDevice, g_pD3DDevice->m_pDevCon, tii);
 
-	m_pMouse->Init(m_pTerrain->m_pQuadPatchVertexBuffer
-		, m_pTerrain->m_pQuadPatchIndexBuffer
-		, m_pTerrain->m_vecHeightmap);
+    if (m_pMouse)
+    {
+        m_pMouse->Init(m_pTerrain->m_pQuadPatchVertexBuffer
+            , m_pTerrain->m_pQuadPatchIndexBuffer
+            , m_pTerrain->m_vecHeightmap);
+    }
+
 }
 
 void cMain::Update(float fDelta)
@@ -91,18 +94,25 @@ void cMain::Update(float fDelta)
         g_pD3DDevice->m_pDevCon->RSSetState(NULL);
     }
 
-	if (m_pMouse->HeightEdit())
-	{
-		m_pTerrain->ChangeHeightData(m_pMouse->GetHeight());
-	}
+    if (m_pMouse)
+    {
+        if (m_pMouse->HeightEdit())
+        {
+            m_pTerrain->ChangeHeightData(m_pMouse->GetHeight());
+        }
+    }
 
-	m_pTerrain->Update(fDelta);
-	m_pMouse->Update(fDelta);
+
+    m_pTerrain->Update(fDelta);
+    if (m_pMouse)
+    {
+        m_pMouse->Update(fDelta);
+    }
+
 }
 
 void cMain::Render()
 {
-	XMVECTORF32 Blue = { 0.0f, 0.0f, 1.0f, 1.0f };
 	g_pD3DDevice->m_pDevCon->ClearRenderTargetView(g_pD3DDevice->m_pRenderTargetView, reinterpret_cast<const float*>(&Colors::LightSteelBlue));
 	g_pD3DDevice->m_pDevCon->ClearDepthStencilView(g_pD3DDevice->m_pDepthStencilView,
 		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -112,7 +122,11 @@ void cMain::Render()
 		m_pTerrain->Render(g_pD3DDevice->m_pDevCon, *g_pCamera, m_DirLights);
 	}
 
-	m_pMouse->Render(m_DirLights);
+    if (m_pMouse)
+    {
+       m_pMouse->Render(m_DirLights);
+    }
+
 
 	g_pD3DDevice->m_pSwapChain->Present(0, 0);
 }
