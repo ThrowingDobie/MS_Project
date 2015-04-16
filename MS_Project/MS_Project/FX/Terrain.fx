@@ -268,7 +268,7 @@ DomainOut DS(PatchTess patchTess,
 		lerp(quad[0].Tex, quad[1].Tex, uv.x),
 		lerp(quad[2].Tex, quad[3].Tex, uv.x),
 		uv.y); 
-		
+
 	// Tile layer textures over terrain.
 	dout.TiledTex = dout.Tex*gTexScale; 
 	
@@ -333,10 +333,10 @@ float4 PS(DomainOut pin,
     
     // Blend the layers on top of each other.
     float4 texColor = c0;
-    texColor = lerp(texColor, c1, t.r);
-    texColor = lerp(texColor, c2, t.g);
+    //texColor = lerp(texColor, c1, t.r);
+    //texColor = lerp(texColor, c2, t.g);
     texColor = lerp(texColor, c3, t.b);
-    texColor = lerp(texColor, c4, t.a);
+    //texColor = lerp(texColor, c4, t.a);
  
 	//
 	// Lighting.
