@@ -24,6 +24,8 @@ cMousePicking::cMousePicking()
 
     m_eKeyTest = E_UP;
     m_eKeyReturn = E_UP;
+
+	m_eAlphaType = E_ALPHAEMPTY;
 }
 
 cMousePicking::~cMousePicking()
@@ -190,6 +192,7 @@ void cMousePicking::OnMouseDown(WPARAM btnState, int nX, int nY)
 	if ((btnState & MK_RBUTTON) != 0)
 	{
 		Pick(nX, nY);
+		m_vecPoint = SelectCircle(m_vPickingPoint.x, m_vPickingPoint.z, 10);
     }
 }
 
@@ -406,6 +409,42 @@ bool cMousePicking::HeightEdit()
 	}
 }
 
+bool cMousePicking::AlphaMap()
+{
+	if (GetAsyncKeyState('2') & 0x8000)
+	{
+		m_eAlphaType = E_GRASS;
+	}
+	else if (GetAsyncKeyState('3') & 0x8000)
+	{
+		m_eAlphaType = E_DARKDIRT;
+	}
+	else if (GetAsyncKeyState('4') & 0x8000)
+	{
+		m_eAlphaType = E_STONE;
+	}
+	else if (GetAsyncKeyState('5') & 0x8000)
+	{
+		m_eAlphaType = E_LIGHTDIRT;
+	}
+	if (m_eAlphaType != E_ALPHAEMPTY)
+	{
+		if (GetAsyncKeyState(VK_END) & 0x8000)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		return false;
+	}
+
+}
+
 std::vector<Vertex::ST_P_VERTEX> cMousePicking::GetHeight()
 {
 	return m_vecVertex;
@@ -415,6 +454,11 @@ float cMousePicking::GetGaussian(float fX, float fZ, float fRho)
 {
 	float g = 1.0f / sqrt(2.0f * D3DX_PI * fRho * fRho);
 	return g * exp(-(fX * fX + fZ * fZ) / (2 * fRho * fRho));
+}
+
+std::vector<D3DXVECTOR3> cMousePicking::GetVecPoint()
+{
+	return m_vecPoint;
 }
 
 void cMousePicking::CalGauss(int nX, int nZ, float fDelta)
@@ -504,34 +548,34 @@ std::vector<D3DXVECTOR3> cMousePicking::SelectCircle(int nX, int nZ, int nRange)
         }
     }
 
-    std::vector<D3DXVECTOR3> vecReturn;
+    //std::vector<D3DXVECTOR3> vecReturn;
 
-    for (int i = 0; i < vecVertex.size(); i++)
-    {
-        D3DXVECTOR3 vFrom(0.f, 0.f, 0.f);
-        D3DXVECTOR3 vTo(0.f, 0.f, 0.f);
-        D3DXVECTOR3 vDist(0.f, 0.f, 0.f);
+    //for (int i = 0; i < vecVertex.size(); i++)
+    //{
+    //    D3DXVECTOR3 vFrom(0.f, 0.f, 0.f);
+    //    D3DXVECTOR3 vTo(0.f, 0.f, 0.f);
+    //    D3DXVECTOR3 vDist(0.f, 0.f, 0.f);
 
-        vFrom.x = nX;
-        vFrom.z = nZ;
+    //    vFrom.x = nX;
+    //    vFrom.z = nZ;
 
-        vTo.x = vecVertex[i].x;
-        vTo.z = vecVertex[i].z;
+    //    vTo.x = vecVertex[i].x;
+    //    vTo.z = vecVertex[i].z;
 
-        vDist = vFrom - vTo;
+    //    vDist = vFrom - vTo;
 
-        float fDist = D3DXVec3Length(&vDist);
+    //    float fDist = D3DXVec3Length(&vDist);
 
-        if (fDist <= nRange)
-        {
-            D3DXVECTOR3 v(0.f, 0.f, 0.f);
-            v = vecVertex[i];
+    //    if (fDist <= nRange)
+    //    {
+    //        D3DXVECTOR3 v(0.f, 0.f, 0.f);
+    //        v = vecVertex[i];
 
-            vecReturn.push_back(v);
-        }
-    }
+    //        vecReturn.push_back(v);
+    //    }
+    //}
 
-    return vecReturn;
+	return vecVertex;
 }
 
 void cMousePicking::EraseHeight(int nRange)

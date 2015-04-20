@@ -35,6 +35,7 @@ public:
 	void SetWorld(CXMMATRIX M);
 
 	void ChangeHeightData(std::vector<Vertex::ST_P_VERTEX> vecVertex);
+	void SetMappingPoint(std::vector<D3DXVECTOR3> vecPoint);
 
 	float Average(int i, int j);
 private:
@@ -46,6 +47,8 @@ private:
 	void BuildQuadPatchVB(ID3D11Device* device);
 	void BuildQuadPatchIB(ID3D11Device* device);
 	void BuildHeightmapSRV(ID3D11Device* device);
+
+	std::vector<D3DXVECTOR3> m_vecPoint;
 
 private:
 	static const int CellsPerPatch = 64;

@@ -66,7 +66,7 @@ void cMain::Init()
 	tii.LayerMapFilename2 = L"Textures/stone.dds";
 	tii.LayerMapFilename3 = L"Textures/lightdirt.dds";
 	tii.LayerMapFilename4 = L"Textures/snow.dds";
-    tii.BlendMapFilename = L"Image/blend.dds";
+    //tii.BlendMapFilename = L"Image/blend.dds";
 	tii.HeightScale = 50.f;
 	tii.HeightmapWidth = 257;
 	tii.HeightmapHeight = 257;
@@ -100,6 +100,10 @@ void cMain::Update(float fDelta)
         {
             m_pTerrain->ChangeHeightData(m_pMouse->GetHeight());
         }
+		if (m_pMouse->AlphaMap())
+		{
+			m_pTerrain->SetMappingPoint(m_pMouse->GetVecPoint());
+		}
     }
 
 

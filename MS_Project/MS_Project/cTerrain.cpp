@@ -41,42 +41,6 @@ cTerrain::~cTerrain()
 
 void cTerrain::Setup()
 {
-    //DXGI_FORMAT format = DXGI_FORMAT_FROM_FILE;
-    //UINT filter = D3DX11_FILTER_NONE;
-    //UINT mipFilter = D3DX11_FILTER_LINEAR;
-
-    //D3DX11_IMAGE_LOAD_INFO loadInfo;
-
-    ////loadInfo.Width = 1024;
-    ////loadInfo.Height = 1024;
-    //loadInfo.Width = D3DX11_FROM_FILE;
-    //loadInfo.Height = D3DX11_FROM_FILE;
-    //loadInfo.Depth = D3DX11_FROM_FILE;
-    //loadInfo.FirstMipLevel = 0;
-    //loadInfo.MipLevels = D3DX11_FROM_FILE;
-    //loadInfo.Usage = D3D11_USAGE_STAGING;
-    //loadInfo.BindFlags = 0;
-    //loadInfo.CpuAccessFlags = D3D11_CPU_ACCESS_WRITE | D3D11_CPU_ACCESS_READ;
-    //loadInfo.MiscFlags = 0;
-    //loadInfo.Format = format;
-    //loadInfo.Filter = filter;
-    //loadInfo.MipFilter = mipFilter;
-    //loadInfo.pSrcInfo = 0;
-
-
-
-
-
-    //// png->dds
-    //D3DX11CreateTextureFromFile(g_pD3DDevice->m_pDevice, L"./Image/test_png.png", &loadInfo, 0
-    //    , &Test, 0);
-    //D3DX11SaveTextureToFile(g_pD3DDevice->m_pDevCon, Test, D3DX11_IFF_DDS, L"./Image/asd.dds");
-
-    //// dds->png
-    //D3DX11CreateTextureFromFile(g_pD3DDevice->m_pDevice, L"./Textures/blend.dds", &loadInfo, 0, &Test, 0);
-    //D3DX11SaveTextureToFile(g_pD3DDevice->m_pDevCon, Test, D3DX11_IFF_PNG, L"./Textures/asdpng.png");
-
-
 }
 
 void cTerrain::Init(ID3D11Device* device, ID3D11DeviceContext* dc, const InitInfo& initInfo)
@@ -108,16 +72,19 @@ void cTerrain::Init(ID3D11Device* device, ID3D11DeviceContext* dc, const InitInf
 
     //HR(D3DX11CreateShaderResourceViewFromFile(device,
     //    m_Info.BlendMapFilename.c_str(), 0, 0, &m_pBlendMapSRV, 0));
+	
+	D3DXVECTOR3 vec(1, 0, 1);
+	m_vecPoint.push_back(vec);
 
     DirectX::CreateDDSTextureFromFile(g_pD3DDevice->m_pDevice,
-        L"./Image/blend.dds", 0, &m_pBlendMapSRV, 0, 0);
+		L"./Image/blend.dds", 0, &m_pBlendMapSRV, 0, 0, &m_vecPoint);
 }
 
 void cTerrain::Update(float fDelta)
 {
 	//BuildQuadPatchVB(g_pD3DDevice->m_pDevice);
 	//BuildQuadPatchIB(g_pD3DDevice->m_pDevice);
-	BuildHeightmapSRV(g_pD3DDevice->m_pDevice);
+
 }
 
 void cTerrain::Render(ID3D11DeviceContext* dc, const Camera& cam, DirectionalLight lights[3])
@@ -517,4 +484,74 @@ void cTerrain::ChangeHeightData(std::vector<Vertex::ST_P_VERTEX> vecVertex)
 	{
 		m_vecHeightmap[i] = vecVertex[i].Pos.y;
 	}
+
+	BuildHeightmapSRV(g_pD3DDevice->m_pDevice);
 }
+
+void cTerrain::SetMappingPoint(std::vector<D3DXVECTOR3> vecPoint)
+{
+	ID3D11Resource* pSave;
+
+	m_vecPoint = vecPoint;
+	DirectX::CreateDDSTextureFromFile(g_pD3DDevice->m_pDevice,
+		L"./Image/blend.dds", &pSave, &m_pBlendMapSRV, 0, 0, &m_vecPoint);
+
+	//DXGI_FORMAT format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	//UINT filter = D3DX11_FILTER_SRGB;
+	//UINT mipFilter = D3DX11_FILTER_TRIANGLE;
+
+	DXGI_FORMAT format = DXGI_FORMAT_FROM_FILE;
+	UINT filter = D3DX11_FILTER_NONE;
+	UINT mipFilter = D3DX11_FILTER_LINEAR;
+
+	D3DX11_IMAGE_LOAD_INFO loadInfo;
+
+	loadInfo.Width = D3DX11_FROM_FILE;
+	loadInfo.Height = D3DX11_FROM_FILE;
+	loadInfo.Depth = D3DX11_FROM_FILE;
+	loadInfo.FirstMipLevel = 0;
+	loadInfo.MipLevels = D3DX11_FROM_FILE;
+	loadInfo.Usage = D3D11_USAGE_STAGING;
+	loadInfo.BindFlags = 0;
+	loadInfo.CpuAccessFlags = D3D11_CPU_ACCESS_WRITE | D3D11_CPU_ACCESS_READ;
+	loadInfo.MiscFlags = 0;
+	loadInfo.Format = format;
+	loadInfo.Filter = filter;
+	loadInfo.MipFilter = mipFilter;
+	loadInfo.pSrcInfo = 0;
+
+	D3DX11SaveTextureToFile(g_pD3DDevice->m_pDevCon, pSave, D3DX11_IFF_DDS, L"./Image/blend.dds");
+}
+//DXGI_FORMAT format = DXGI_FORMAT_FROM_FILE;
+//UINT filter = D3DX11_FILTER_NONE;
+//UINT mipFilter = D3DX11_FILTER_LINEAR;
+
+//D3DX11_IMAGE_LOAD_INFO loadInfo;
+
+////loadInfo.Width = 1024;
+////loadInfo.Height = 1024;
+//loadInfo.Width = D3DX11_FROM_FILE;
+//loadInfo.Height = D3DX11_FROM_FILE;
+//loadInfo.Depth = D3DX11_FROM_FILE;
+//loadInfo.FirstMipLevel = 0;
+//loadInfo.MipLevels = D3DX11_FROM_FILE;
+//loadInfo.Usage = D3D11_USAGE_STAGING;
+//loadInfo.BindFlags = 0;
+//loadInfo.CpuAccessFlags = D3D11_CPU_ACCESS_WRITE | D3D11_CPU_ACCESS_READ;
+//loadInfo.MiscFlags = 0;
+//loadInfo.Format = format;
+//loadInfo.Filter = filter;
+//loadInfo.MipFilter = mipFilter;
+//loadInfo.pSrcInfo = 0;
+
+
+//ID3D11Resource* Test;
+
+////png->dds
+//D3DX11CreateTextureFromFile(g_pD3DDevice->m_pDevice, L"./Image/test_png.png", &loadInfo, 0
+//    , &Test, 0);
+//D3DX11SaveTextureToFile(g_pD3DDevice->m_pDevCon, Test, D3DX11_IFF_DDS, L"./Image/asd.dds");
+
+//// dds->png
+//D3DX11CreateTextureFromFile(g_pD3DDevice->m_pDevice, L"./Textures/blend.dds", &loadInfo, 0, &Test, 0);
+//D3DX11SaveTextureToFile(g_pD3DDevice->m_pDevCon, Test, D3DX11_IFF_PNG, L"./Textures/asdpng.png");
