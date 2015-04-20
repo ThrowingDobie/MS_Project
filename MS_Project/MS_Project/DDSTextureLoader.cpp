@@ -1312,6 +1312,105 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
         return HRESULT_FROM_WIN32( ERROR_NOT_SUPPORTED );
     }
 
+	/////////////////
+	UINT iMipCount = mipCount;
+	BYTE* pBitData = (BYTE*)bitData;
+	size_t BitSize = bitSize;
+
+	D3D11_SUBRESOURCE_DATA* pInitData = new D3D11_SUBRESOURCE_DATA[iMipCount * arraySize];
+
+	std::unique_ptr<D3D11_SUBRESOURCE_DATA[]> initData(new (std::nothrow) D3D11_SUBRESOURCE_DATA[mipCount * arraySize]);
+
+	size_t skipMip = 0;
+	size_t twidth = 0;
+	size_t theight = 0;
+	size_t tdepth = 0;
+	hr = FillInitData(width, height, depth, mipCount, arraySize, format, maxsize, bitSize, bitData,
+		twidth, theight, tdepth, skipMip, initData.get());
+
+
+	UINT NumBytes = 0;
+	UINT RowBytes = 0;
+	UINT NumRows = 0;
+	BYTE* pSrcBits = pBitData;
+	const BYTE *pEndBits = pBitData + BitSize;
+	UINT iWidth = header->width;
+	UINT iHeight = header->height;
+	UINT iDepth = header->depth;
+
+	iWidth = twidth;
+	iHeight = theight;
+	iDepth = tdepth;
+
+	std::vector<BYTE> vecBlue;
+	std::vector<BYTE> vecGreen;
+	std::vector<BYTE> vecRed;
+	std::vector<BYTE> vecAlpha;
+
+	vecBlue.reserve(iWidth*iHeight*iMipCount);
+	vecGreen.reserve(iWidth*iHeight*iMipCount);
+	vecRed.reserve(iWidth*iHeight*iMipCount);
+	vecAlpha.reserve(iWidth*iHeight*iMipCount);
+
+	UINT index = 0;
+	for (UINT j = 0; j < arraySize; j++)
+	{
+		UINT w = iWidth;
+		UINT h = iHeight;
+		UINT d = iDepth;
+		for (UINT i = 0; i < iMipCount; i++)
+		{
+			GetSurfaceInfo(w, h, format, &NumBytes, &RowBytes, &NumRows);
+
+			pInitData[index].pSysMem = (void*)pSrcBits;
+			pInitData[index].SysMemPitch = RowBytes;
+			pInitData[index].SysMemSlicePitch = NumBytes;
+			++index;
+
+			if (pSrcBits + (NumBytes*d) > pEndBits)
+			{
+				SAFE_DELETE_ARRAY(pInitData);
+				return HRESULT_FROM_WIN32(ERROR_HANDLE_EOF);
+			}
+
+			BYTE* sptr = pSrcBits;
+			for (UINT slice = 0; slice < d; ++slice)
+			{
+				BYTE* rptr = sptr;
+				for (UINT row = 0; row < NumRows; ++row)
+				{
+					BYTE* ptr = rptr;
+					for (UINT x = 0; x < w; ++x, ptr += 4)
+					{
+						if (ptr + 4 <= pEndBits)
+						{
+							//BYTE TestA = 255;
+							//BYTE TestB = 255;
+							//BYTE TestC = 255;
+							//BYTE TestD = 255;
+
+							//ptr[0] = TestA; // blue
+							//ptr[1] = TestB; // green
+							//ptr[2] = TestC; // red
+							//ptr[3] = TestD; // alpha
+
+							//BYTE bluecolor = *ptr;
+							//BYTE greencolor = *(ptr + 1);
+							//BYTE redcolor = *(ptr + 2);
+							//BYTE alphacolor = *(ptr + 3);
+							//vecBlue.push_back(bluecolor);
+							//vecRed.push_back(redcolor);
+							//vecGreen.push_back(greencolor);
+							//vecAlpha.push_back(alphacolor);
+						}
+					}
+					rptr += RowBytes;
+				}
+				sptr += NumBytes;
+			}
+		}
+	}
+
     bool autogen = false;
     if ( mipCount == 1 && d3dContext != 0 && textureView != 0 ) // Must have context and shader-view to auto generate mipmaps
     {
@@ -1328,101 +1427,6 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
             }
         }
     }
-
-	/////////////////
-    UINT iMipCount = mipCount;
-    BYTE* pBitData = (BYTE*)bitData;
-    size_t BitSize = bitSize;
-
-    D3D11_SUBRESOURCE_DATA* pInitData = new D3D11_SUBRESOURCE_DATA[iMipCount * arraySize];
-
-    std::unique_ptr<D3D11_SUBRESOURCE_DATA[]> initData(new (std::nothrow) D3D11_SUBRESOURCE_DATA[mipCount * arraySize]);
-
-    size_t skipMip = 0;
-    size_t twidth = 0;
-    size_t theight = 0;
-    size_t tdepth = 0;
-    hr = FillInitData(width, height, depth, mipCount, arraySize, format, maxsize, bitSize, bitData,
-        twidth, theight, tdepth, skipMip, initData.get());
-
-
-    UINT NumBytes = 0;
-    UINT RowBytes = 0;
-    UINT NumRows = 0;
-    BYTE* pSrcBits = pBitData;
-    const BYTE *pEndBits = pBitData + BitSize;
-    UINT iWidth = header->width;
-    UINT iHeight = header->height;
-    UINT iDepth = header->depth;
-
-    iWidth = twidth;
-    iHeight = theight;
-    iDepth = tdepth;
-
-    std::vector<BYTE> vecBlue;
-    std::vector<BYTE> vecGreen;
-    std::vector<BYTE> vecRed;
-    std::vector<BYTE> vecAlpha;
-
-    vecBlue.reserve(iWidth*iHeight*iMipCount);
-    vecGreen.reserve(iWidth*iHeight*iMipCount);
-    vecRed.reserve(iWidth*iHeight*iMipCount);
-    vecAlpha.reserve(iWidth*iHeight*iMipCount);
-
-    UINT index = 0;
-    for (UINT j = 0; j < arraySize; j++)
-    {
-        UINT w = iWidth;
-        UINT h = iHeight;
-        UINT d = iDepth;
-        for (UINT i = 0; i < iMipCount; i++)
-        {
-            GetSurfaceInfo(w, h, format, &NumBytes, &RowBytes, &NumRows);
-
-            pInitData[index].pSysMem = (void*)pSrcBits;
-            pInitData[index].SysMemPitch = RowBytes;
-            pInitData[index].SysMemSlicePitch = NumBytes;
-            ++index;
-
-            if (pSrcBits + (NumBytes*d) > pEndBits)
-            {
-                SAFE_DELETE_ARRAY(pInitData);
-                return HRESULT_FROM_WIN32(ERROR_HANDLE_EOF);
-            }
-
-            BYTE* sptr = pSrcBits;
-            for (UINT slice = 0; slice < d; ++slice)
-            {
-                BYTE* rptr = sptr;
-                for (UINT row = 0; row < NumRows; ++row)
-                {
-                    BYTE* ptr = rptr;
-                    for (UINT x = 0; x < w; ++x, ptr += 4)
-                    {
-                        if (ptr + 4 <= pEndBits)
-                        {
-                            ptr[0] = 255; // blue
-                            ptr[1] = 255; // green
-                            ptr[2] = 255; // red
-                            ptr[3] = 255; // alpha
-
-                            //BYTE bluecolor = *ptr;
-                            //BYTE greencolor = *(ptr + 1);
-                            //BYTE redcolor = *(ptr + 2);
-                            //BYTE alphacolor = *(ptr + 3);
-                            //vecBlue.push_back(bluecolor);
-                            //vecRed.push_back(redcolor);
-                            //vecGreen.push_back(greencolor);
-                            //vecAlpha.push_back(alphacolor);
-                        }
-                    }
-                    rptr += RowBytes;
-                }
-                sptr += NumBytes;
-            }
-        }
-    }
-
 
 
     if ( autogen )

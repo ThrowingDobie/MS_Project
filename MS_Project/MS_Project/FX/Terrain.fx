@@ -58,6 +58,16 @@ SamplerState samLinear
 	AddressV = WRAP;
 };
 
+SamplerState samBlend
+{
+	//Filter = ANISOTROPIC;
+
+	Filter = ANISOTROPIC;
+
+	AddressU = WRAP;
+	AddressV = WRAP;
+};
+
 SamplerState samHeightmap
 {
 	Filter = MIN_MAG_LINEAR_MIP_POINT;
@@ -322,21 +332,27 @@ float4 PS(DomainOut pin,
 	//
 	
 	// Sample layers in texture array.
-	float4 c0 = gLayerMapArray.Sample( samLinear, float3(pin.TiledTex, 0.0f) );
-	float4 c1 = gLayerMapArray.Sample( samLinear, float3(pin.TiledTex, 1.0f) );
-	float4 c2 = gLayerMapArray.Sample( samLinear, float3(pin.TiledTex, 2.0f) );
-	float4 c3 = gLayerMapArray.Sample( samLinear, float3(pin.TiledTex, 3.0f) );
-	float4 c4 = gLayerMapArray.Sample( samLinear, float3(pin.TiledTex, 4.0f) ); 
-	
+	float4 c0 = gLayerMapArray.Sample(samLinear, float3(pin.TiledTex, 0.0f));
+	float4 c1 = gLayerMapArray.Sample(samLinear, float3(pin.TiledTex, 1.0f));
+	float4 c2 = gLayerMapArray.Sample(samLinear, float3(pin.TiledTex, 2.0f));
+	float4 c3 = gLayerMapArray.Sample(samLinear, float3(pin.TiledTex, 3.0f));
+	float4 c4 = gLayerMapArray.Sample(samLinear, float3(pin.TiledTex, 4.0f));
+
 	// Sample the blend map.
-	float4 t  = gBlendMap.Sample( samLinear, pin.Tex ); 
-    
-    // Blend the layers on top of each other.
-    float4 texColor = c0;
-    texColor = lerp(texColor, c1, t.r);
-    texColor = lerp(texColor, c2, t.g);
-    texColor = lerp(texColor, c3, t.b);
-    texColor = lerp(texColor, c4, t.a);
+	float4 t = gBlendMap.Sample(samBlend, pin.Tex);
+
+	// Blend the layers on top of each other.
+	float4 texColor = c0;
+
+	float4 red = t.r;
+	float4 green = t.g;
+	float4 blue = t.b;
+	float4 alpha = t.w;
+
+	texColor = lerp(texColor, c1, t.r);
+	texColor = lerp(texColor, c2, t.g);
+	texColor = lerp(texColor, c3, t.b);
+	texColor = lerp(texColor, c4, t.a);
  
 	//
 	// Lighting.
