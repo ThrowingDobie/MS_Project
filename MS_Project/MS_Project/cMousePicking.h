@@ -54,7 +54,7 @@ private:
     KeyType m_eKeyTest;
     KeyType m_eKeyReturn;
 
-
+	XMVECTOR GetNearPoint(std::vector<XMVECTOR> vecPoint);
 
 private:
 	ID3D11Buffer* m_pVertexBuffer;

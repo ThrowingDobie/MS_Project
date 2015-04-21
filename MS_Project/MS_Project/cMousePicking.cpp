@@ -304,88 +304,62 @@ void cMousePicking::Pick(int nX, int nY)
 	rayDir = XMVector3TransformNormal(rayDir, toLocal);
 
 	rayDir = XMVector3Normalize(rayDir);
-	rayOrigin = XMLoadFloat3(&g_pCamera->GetPosition());
 
+
+	std::vector<XMVECTOR> vecPoint;
 	XMVECTOR* vFirst = nullptr;
 	XMVECTOR* vSecond = nullptr;
-	for (int i = 0; i < m_vecVertex.size() - (MAP_SIZE + 2); i++)
+	int nTest = 0;
+	//for (int i = 0; i < m_vecVertex.size() - (MAP_SIZE + 2); i++);
+	for (int i = 0; i < m_vecVertex.size(); i++)
 	{
-		if (i % MAP_SIZE != MAP_SIZE - 1)
+		if (i % MAP_SIZE == MAP_SIZE - 1)
 		{
-			UINT i0 = (i + 0); 
-			UINT i1 = (i + 1);
-			UINT i2 = (i + 1) + MAP_SIZE;
-
-			XMVECTOR v0 = XMLoadFloat3(&m_vecVertex[i0].Pos);
-			XMVECTOR v1 = XMLoadFloat3(&m_vecVertex[i1].Pos);
-			XMVECTOR v2 = XMLoadFloat3(&m_vecVertex[i2].Pos);
-
-			float fDist = 0.f;
-			bool isColliedTri = false;
-			isColliedTri = XNA::IntersectRayTriangle(rayOrigin, rayDir, v0, v1, v2, &fDist);
-
-			if (isColliedTri == true)
-			{
-				XMVECTOR vPickingPoint;
-				vPickingPoint = rayOrigin + (fDist*rayDir);
-				XMStoreFloat3(&m_vPickingPoint, vPickingPoint);
-
-				vFirst = new XMVECTOR;
-				vFirst = &vPickingPoint;
-				//return;
-			}
-
-			i0 = (i + 1) + MAP_SIZE;
-			i1 = (i + 0) + MAP_SIZE;
-			i2 = (i + 0);
-
-			v0 = XMLoadFloat3(&m_vecVertex[i0].Pos);
-			v1 = XMLoadFloat3(&m_vecVertex[i1].Pos);
-			v2 = XMLoadFloat3(&m_vecVertex[i2].Pos);
-
-			fDist = 0.f;
-			isColliedTri = XNA::IntersectRayTriangle(rayOrigin, rayDir, v0, v1, v2, &fDist);
-
-			if (isColliedTri == true)
-			{
-				XMVECTOR vPickingPoint;
-				vPickingPoint = rayOrigin + (fDist*rayDir);
-				XMStoreFloat3(&m_vPickingPoint, vPickingPoint);
-
-				vSecond = new XMVECTOR;
-				vSecond = &vPickingPoint;
-				//return;
-			}
+			nTest = 1;
 		}
-		if (vFirst != nullptr && vSecond != nullptr)
+		else
 		{
-			XMVECTOR vDistFirst = rayOrigin - *vFirst;
-			XMVECTOR vDistSecond = rayOrigin - *vSecond;
-
-			XMFLOAT3 v3First;
-			XMFLOAT3 v3Second;
-
-			XMStoreFloat3(&v3First, vDistFirst);
-			XMStoreFloat3(&v3Second, vDistSecond);
-
-			D3DXVECTOR3 d3First(v3First.x, v3First.y, v3First.z);
-			D3DXVECTOR3 d3Second(v3Second.x, v3Second.y, v3Second.z);
-
-			float fDistFirst = D3DXVec3Length(&d3First);
-			float fDistSecond = D3DXVec3Length(&d3Second);
-
-			if (fDistFirst > fDistSecond)
-			{
-				XMStoreFloat3(&m_vPickingPoint, vDistFirst);
-			}
-			else
-			{
-				XMStoreFloat3(&m_vPickingPoint, vDistSecond);
-
-			}
+			nTest = 0;
 		}
 
+		UINT i0 = (i + 0) + nTest;
+		UINT i1 = (i + 1) + nTest;
+		UINT i2 = (i + 1) + MAP_SIZE + nTest;
+		UINT i3 = (i + 0) + MAP_SIZE + nTest;
+
+		if (i3 >= m_vecVertex.size())
+		{
+			if (vecPoint.size()>0)
+			{
+				XMStoreFloat3(&m_vPickingPoint, GetNearPoint(vecPoint));
+			}
+			return;
+		}
+
+		XMVECTOR v0 = XMLoadFloat3(&m_vecVertex[i0].Pos);
+		XMVECTOR v1 = XMLoadFloat3(&m_vecVertex[i1].Pos);
+		XMVECTOR v2 = XMLoadFloat3(&m_vecVertex[i2].Pos);
+		XMVECTOR v3 = XMLoadFloat3(&m_vecVertex[i3].Pos);
+
+		float fDist = 0.f;
+		bool isColliedTri = false;
+		XMVECTOR vPickingPoint;
+
+		isColliedTri = XNA::IntersectRayTriangle(rayOrigin, rayDir, v0, v1, v2, &fDist);
+		if (isColliedTri == true)
+		{
+			vPickingPoint = rayOrigin + (fDist*rayDir);
+			vecPoint.push_back(vPickingPoint);
+		}
+
+		isColliedTri = XNA::IntersectRayTriangle(rayOrigin, rayDir, v2, v3, v0, &fDist);
+		if (isColliedTri == true)
+		{
+			vPickingPoint = rayOrigin + (fDist*rayDir);
+			vecPoint.push_back(vPickingPoint);
+		}
 	}
+
 }
 
 bool cMousePicking::HeightEdit()
@@ -531,13 +505,16 @@ void cMousePicking::CalGauss(int nX, int nZ, float fDelta)
 	int nGaussX = -nRange;
 	int nGaussZ = -nRange;
 
-
     float fAverage = 0.f;
     int nSize = 0;
     for (int z = nZ - nRange; z <= nZ + nRange; z++)
     {
         for (int x = nX - nRange; x <= nX + nRange; x++)
         {
+			if (x + (MAP_SIZE - z)*MAP_SIZE < 0 || x + (MAP_SIZE - z)*MAP_SIZE >= m_vecVertex.size())
+			{
+				return;
+			}
             fAverage += m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y;
             nSize++;
         }
@@ -657,4 +634,32 @@ void cMousePicking::SetMappingData()
 DirectX::ST_PD_VERTEX cMousePicking::GetMappingData()
 {
 	return m_pdVertex;
+}
+
+XMVECTOR cMousePicking::GetNearPoint(std::vector<XMVECTOR> vecPoint)
+{
+	XMVECTOR returnVector;
+	float returnDist = 0.0f;
+	XMVECTOR vCamera = XMLoadFloat3(&g_pCamera->GetPosition());	
+
+	for (int i = 0; i < vecPoint.size(); i++)
+	{
+		XMVECTOR vDist = vCamera - vecPoint[i];
+		XMFLOAT3 v3Dist;
+		XMStoreFloat3(&v3Dist, vDist);
+		D3DXVECTOR3 d3Dist(v3Dist.x, v3Dist.y, v3Dist.z);
+		float fDist = D3DXVec3Length(&d3Dist);
+
+		if (returnDist == 0.0f)
+		{
+			returnDist = fDist;
+			returnVector = vecPoint[i];
+		}
+		else if (returnDist >= fDist)
+		{
+			returnDist = fDist;
+			returnVector = vecPoint[i];
+		}
+	}
+	return returnVector;
 }
