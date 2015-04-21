@@ -294,7 +294,8 @@ void cMousePicking::Pick(int nX, int nY)
 	XMMATRIX V = g_pCamera->View();
 	XMMATRIX invView = XMMatrixInverse(&XMMatrixDeterminant(V), V);
 
-	XMMATRIX W = XMLoadFloat4x4(&m_matMeshWorld);
+	XMMATRIX W = XMMatrixIdentity();
+	//XMMATRIX W = XMLoadFloat4x4(&m_matMeshWorld);
 	XMMATRIX invWorld = XMMatrixInverse(&XMMatrixDeterminant(W), W);
 
 	XMMATRIX toLocal = XMMatrixMultiply(invView, invWorld);
@@ -303,10 +304,10 @@ void cMousePicking::Pick(int nX, int nY)
 	rayDir = XMVector3TransformNormal(rayDir, toLocal);
 
 	rayDir = XMVector3Normalize(rayDir);
-	//
+	rayOrigin = XMLoadFloat3(&g_pCamera->GetPosition());
 
-	XMVECTOR vFirst;
-	XMVECTOR vSecond;
+	XMVECTOR* vFirst = nullptr;
+	XMVECTOR* vSecond = nullptr;
 	for (int i = 0; i < m_vecVertex.size() - (MAP_SIZE + 2); i++)
 	{
 		if (i % MAP_SIZE != MAP_SIZE - 1)
@@ -329,7 +330,8 @@ void cMousePicking::Pick(int nX, int nY)
 				vPickingPoint = rayOrigin + (fDist*rayDir);
 				XMStoreFloat3(&m_vPickingPoint, vPickingPoint);
 
-				vFirst = vPickingPoint;
+				vFirst = new XMVECTOR;
+				vFirst = &vPickingPoint;
 				//return;
 			}
 
@@ -350,32 +352,39 @@ void cMousePicking::Pick(int nX, int nY)
 				vPickingPoint = rayOrigin + (fDist*rayDir);
 				XMStoreFloat3(&m_vPickingPoint, vPickingPoint);
 
-				vSecond = vPickingPoint;
+				vSecond = new XMVECTOR;
+				vSecond = &vPickingPoint;
 				//return;
 			}
 		}
-		XMVECTOR vDistFirst = vFirst - rayOrigin;
-		XMVECTOR vDistSecond = vSecond - rayOrigin;
-
-		XMFLOAT3 v3First;
-		XMFLOAT3 v3Second;
-
-		XMStoreFloat3(&v3First, vDistFirst);
-		XMStoreFloat3(&v3Second, vDistSecond);
-
-		D3DXVECTOR3 d3First(v3First.x, v3First.y, v3First.z);
-		D3DXVECTOR3 d3Second(v3Second.x, v3Second.y, v3Second.z);
-
-		float fDistFirst = D3DXVec3Length(&d3First);
-		float fDistSecond = D3DXVec3Length(&d3Second);
-		if (fDistFirst < fDistSecond)
+		if (vFirst != nullptr && vSecond != nullptr)
 		{
-			XMStoreFloat3(&m_vPickingPoint, vDistFirst);
+			XMVECTOR vDistFirst = rayOrigin - *vFirst;
+			XMVECTOR vDistSecond = rayOrigin - *vSecond;
+
+			XMFLOAT3 v3First;
+			XMFLOAT3 v3Second;
+
+			XMStoreFloat3(&v3First, vDistFirst);
+			XMStoreFloat3(&v3Second, vDistSecond);
+
+			D3DXVECTOR3 d3First(v3First.x, v3First.y, v3First.z);
+			D3DXVECTOR3 d3Second(v3Second.x, v3Second.y, v3Second.z);
+
+			float fDistFirst = D3DXVec3Length(&d3First);
+			float fDistSecond = D3DXVec3Length(&d3Second);
+
+			if (fDistFirst > fDistSecond)
+			{
+				XMStoreFloat3(&m_vPickingPoint, vDistFirst);
+			}
+			else
+			{
+				XMStoreFloat3(&m_vPickingPoint, vDistSecond);
+
+			}
 		}
-		else
-		{
-			XMStoreFloat3(&m_vPickingPoint, vDistSecond);
-		}
+
 	}
 }
 
