@@ -224,7 +224,7 @@ void cDeviceManager::CalculateFrameStats()
 		outs << "Main"		   << L"    "
 			<< L"FPS: " << fps << L"    "
 			<< L"Frame Time: " << mspf << L" (ms)";
-		//SetWindowText(g_hWnd, outs.str().c_str());
+		SetWindowText(g_hWnd, outs.str().c_str());
 
 		// Reset for next average.
 		m_nFrameCnt = 0;

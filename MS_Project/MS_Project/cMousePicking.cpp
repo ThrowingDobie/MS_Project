@@ -126,12 +126,12 @@ void cMousePicking::Update(float fDelta)
 
 void cMousePicking::Render(DirectionalLight lights[3])
 {
-	std::wostringstream outs;
-	outs.precision(3);
-	outs << L"X = " << m_vPickingPoint.x << L"   Z = " << m_vPickingPoint.z
-		<< L"   Y = " << m_vPickingPoint.y;
+	//std::wostringstream outs;
+	//outs.precision(3);
+	//outs << L"X = " << m_vPickingPoint.x << L"   Z = " << m_vPickingPoint.z
+	//	<< L"   Y = " << m_vPickingPoint.y;
 
-	SetWindowText(g_hWnd, outs.str().c_str());
+	//SetWindowText(g_hWnd, outs.str().c_str());
 
 	g_pD3DDevice->m_pDevCon->IASetInputLayout(InputLayouts::Basic32);
 	g_pD3DDevice->m_pDevCon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
