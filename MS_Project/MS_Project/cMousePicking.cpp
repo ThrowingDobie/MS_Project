@@ -305,6 +305,8 @@ void cMousePicking::Pick(int nX, int nY)
 	rayDir = XMVector3Normalize(rayDir);
 	//
 
+	XMVECTOR vFirst;
+	XMVECTOR vSecond;
 	for (int i = 0; i < m_vecVertex.size() - (MAP_SIZE + 2); i++)
 	{
 		if (i % MAP_SIZE != MAP_SIZE - 1)
@@ -326,6 +328,8 @@ void cMousePicking::Pick(int nX, int nY)
 				XMVECTOR vPickingPoint;
 				vPickingPoint = rayOrigin + (fDist*rayDir);
 				XMStoreFloat3(&m_vPickingPoint, vPickingPoint);
+
+				vFirst = vPickingPoint;
 				//return;
 			}
 
@@ -345,8 +349,32 @@ void cMousePicking::Pick(int nX, int nY)
 				XMVECTOR vPickingPoint;
 				vPickingPoint = rayOrigin + (fDist*rayDir);
 				XMStoreFloat3(&m_vPickingPoint, vPickingPoint);
+
+				vSecond = vPickingPoint;
 				//return;
 			}
+		}
+		XMVECTOR vDistFirst = vFirst - rayOrigin;
+		XMVECTOR vDistSecond = vSecond - rayOrigin;
+
+		XMFLOAT3 v3First;
+		XMFLOAT3 v3Second;
+
+		XMStoreFloat3(&v3First, vDistFirst);
+		XMStoreFloat3(&v3Second, vDistSecond);
+
+		D3DXVECTOR3 d3First(v3First.x, v3First.y, v3First.z);
+		D3DXVECTOR3 d3Second(v3Second.x, v3Second.y, v3Second.z);
+
+		float fDistFirst = D3DXVec3Length(&d3First);
+		float fDistSecond = D3DXVec3Length(&d3Second);
+		if (fDistFirst < fDistSecond)
+		{
+			XMStoreFloat3(&m_vPickingPoint, vDistFirst);
+		}
+		else
+		{
+			XMStoreFloat3(&m_vPickingPoint, vDistSecond);
 		}
 	}
 }
