@@ -1132,6 +1132,7 @@ static HRESULT CreateD3DResources( _In_ ID3D11Device* d3dDevice,
 
 
 //--------------------------------------------------------------------------------------
+
 static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
                                      _In_opt_ ID3D11DeviceContext* d3dContext,
                                      _In_ const DDS_HEADER* header,
@@ -1145,7 +1146,9 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
                                      _In_ bool forceSRGB,
                                      _Outptr_opt_ ID3D11Resource** texture,
                                      _Outptr_opt_ ID3D11ShaderResourceView** textureView,
-									 std::vector<D3DXVECTOR3>* pvecPoint)
+									 std::vector<D3DXVECTOR3>* pvecPoint,
+									 DirectX::TextureType eType
+									 )
 {
     HRESULT hr = S_OK;
 
@@ -1343,7 +1346,6 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
 	hr = FillInitData(width, height, depth, mipCount, arraySize, format, maxsize, bitSize, bitData,
 		twidth, theight, tdepth, skipMip, initData.get());
 
-
 	UINT NumBytes = 0;
 	UINT RowBytes = 0;
 	UINT NumRows = 0;
@@ -1402,31 +1404,48 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
 							int nY = 1024 - row;
 							int nX = x;
 
-							//for (int i = 0; i < pvecPoint->size(); i++)
-							//{
-							//	if (vecPoint[i].x == nX && vecPoint[i].z == nY)
-							//	{
-							//		ptr[1] = 255;
-							//	}
-							//}
-
-							//if (nX > 100 && nX < 300 && nY>100 && nY < 300)
-							//{
-							//	ptr[2] = 255;
-							//}
 							if (nX > rt.left && nX < rt.right && nY>rt.top && nY<rt.bottom)
 							{
-								//ptr[0] = 255;
-								//ptr[1] = 255;
-								//BYTE TestA = 0;
-								//BYTE TestB = 0;
-								//BYTE TestC = 0;
-								//BYTE TestD = 0;
+								BYTE test = 255;
+								if (eType == DirectX::TextureType::E_GRASS)
+								{
+									ptr[0] = 0; // blue
+									ptr[1] = 0; // green
+									ptr[2] = 0; // red
+									ptr[3] = 0; // alpha
+								}
 
-								//ptr[0] = 255; // blue
-								//ptr[1] = 255; // green
-								ptr[2] = 255; // red
-								//ptr[3] = 255; // alpha
+								else if (eType == DirectX::TextureType::E_DARKDIRT)
+								{
+									ptr[0] = 0; // blue
+									ptr[1] = 0; // green
+									ptr[2] = test; // red
+									ptr[3] = 0; // alpha
+								}
+
+								else if(eType == DirectX::TextureType::E_STONE)
+								{
+									ptr[0] = 0; // blue
+									ptr[1] = test; // green
+									ptr[2] = 0; // red
+									ptr[3] = 0; // alpha
+								}
+
+								else if(eType == DirectX::TextureType::E_LIGHTDIRT)
+								{
+									ptr[0] = test; // blue
+									ptr[1] = 0; // green
+									ptr[2] = 0; // red
+									ptr[3] = 0; // alpha
+								}
+
+								else if(eType == DirectX::TextureType::E_SNOW)
+								{
+									ptr[0] = test; // blue
+									ptr[1] = test; // green
+									ptr[2] = test; // red
+									ptr[3] = test; // alpha
+								}
 							}
 						}
 					}
@@ -1697,7 +1716,8 @@ HRESULT DirectX::CreateDDSTextureFromMemoryEx( ID3D11Device* d3dDevice,
                                                bool forceSRGB,
                                                ID3D11Resource** texture,
                                                ID3D11ShaderResourceView** textureView,
-                                               DDS_ALPHA_MODE* alphaMode )
+                                               DDS_ALPHA_MODE* alphaMode,
+											   TextureType eType)
 {
     if ( texture )
     {
@@ -1759,7 +1779,7 @@ HRESULT DirectX::CreateDDSTextureFromMemoryEx( ID3D11Device* d3dDevice,
     HRESULT hr = CreateTextureFromDDS( d3dDevice, d3dContext, header,
                                        ddsData + offset, ddsDataSize - offset, maxsize,
                                        usage, bindFlags, cpuAccessFlags, miscFlags, forceSRGB,
-                                       texture, textureView, nullptr);
+                                       texture, textureView, nullptr, eType);
     if ( SUCCEEDED(hr) )
     {
         if (texture != 0 && *texture != 0)
@@ -1787,11 +1807,12 @@ HRESULT DirectX::CreateDDSTextureFromFile( ID3D11Device* d3dDevice,
                                            ID3D11ShaderResourceView** textureView,
                                            size_t maxsize,
                                            DDS_ALPHA_MODE* alphaMode,
-										   std::vector<D3DXVECTOR3>* pvecPoint)
+										   std::vector<D3DXVECTOR3>* pvecPoint,
+										   TextureType eType)
 {
     return CreateDDSTextureFromFileEx( d3dDevice, nullptr, fileName, maxsize,
                                        D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, false,
-                                       texture, textureView, alphaMode, pvecPoint);
+                                       texture, textureView, alphaMode, pvecPoint, eType);
 }
 
 _Use_decl_annotations_
@@ -1802,11 +1823,12 @@ HRESULT DirectX::CreateDDSTextureFromFile( ID3D11Device* d3dDevice,
                                            ID3D11ShaderResourceView** textureView,
                                            size_t maxsize,
 										   DDS_ALPHA_MODE* alphaMode,
-										   std::vector<D3DXVECTOR3>* pvecPoint)
+										   std::vector<D3DXVECTOR3>* pvecPoint,
+										   TextureType eType)
 {
     return CreateDDSTextureFromFileEx( d3dDevice, d3dContext, fileName, maxsize,
                                        D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, false,
-                                       texture, textureView, alphaMode, pvecPoint );
+                                       texture, textureView, alphaMode, pvecPoint, eType );
 }
 
 _Use_decl_annotations_
@@ -1841,7 +1863,8 @@ HRESULT DirectX::CreateDDSTextureFromFileEx( ID3D11Device* d3dDevice,
                                              ID3D11Resource** texture,
                                              ID3D11ShaderResourceView** textureView,
                                              DDS_ALPHA_MODE* alphaMode,
-											 std::vector<D3DXVECTOR3>* pvecPoint)
+											 std::vector<D3DXVECTOR3>* pvecPoint,
+											 TextureType eType)
 {
     if ( texture )
     {
@@ -1880,7 +1903,7 @@ HRESULT DirectX::CreateDDSTextureFromFileEx( ID3D11Device* d3dDevice,
     hr = CreateTextureFromDDS( d3dDevice, d3dContext, header,
                                bitData, bitSize, maxsize,
                                usage, bindFlags, cpuAccessFlags, miscFlags, forceSRGB,
-                               texture, textureView, pvecPoint);
+                               texture, textureView, pvecPoint, eType);
 
     if ( SUCCEEDED(hr) )
     {

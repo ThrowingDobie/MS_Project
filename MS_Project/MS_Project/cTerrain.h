@@ -36,6 +36,7 @@ public:
 
 	void ChangeHeightData(std::vector<Vertex::ST_P_VERTEX> vecVertex);
 	void SetMappingPoint(std::vector<D3DXVECTOR3> vecPoint);
+	void SetTextureType(TextureType eType);
 
 	float Average(int i, int j);
 private:
@@ -73,6 +74,8 @@ private:
 	Material m_mtTerrain;
 
 	std::vector<XMFLOAT2> m_vecPatchBoundsY;
+
+	DirectX::TextureType m_eTextureType;
 public:
 
 	ID3D11Buffer* m_pQuadPatchVertexBuffer;

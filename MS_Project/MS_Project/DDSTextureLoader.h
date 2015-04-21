@@ -57,6 +57,18 @@ namespace DirectX
         DDS_ALPHA_MODE_CUSTOM        = 4,
     };
 
+	enum TextureType
+	{
+		E_GRASS,
+		E_DARKDIRT,
+		E_STONE,
+		E_LIGHTDIRT,
+		E_SNOW,
+		E_ALPHAEMPTY,
+		E_ALPHAMAX
+	};
+
+
     // Standard version
     HRESULT CreateDDSTextureFromMemory( _In_ ID3D11Device* d3dDevice,
                                         _In_reads_bytes_(ddsDataSize) const uint8_t* ddsData,
@@ -73,7 +85,8 @@ namespace DirectX
                                       _Outptr_opt_ ID3D11ShaderResourceView** textureView,
                                       _In_ size_t maxsize = 0,
                                       _Out_opt_ DDS_ALPHA_MODE* alphaMode = nullptr,
-									  std::vector<D3DXVECTOR3>* pvecPoint = nullptr
+									  std::vector<D3DXVECTOR3>* pvecPoint = nullptr,
+									  TextureType eType = TextureType::E_ALPHAEMPTY
                                     );
 
     // Standard version with optional auto-gen mipmap support
@@ -94,7 +107,8 @@ namespace DirectX
                                       _Outptr_opt_ ID3D11ShaderResourceView** textureView,
                                       _In_ size_t maxsize = 0,
                                       _Out_opt_ DDS_ALPHA_MODE* alphaMode = nullptr,
-									  std::vector<D3DXVECTOR3>* pvecPoint = nullptr
+									  std::vector<D3DXVECTOR3>* pvecPoint = nullptr,
+									  TextureType eType = TextureType::E_ALPHAEMPTY
                                     );
 
     // Extended version
@@ -138,7 +152,8 @@ namespace DirectX
                                           _In_ bool forceSRGB,
                                           _Outptr_opt_ ID3D11Resource** texture,
                                           _Outptr_opt_ ID3D11ShaderResourceView** textureView,
-                                          _Out_opt_ DDS_ALPHA_MODE* alphaMode = nullptr
+                                          _Out_opt_ DDS_ALPHA_MODE* alphaMode = nullptr,
+										  TextureType eType = TextureType::E_ALPHAEMPTY
                                       );
 
     HRESULT CreateDDSTextureFromFileEx( _In_ ID3D11Device* d3dDevice,
@@ -153,7 +168,8 @@ namespace DirectX
                                         _Outptr_opt_ ID3D11Resource** texture,
                                         _Outptr_opt_ ID3D11ShaderResourceView** textureView,
                                         _Out_opt_ DDS_ALPHA_MODE* alphaMode = nullptr,
-										std::vector<D3DXVECTOR3>* pvecPoint = nullptr
+										std::vector<D3DXVECTOR3>* pvecPoint = nullptr,
+										TextureType eType = TextureType::E_ALPHAEMPTY
                                     );
 
 }

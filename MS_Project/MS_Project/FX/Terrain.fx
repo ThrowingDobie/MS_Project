@@ -344,11 +344,6 @@ float4 PS(DomainOut pin,
 	// Blend the layers on top of each other.
 	float4 texColor = c0;
 
-	float4 red = t.r;
-	float4 green = t.g;
-	float4 blue = t.b;
-	float4 alpha = t.w;
-
 	texColor = lerp(texColor, c1, t.r);
 	texColor = lerp(texColor, c2, t.g);
 	texColor = lerp(texColor, c3, t.b);

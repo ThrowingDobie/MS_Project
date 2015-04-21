@@ -494,7 +494,7 @@ void cTerrain::SetMappingPoint(std::vector<D3DXVECTOR3> vecPoint)
 
 	m_vecPoint = vecPoint;
 	DirectX::CreateDDSTextureFromFile(g_pD3DDevice->m_pDevice,
-		L"./Image/blend.dds", &pSave, &m_pBlendMapSRV, 0, 0, &m_vecPoint);
+		L"./Image/blend.dds", &pSave, &m_pBlendMapSRV, 0, 0, &m_vecPoint,m_eTextureType);
 
 	//DXGI_FORMAT format = DXGI_FORMAT_B8G8R8A8_UNORM;
 	//UINT filter = D3DX11_FILTER_SRGB;
@@ -521,6 +521,11 @@ void cTerrain::SetMappingPoint(std::vector<D3DXVECTOR3> vecPoint)
 	loadInfo.pSrcInfo = 0;
 
 	D3DX11SaveTextureToFile(g_pD3DDevice->m_pDevCon, pSave, D3DX11_IFF_DDS, L"./Image/blend.dds");
+}
+
+void cTerrain::SetTextureType(TextureType eType)
+{
+	m_eTextureType = (DirectX::TextureType)eType;
 }
 //DXGI_FORMAT format = DXGI_FORMAT_FROM_FILE;
 //UINT filter = D3DX11_FILTER_NONE;

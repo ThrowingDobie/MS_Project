@@ -25,7 +25,8 @@ cMousePicking::cMousePicking()
     m_eKeyTest = E_UP;
     m_eKeyReturn = E_UP;
 
-	m_eAlphaType = E_ALPHAEMPTY;
+	m_eTextureType = E_ALPHAEMPTY;
+	m_isRightClick = false;
 }
 
 cMousePicking::~cMousePicking()
@@ -191,9 +192,14 @@ void cMousePicking::OnMouseDown(WPARAM btnState, int nX, int nY)
 {
 	if ((btnState & MK_RBUTTON) != 0)
 	{
+		m_isRightClick = true;
 		Pick(nX, nY);
-		m_vecPoint = SelectCircle(m_vPickingPoint.x, m_vPickingPoint.z, 10);
+		m_vecPoint = SelectCircle(m_vPickingPoint.x, m_vPickingPoint.z, 5);
     }
+	else
+	{
+		m_isRightClick = false;
+	}
 }
 
 
@@ -409,34 +415,42 @@ bool cMousePicking::HeightEdit()
 	}
 }
 
-bool cMousePicking::AlphaMap()
+bool cMousePicking::TextureMap()
 {
-	if (GetAsyncKeyState('2') & 0x8000)
+	if (GetAsyncKeyState('1') & 0x8000)
 	{
-		m_eAlphaType = E_GRASS;
+		m_eTextureType = E_GRASS;
+	}
+	else if (GetAsyncKeyState('2') & 0x8000)
+	{
+		m_eTextureType = E_DARKDIRT;
 	}
 	else if (GetAsyncKeyState('3') & 0x8000)
 	{
-		m_eAlphaType = E_DARKDIRT;
+		m_eTextureType = E_STONE;
 	}
 	else if (GetAsyncKeyState('4') & 0x8000)
 	{
-		m_eAlphaType = E_STONE;
+		m_eTextureType = E_LIGHTDIRT;
 	}
 	else if (GetAsyncKeyState('5') & 0x8000)
 	{
-		m_eAlphaType = E_LIGHTDIRT;
+		m_eTextureType = E_SNOW;
 	}
-	if (m_eAlphaType != E_ALPHAEMPTY)
+	if (m_eTextureType != E_ALPHAEMPTY)
 	{
-		if (GetAsyncKeyState(VK_END) & 0x8000)
+		if (GetAsyncKeyState(VK_CONTROL) & 0x8000)
 		{
-			return true;
+			if (m_isRightClick)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
-		else
-		{
-			return false;
-		}
+
 	}
 	else
 	{
@@ -459,6 +473,11 @@ float cMousePicking::GetGaussian(float fX, float fZ, float fRho)
 std::vector<D3DXVECTOR3> cMousePicking::GetVecPoint()
 {
 	return m_vecPoint;
+}
+
+TextureType cMousePicking::GetTextureType()
+{
+	return m_eTextureType;
 }
 
 void cMousePicking::CalGauss(int nX, int nZ, float fDelta)
@@ -547,6 +566,14 @@ std::vector<D3DXVECTOR3> cMousePicking::SelectCircle(int nX, int nZ, int nRange)
             vecVertex.push_back(vec3);
         }
     }
+
+	std::vector<float> vecGauss;
+	for (int i = 0; i < vecVertex.size(); i++)
+	{
+		float fGauss = GetGaussian(vecVertex[i].x-nX, vecVertex[i].z-nZ, 1.f);
+		vecGauss.push_back(fGauss);
+	}
+
 
     //std::vector<D3DXVECTOR3> vecReturn;
 

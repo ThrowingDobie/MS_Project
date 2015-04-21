@@ -20,17 +20,6 @@ class cMousePicking
         E_KEYUP,
         E_UP,
     };
-
-	enum AlphaType
-	{
-		E_GRASS,
-		E_DARKDIRT,
-		E_STONE,
-		E_LIGHTDIRT,
-		E_SNOW,
-		E_ALPHAEMPTY,
-		E_ALPHAMAX
-	};
 public:
 	cMousePicking::cMousePicking();
 	cMousePicking::~cMousePicking();
@@ -43,9 +32,10 @@ public:
 
 	std::vector<Vertex::ST_P_VERTEX> GetHeight();
 	std::vector<D3DXVECTOR3> GetVecPoint();
+	TextureType GetTextureType();
 
 	bool HeightEdit();
-	bool AlphaMap();
+	bool TextureMap();
 private:
 	void Pick(int nX, int nY);
 	void BuildMeshGeometryBuffers();
@@ -60,7 +50,7 @@ private:
 
 	float m_fRho;
 	TerrainEditType m_eEditType;
-	AlphaType m_eAlphaType;
+	TextureType m_eTextureType;
 
     KeyType m_eKeyTest;
     KeyType m_eKeyReturn;
@@ -92,5 +82,7 @@ private:
     std::stack<std::vector<Vertex::ST_P_VERTEX>> m_StackNext;
 
 	XMFLOAT3 m_vPickingPoint;
+
+	bool m_isRightClick;
 };
 

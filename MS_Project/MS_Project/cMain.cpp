@@ -85,14 +85,14 @@ void cMain::Init()
 
 void cMain::Update(float fDelta)
 {
-    if (GetAsyncKeyState('1') & 0x8000)
+    if (GetAsyncKeyState(VK_TAB) & 0x8000)
     {
         g_pD3DDevice->m_pDevCon->RSSetState(RenderStates::WireframeRS);
     }
-    if (GetAsyncKeyState('2') & 0x8000)
-    {
-        g_pD3DDevice->m_pDevCon->RSSetState(NULL);
-    }
+    //if (GetAsyncKeyState('2') & 0x8000)
+    //{
+    //    g_pD3DDevice->m_pDevCon->RSSetState(NULL);
+    //}
 
     if (m_pMouse)
     {
@@ -100,8 +100,9 @@ void cMain::Update(float fDelta)
         {
             m_pTerrain->ChangeHeightData(m_pMouse->GetHeight());
         }
-		if (m_pMouse->AlphaMap())
+		if (m_pMouse->TextureMap())
 		{
+			m_pTerrain->SetTextureType(m_pMouse->GetTextureType());
 			m_pTerrain->SetMappingPoint(m_pMouse->GetVecPoint());
 		}
     }
