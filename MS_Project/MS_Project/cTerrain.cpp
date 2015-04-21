@@ -77,9 +77,6 @@ void cTerrain::Init(ID3D11Device* device, ID3D11DeviceContext* dc, const InitInf
 
 void cTerrain::Update(float fDelta)
 {
-	//BuildQuadPatchVB(g_pD3DDevice->m_pDevice);
-	//BuildQuadPatchIB(g_pD3DDevice->m_pDevice);
-
 }
 
 void cTerrain::Render(ID3D11DeviceContext* dc, const Camera& cam, DirectionalLight lights[3])
@@ -155,6 +152,7 @@ void cTerrain::Render(ID3D11DeviceContext* dc, const Camera& cam, DirectionalLig
 	// to turn off tessellation.
 	dc->HSSetShader(0, 0, 0);
 	dc->DSSetShader(0, 0, 0);
+
 }
 
 void cTerrain::LoadHeightmap()
@@ -245,7 +243,7 @@ void cTerrain::Smooth()
 
 void cTerrain::BuildHeightmapSRV(ID3D11Device* device)
 {
-	m_pHeightMapSRV = nullptr;
+	SAFE_RELEASE(m_pHeightMapSRV);
 
 	D3D11_TEXTURE2D_DESC texDesc;
 	texDesc.Width = m_Info.HeightmapWidth;
@@ -278,6 +276,7 @@ void cTerrain::BuildHeightmapSRV(ID3D11Device* device)
 	srvDesc.Texture2D.MostDetailedMip = 0;
 	srvDesc.Texture2D.MipLevels = -1;
 	HR(device->CreateShaderResourceView(hmapTex, &srvDesc, &m_pHeightMapSRV));
+
 
 	// SRV saves reference.
 	ReleaseCOM(hmapTex);
@@ -487,6 +486,8 @@ void cTerrain::ChangeHeightData(std::vector<Vertex::ST_P_VERTEX> vecVertex)
 
 void cTerrain::SetMappingData(DirectX::ST_PD_VERTEX pdVertex)
 {
+	SAFE_RELEASE(m_pBlendMapSRV);
+
 	m_pdVertex = pdVertex;
 	ID3D11Resource* pSave;
 	DirectX::CreateDDSTextureFromFile(g_pD3DDevice->m_pDevice,
@@ -513,6 +514,7 @@ void cTerrain::SetMappingData(DirectX::ST_PD_VERTEX pdVertex)
 	loadInfo.pSrcInfo = 0;
 
 	D3DX11SaveTextureToFile(g_pD3DDevice->m_pDevCon, pSave, D3DX11_IFF_DDS, L"./Image/blend.dds");
+	SAFE_RELEASE(pSave);
 }
 //DXGI_FORMAT format = DXGI_FORMAT_FROM_FILE;
 //UINT filter = D3DX11_FILTER_NONE;

@@ -55,6 +55,7 @@ void cMousePicking::Init(ID3D11Buffer* pVertexBuffer
 
 	if (m_vecVertex.size() == 0)
 	{
+		m_vecVertex.clear();
 		m_vecVertex.reserve(m_vecHeight.size());
 
 		for (int i = 0; i < m_vecHeight.size(); i++)
@@ -389,6 +390,13 @@ bool cMousePicking::HeightEdit()
             if (m_eKeyTest == E_KEYDOWN)
             {
                 m_StackPrve.push(m_vecVertex);
+				if (m_StackPrve.size() >= 10)
+				{
+					while (m_StackPrve.size())
+					{
+						m_StackPrve.pop();
+					}
+				}
             }
             else
             {

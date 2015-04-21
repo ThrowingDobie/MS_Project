@@ -105,9 +105,6 @@ void cMain::Update(float fDelta)
 			m_pTerrain->SetMappingData(m_pMouse->GetMappingData());
 		}
     }
-
-
-    m_pTerrain->Update(fDelta);
     if (m_pMouse)
     {
         m_pMouse->Update(fDelta);
