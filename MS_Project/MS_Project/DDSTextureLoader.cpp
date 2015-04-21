@@ -1394,12 +1394,10 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
 				SAFE_DELETE_ARRAY(pInitData);
 				return HRESULT_FROM_WIN32(ERROR_HANDLE_EOF);
 			}
-
 			BYTE* sptr = pSrcBits;
 			for (UINT slice = 0; slice < d; ++slice)
 			{
 				BYTE* rptr = sptr;
-
 				for (UINT row = 0; row < NumRows; ++row)
 				{
 					BYTE* ptr = rptr;
@@ -1413,54 +1411,91 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
 
 							if (nX > rt.left && nX < rt.right && nY>rt.top && nY<rt.bottom)
 							{
-								ni++;
-								BYTE test = 255;
-								if (ppdVertex->eType == DirectX::TextureType::E_GRASS)
+								for (int i = 0; i < ppdVertex->vecPoint.size(); i++)
 								{
-									ptr[0] = 0; // blue
-									ptr[1] = 0; // green
-									ptr[2] = 0; // red
-									ptr[3] = 0; // alpha
+									if (nX >= ppdVertex->vecPoint[i].x * 4 - 3
+										&& nX <= ppdVertex->vecPoint[i].x * 4 + 4
+										&& nY >= ppdVertex->vecPoint[i].z * 4 - 3
+										&& nY <= ppdVertex->vecPoint[i].z * 4 + 4)
+									{
+										float fGauss = ppdVertex->vecDepth[i];
+										BYTE test = fGauss*10.0f;
+										if (ppdVertex->eType == DirectX::TextureType::E_GRASS)
+										{
+											if (ptr[0] >=  test)
+											{
+												ptr[0] -= test; // blue
+											}
+											if (ptr[1] >= test)
+											{
+												ptr[1] -= test; // blue
+											}
+											if (ptr[2] >= test)
+											{
+												ptr[2] -= test; // blue
+											}
+											if (ptr[3] >= test)
+											{
+												ptr[3] -= test; // blue
+											}
+
+										}
+
+										else if (ppdVertex->eType == DirectX::TextureType::E_DARKDIRT)
+										{
+											if (ptr[2] >= 0 && ptr[2] < 255 - test)
+											{
+												ptr[2] += test;
+											}
+											else
+											{
+												ptr[2] = 255;
+											}
+										}
+
+										else if (ppdVertex->eType == DirectX::TextureType::E_STONE)
+										{
+											if (ptr[1] >= 0 && ptr[1] < 255 - test)
+											{
+												ptr[1] += test;
+											}
+											else
+											{
+												ptr[1] = 255;
+											}
+										}
+
+										else if (ppdVertex->eType == DirectX::TextureType::E_LIGHTDIRT)
+										{
+											if (ptr[0] >= 0 && ptr[0] < 255 - test)
+											{
+												ptr[0] += test;
+											}
+											else
+											{
+												ptr[0] = 255;
+											}
+										}
+
+										else if (ppdVertex->eType == DirectX::TextureType::E_SNOW)
+										{
+											if (ptr[3] >= 0 && ptr[3] < 255 - test)
+											{
+												ptr[3] += test;
+											}
+											else
+											{
+												ptr[3] = 255;
+											}
+										}
+									}
 								}
 
-								else if (ppdVertex->eType == DirectX::TextureType::E_DARKDIRT)
-								{
-									ptr[0] = 0; // blue
-									ptr[1] = 0; // green
-									ptr[2] = test; // red
-									ptr[3] = 0; // alpha
-								}
-
-								else if (ppdVertex->eType == DirectX::TextureType::E_STONE)
-								{
-									ptr[0] = 0; // blue
-									ptr[1] = test; // green
-									ptr[2] = 0; // red
-									ptr[3] = 0; // alpha
-								}
-
-								else if (ppdVertex->eType == DirectX::TextureType::E_LIGHTDIRT)
-								{
-									ptr[0] = test; // blue
-									ptr[1] = 0; // green
-									ptr[2] = 0; // red
-									ptr[3] = 0; // alpha
-								}
-
-								else if (ppdVertex->eType == DirectX::TextureType::E_SNOW)
-								{
-									ptr[0] = test; // blue
-									ptr[1] = test; // green
-									ptr[2] = test; // red
-									ptr[3] = test; // alpha
-								}
 							}
 						}
 					}
-
 					rptr += RowBytes;
 				}
-
 				sptr += NumBytes;
 			}
 		}

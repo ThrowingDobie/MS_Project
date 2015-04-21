@@ -70,14 +70,6 @@ void cTerrain::Init(ID3D11Device* device, ID3D11DeviceContext* dc, const InitInf
 	layerFilenames.push_back(m_Info.LayerMapFilename4);
 	m_pLayerMapArraySRV = d3dHelper::CreateTexture2DArraySRV(device, dc, layerFilenames);
 
-    //HR(D3DX11CreateShaderResourceViewFromFile(device,
-    //    m_Info.BlendMapFilename.c_str(), 0, 0, &m_pBlendMapSRV, 0));
-	
-	D3DXVECTOR3 vec(1, 0, 1);
-	m_vecPoint.push_back(vec);
-
-  //  DirectX::CreateDDSTextureFromFile(g_pD3DDevice->m_pDevice,
-		//L"./Image/blend.dds", 0, &m_pBlendMapSRV, 0, 0, &m_vecPoint);
 	DirectX::CreateDDSTextureFromFile(g_pD3DDevice->m_pDevice,
 		L"./Image/blend.dds", nullptr, &m_pBlendMapSRV, 0, 0, &m_pdVertex);
 
@@ -253,6 +245,8 @@ void cTerrain::Smooth()
 
 void cTerrain::BuildHeightmapSRV(ID3D11Device* device)
 {
+	m_pHeightMapSRV = nullptr;
+
 	D3D11_TEXTURE2D_DESC texDesc;
 	texDesc.Width = m_Info.HeightmapWidth;
 	texDesc.Height = m_Info.HeightmapHeight;

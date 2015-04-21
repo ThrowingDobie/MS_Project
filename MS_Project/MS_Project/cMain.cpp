@@ -61,7 +61,7 @@ void cMain::Init()
 
 	cTerrain::InitInfo tii;
 	tii.HeightMapFilename = L"Textures/test.raw";
-	tii.LayerMapFilename0 = L"Textures/grass.dds";
+	tii.LayerMapFilename0 = L"Textures/grass1.jpg";
 	tii.LayerMapFilename1 = L"Textures/darkdirt.dds";
 	tii.LayerMapFilename2 = L"Textures/stone.dds";
 	tii.LayerMapFilename3 = L"Textures/lightdirt.dds";
