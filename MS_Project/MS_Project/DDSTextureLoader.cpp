@@ -1146,8 +1146,7 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
                                      _In_ bool forceSRGB,
                                      _Outptr_opt_ ID3D11Resource** texture,
                                      _Outptr_opt_ ID3D11ShaderResourceView** textureView,
-									 std::vector<D3DXVECTOR3>* pvecPoint,
-									 DirectX::TextureType eType
+									 ST_PD_VERTEX* ppdVertex
 									 )
 {
     HRESULT hr = S_OK;
@@ -1320,15 +1319,20 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
 
 	/////////////////
 
-	std::vector<D3DXVECTOR3> vecPoint;
-	vecPoint.reserve(pvecPoint->size());
-	vecPoint = *pvecPoint;
 
 	RECT rt;
-	rt.left = vecPoint[0].x*4;
-	rt.top = vecPoint[0].z*4;
-	rt.right = vecPoint[vecPoint.size() - 1].x*4;
-	rt.bottom = vecPoint[vecPoint.size() - 1].z*4;
+	if (ppdVertex->vecPoint.size() > 0)
+	{
+		rt.left = ppdVertex->vecPoint[0].x * 4;
+		rt.top = ppdVertex->vecPoint[0].z * 4;
+		rt.right = ppdVertex->vecPoint[ppdVertex->vecPoint.size() - 1].x * 4;
+		rt.bottom = ppdVertex->vecPoint[ppdVertex->vecPoint.size() - 1].z * 4;
+	}
+	else
+	{
+		rt = { 0, 0, 0, 0 };
+	}
+
 
 
 	UINT iMipCount = mipCount;
@@ -1369,6 +1373,7 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
 	vecRed.reserve(iWidth*iHeight*iMipCount);
 	vecAlpha.reserve(iWidth*iHeight*iMipCount);
 
+
 	UINT index = 0;
 	for (UINT j = 0; j < arraySize; j++)
 	{
@@ -1394,9 +1399,11 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
 			for (UINT slice = 0; slice < d; ++slice)
 			{
 				BYTE* rptr = sptr;
+
 				for (UINT row = 0; row < NumRows; ++row)
 				{
 					BYTE* ptr = rptr;
+
 					for (UINT x = 0; x < w; ++x, ptr += 4)
 					{
 						if (ptr + 4 <= pEndBits)
@@ -1406,8 +1413,9 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
 
 							if (nX > rt.left && nX < rt.right && nY>rt.top && nY<rt.bottom)
 							{
+								ni++;
 								BYTE test = 255;
-								if (eType == DirectX::TextureType::E_GRASS)
+								if (ppdVertex->eType == DirectX::TextureType::E_GRASS)
 								{
 									ptr[0] = 0; // blue
 									ptr[1] = 0; // green
@@ -1415,7 +1423,7 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
 									ptr[3] = 0; // alpha
 								}
 
-								else if (eType == DirectX::TextureType::E_DARKDIRT)
+								else if (ppdVertex->eType == DirectX::TextureType::E_DARKDIRT)
 								{
 									ptr[0] = 0; // blue
 									ptr[1] = 0; // green
@@ -1423,7 +1431,7 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
 									ptr[3] = 0; // alpha
 								}
 
-								else if(eType == DirectX::TextureType::E_STONE)
+								else if (ppdVertex->eType == DirectX::TextureType::E_STONE)
 								{
 									ptr[0] = 0; // blue
 									ptr[1] = test; // green
@@ -1431,7 +1439,7 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
 									ptr[3] = 0; // alpha
 								}
 
-								else if(eType == DirectX::TextureType::E_LIGHTDIRT)
+								else if (ppdVertex->eType == DirectX::TextureType::E_LIGHTDIRT)
 								{
 									ptr[0] = test; // blue
 									ptr[1] = 0; // green
@@ -1439,7 +1447,7 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
 									ptr[3] = 0; // alpha
 								}
 
-								else if(eType == DirectX::TextureType::E_SNOW)
+								else if (ppdVertex->eType == DirectX::TextureType::E_SNOW)
 								{
 									ptr[0] = test; // blue
 									ptr[1] = test; // green
@@ -1449,12 +1457,15 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
 							}
 						}
 					}
+
 					rptr += RowBytes;
 				}
+
 				sptr += NumBytes;
 			}
 		}
 	}
+
 
     bool autogen = false;
     if ( mipCount == 1 && d3dContext != 0 && textureView != 0 ) // Must have context and shader-view to auto generate mipmaps
@@ -1717,7 +1728,7 @@ HRESULT DirectX::CreateDDSTextureFromMemoryEx( ID3D11Device* d3dDevice,
                                                ID3D11Resource** texture,
                                                ID3D11ShaderResourceView** textureView,
                                                DDS_ALPHA_MODE* alphaMode,
-											   TextureType eType)
+											   ST_PD_VERTEX* ppdVertex)
 {
     if ( texture )
     {
@@ -1779,7 +1790,7 @@ HRESULT DirectX::CreateDDSTextureFromMemoryEx( ID3D11Device* d3dDevice,
     HRESULT hr = CreateTextureFromDDS( d3dDevice, d3dContext, header,
                                        ddsData + offset, ddsDataSize - offset, maxsize,
                                        usage, bindFlags, cpuAccessFlags, miscFlags, forceSRGB,
-                                       texture, textureView, nullptr, eType);
+                                       texture, textureView, ppdVertex);
     if ( SUCCEEDED(hr) )
     {
         if (texture != 0 && *texture != 0)
@@ -1807,12 +1818,11 @@ HRESULT DirectX::CreateDDSTextureFromFile( ID3D11Device* d3dDevice,
                                            ID3D11ShaderResourceView** textureView,
                                            size_t maxsize,
                                            DDS_ALPHA_MODE* alphaMode,
-										   std::vector<D3DXVECTOR3>* pvecPoint,
-										   TextureType eType)
+										   ST_PD_VERTEX* ppdVertex)
 {
     return CreateDDSTextureFromFileEx( d3dDevice, nullptr, fileName, maxsize,
                                        D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, false,
-                                       texture, textureView, alphaMode, pvecPoint, eType);
+                                       texture, textureView, alphaMode, ppdVertex);
 }
 
 _Use_decl_annotations_
@@ -1823,12 +1833,11 @@ HRESULT DirectX::CreateDDSTextureFromFile( ID3D11Device* d3dDevice,
                                            ID3D11ShaderResourceView** textureView,
                                            size_t maxsize,
 										   DDS_ALPHA_MODE* alphaMode,
-										   std::vector<D3DXVECTOR3>* pvecPoint,
-										   TextureType eType)
+										   ST_PD_VERTEX* ppdVertex)
 {
     return CreateDDSTextureFromFileEx( d3dDevice, d3dContext, fileName, maxsize,
                                        D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, false,
-                                       texture, textureView, alphaMode, pvecPoint, eType );
+                                       texture, textureView, alphaMode, ppdVertex);
 }
 
 _Use_decl_annotations_
@@ -1863,8 +1872,7 @@ HRESULT DirectX::CreateDDSTextureFromFileEx( ID3D11Device* d3dDevice,
                                              ID3D11Resource** texture,
                                              ID3D11ShaderResourceView** textureView,
                                              DDS_ALPHA_MODE* alphaMode,
-											 std::vector<D3DXVECTOR3>* pvecPoint,
-											 TextureType eType)
+											 ST_PD_VERTEX* ppdVertex)
 {
     if ( texture )
     {
@@ -1903,7 +1911,7 @@ HRESULT DirectX::CreateDDSTextureFromFileEx( ID3D11Device* d3dDevice,
     hr = CreateTextureFromDDS( d3dDevice, d3dContext, header,
                                bitData, bitSize, maxsize,
                                usage, bindFlags, cpuAccessFlags, miscFlags, forceSRGB,
-                               texture, textureView, pvecPoint, eType);
+                               texture, textureView, ppdVertex);
 
     if ( SUCCEEDED(hr) )
     {

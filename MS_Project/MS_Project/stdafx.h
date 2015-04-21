@@ -85,24 +85,6 @@ enum RenderOptions
 	TexturesAndFog = 2
 };
 
-enum TextureType
-{
-	E_GRASS,
-	E_DARKDIRT,
-	E_STONE,
-	E_LIGHTDIRT,
-	E_SNOW,
-	E_ALPHAEMPTY,
-	E_ALPHAMAX
-};
-
-struct ST_PD_VERTEX
-{
-	std::vector<D3DXVECTOR3> vecPoint;
-	std::vector<float> vecDepth;
-	TextureType eType;
-};
-
 
 //// DDS_HEADER Flag
 //#define DDSD_CAPS			 0x1

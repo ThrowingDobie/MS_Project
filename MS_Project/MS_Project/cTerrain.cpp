@@ -76,8 +76,11 @@ void cTerrain::Init(ID3D11Device* device, ID3D11DeviceContext* dc, const InitInf
 	D3DXVECTOR3 vec(1, 0, 1);
 	m_vecPoint.push_back(vec);
 
-    DirectX::CreateDDSTextureFromFile(g_pD3DDevice->m_pDevice,
-		L"./Image/blend.dds", 0, &m_pBlendMapSRV, 0, 0, &m_vecPoint);
+  //  DirectX::CreateDDSTextureFromFile(g_pD3DDevice->m_pDevice,
+		//L"./Image/blend.dds", 0, &m_pBlendMapSRV, 0, 0, &m_vecPoint);
+	DirectX::CreateDDSTextureFromFile(g_pD3DDevice->m_pDevice,
+		L"./Image/blend.dds", nullptr, &m_pBlendMapSRV, 0, 0, &m_pdVertex);
+
 }
 
 void cTerrain::Update(float fDelta)
@@ -488,17 +491,12 @@ void cTerrain::ChangeHeightData(std::vector<Vertex::ST_P_VERTEX> vecVertex)
 	BuildHeightmapSRV(g_pD3DDevice->m_pDevice);
 }
 
-void cTerrain::SetMappingPoint(std::vector<D3DXVECTOR3> vecPoint)
+void cTerrain::SetMappingData(DirectX::ST_PD_VERTEX pdVertex)
 {
+	m_pdVertex = pdVertex;
 	ID3D11Resource* pSave;
-
-	m_vecPoint = vecPoint;
 	DirectX::CreateDDSTextureFromFile(g_pD3DDevice->m_pDevice,
-		L"./Image/blend.dds", &pSave, &m_pBlendMapSRV, 0, 0, &m_vecPoint,m_eTextureType);
-
-	//DXGI_FORMAT format = DXGI_FORMAT_B8G8R8A8_UNORM;
-	//UINT filter = D3DX11_FILTER_SRGB;
-	//UINT mipFilter = D3DX11_FILTER_TRIANGLE;
+		L"./Image/blend.dds", &pSave, &m_pBlendMapSRV, 0, 0, &m_pdVertex);
 
 	DXGI_FORMAT format = DXGI_FORMAT_FROM_FILE;
 	UINT filter = D3DX11_FILTER_NONE;
@@ -521,11 +519,6 @@ void cTerrain::SetMappingPoint(std::vector<D3DXVECTOR3> vecPoint)
 	loadInfo.pSrcInfo = 0;
 
 	D3DX11SaveTextureToFile(g_pD3DDevice->m_pDevCon, pSave, D3DX11_IFF_DDS, L"./Image/blend.dds");
-}
-
-void cTerrain::SetTextureType(TextureType eType)
-{
-	m_eTextureType = (DirectX::TextureType)eType;
 }
 //DXGI_FORMAT format = DXGI_FORMAT_FROM_FILE;
 //UINT filter = D3DX11_FILTER_NONE;

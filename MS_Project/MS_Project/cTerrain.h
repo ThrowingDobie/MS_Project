@@ -35,8 +35,6 @@ public:
 	void SetWorld(CXMMATRIX M);
 
 	void ChangeHeightData(std::vector<Vertex::ST_P_VERTEX> vecVertex);
-	void SetMappingPoint(std::vector<D3DXVECTOR3> vecPoint);
-	void SetTextureType(TextureType eType);
 
 	float Average(int i, int j);
 private:
@@ -49,7 +47,6 @@ private:
 	void BuildQuadPatchIB(ID3D11Device* device);
 	void BuildHeightmapSRV(ID3D11Device* device);
 
-	std::vector<D3DXVECTOR3> m_vecPoint;
 
 private:
 	static const int CellsPerPatch = 64;
@@ -75,12 +72,20 @@ private:
 
 	std::vector<XMFLOAT2> m_vecPatchBoundsY;
 
-	DirectX::TextureType m_eTextureType;
 public:
 
 	ID3D11Buffer* m_pQuadPatchVertexBuffer;
 	ID3D11Buffer* m_pQuadPatchIndexBuffer;
 
 	std::vector<float> m_vecHeightmap;
+
+	DirectX::ST_PD_VERTEX m_pdVertex;
+	std::vector<D3DXVECTOR3> m_vecPoint;
+	std::vector<float> m_vecDepth;
+	DirectX::TextureType m_eTextureType;
+
+	void SetMappingData(DirectX::ST_PD_VERTEX pdVertex);
+public:
+	DirectX::ST_PD_VERTEX GetMappingData();
 };
 

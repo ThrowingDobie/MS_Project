@@ -68,6 +68,13 @@ namespace DirectX
 		E_ALPHAMAX
 	};
 
+	struct ST_PD_VERTEX
+	{
+		std::vector<D3DXVECTOR3> vecPoint;
+		std::vector<float> vecDepth;
+		TextureType eType;
+	};
+
 
     // Standard version
     HRESULT CreateDDSTextureFromMemory( _In_ ID3D11Device* d3dDevice,
@@ -85,8 +92,7 @@ namespace DirectX
                                       _Outptr_opt_ ID3D11ShaderResourceView** textureView,
                                       _In_ size_t maxsize = 0,
                                       _Out_opt_ DDS_ALPHA_MODE* alphaMode = nullptr,
-									  std::vector<D3DXVECTOR3>* pvecPoint = nullptr,
-									  TextureType eType = TextureType::E_ALPHAEMPTY
+									  ST_PD_VERTEX* ppdVertex = nullptr
                                     );
 
     // Standard version with optional auto-gen mipmap support
@@ -107,8 +113,7 @@ namespace DirectX
                                       _Outptr_opt_ ID3D11ShaderResourceView** textureView,
                                       _In_ size_t maxsize = 0,
                                       _Out_opt_ DDS_ALPHA_MODE* alphaMode = nullptr,
-									  std::vector<D3DXVECTOR3>* pvecPoint = nullptr,
-									  TextureType eType = TextureType::E_ALPHAEMPTY
+									  ST_PD_VERTEX* ppdVertex = nullptr
                                     );
 
     // Extended version
@@ -153,7 +158,7 @@ namespace DirectX
                                           _Outptr_opt_ ID3D11Resource** texture,
                                           _Outptr_opt_ ID3D11ShaderResourceView** textureView,
                                           _Out_opt_ DDS_ALPHA_MODE* alphaMode = nullptr,
-										  TextureType eType = TextureType::E_ALPHAEMPTY
+										  ST_PD_VERTEX* ppdVertex = nullptr
                                       );
 
     HRESULT CreateDDSTextureFromFileEx( _In_ ID3D11Device* d3dDevice,
@@ -168,8 +173,7 @@ namespace DirectX
                                         _Outptr_opt_ ID3D11Resource** texture,
                                         _Outptr_opt_ ID3D11ShaderResourceView** textureView,
                                         _Out_opt_ DDS_ALPHA_MODE* alphaMode = nullptr,
-										std::vector<D3DXVECTOR3>* pvecPoint = nullptr,
-										TextureType eType = TextureType::E_ALPHAEMPTY
+										ST_PD_VERTEX* ppdVertex = nullptr
                                     );
 
 }

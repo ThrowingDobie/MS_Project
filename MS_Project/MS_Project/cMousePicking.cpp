@@ -25,7 +25,7 @@ cMousePicking::cMousePicking()
     m_eKeyTest = E_UP;
     m_eKeyReturn = E_UP;
 
-	m_eTextureType = E_ALPHAEMPTY;
+	m_eTextureType = DirectX::E_ALPHAEMPTY;
 	m_isRightClick = false;
 }
 
@@ -194,7 +194,8 @@ void cMousePicking::OnMouseDown(WPARAM btnState, int nX, int nY)
 	{
 		m_isRightClick = true;
 		Pick(nX, nY);
-		m_vecPoint = SelectCircle(m_vPickingPoint.x, m_vPickingPoint.z, 5);
+		SelectCircle(m_vPickingPoint.x, m_vPickingPoint.z, 5);
+		SetMappingData();
     }
 	else
 	{
@@ -369,10 +370,6 @@ bool cMousePicking::HeightEdit()
 	{
 		m_eEditType = E_DECREASE;
 	}
-    else if(GetAsyncKeyState('B') & 0x8000)
-	{
-		m_eEditType = E_ERASE;
-	}
     else if(GetAsyncKeyState('V') & 0x8000)
     {
         m_eEditType = E_NORMALIZE;
@@ -392,10 +389,6 @@ bool cMousePicking::HeightEdit()
             if (m_eKeyTest == E_KEYDOWN)
             {
                 m_StackPrve.push(m_vecVertex);
-            }
-            if (m_eEditType == E_ERASE)
-            {
-                EraseHeight(10);
             }
             else
             {
@@ -419,25 +412,25 @@ bool cMousePicking::TextureMap()
 {
 	if (GetAsyncKeyState('1') & 0x8000)
 	{
-		m_eTextureType = E_GRASS;
+		m_eTextureType = DirectX::E_GRASS;
 	}
 	else if (GetAsyncKeyState('2') & 0x8000)
 	{
-		m_eTextureType = E_DARKDIRT;
+		m_eTextureType = DirectX::E_DARKDIRT;
 	}
 	else if (GetAsyncKeyState('3') & 0x8000)
 	{
-		m_eTextureType = E_STONE;
+		m_eTextureType = DirectX::E_STONE;
 	}
 	else if (GetAsyncKeyState('4') & 0x8000)
 	{
-		m_eTextureType = E_LIGHTDIRT;
+		m_eTextureType = DirectX::E_LIGHTDIRT;
 	}
 	else if (GetAsyncKeyState('5') & 0x8000)
 	{
-		m_eTextureType = E_SNOW;
+		m_eTextureType = DirectX::E_SNOW;
 	}
-	if (m_eTextureType != E_ALPHAEMPTY)
+	if (m_eTextureType != DirectX::E_ALPHAEMPTY)
 	{
 		if (GetAsyncKeyState(VK_CONTROL) & 0x8000)
 		{
@@ -475,7 +468,7 @@ std::vector<D3DXVECTOR3> cMousePicking::GetVecPoint()
 	return m_vecPoint;
 }
 
-TextureType cMousePicking::GetTextureType()
+DirectX::TextureType cMousePicking::GetTextureType()
 {
 	return m_eTextureType;
 }
@@ -550,7 +543,7 @@ void cMousePicking::CalGauss(int nX, int nZ, float fDelta)
 	}
 }
 
-std::vector<D3DXVECTOR3> cMousePicking::SelectCircle(int nX, int nZ, int nRange)
+void cMousePicking::SelectCircle(int nX, int nZ, int nRange)
 {
     int nSize = (nRange * 2+1)*(nRange * 2+1);
     std::vector<D3DXVECTOR3> vecVertex;
@@ -575,6 +568,8 @@ std::vector<D3DXVECTOR3> cMousePicking::SelectCircle(int nX, int nZ, int nRange)
 	}
 
 
+	m_vecPoint = vecVertex;
+	m_vecDepth = vecGauss;
     //std::vector<D3DXVECTOR3> vecReturn;
 
     //for (int i = 0; i < vecVertex.size(); i++)
@@ -602,16 +597,19 @@ std::vector<D3DXVECTOR3> cMousePicking::SelectCircle(int nX, int nZ, int nRange)
     //    }
     //}
 
-	return vecVertex;
 }
 
-void cMousePicking::EraseHeight(int nRange)
+void cMousePicking::SetMappingData()
 {
-    std::vector<D3DXVECTOR3> vecVertex;
-    vecVertex = SelectCircle(m_vPickingPoint.x, m_vPickingPoint.z, nRange);
+	DirectX::ST_PD_VERTEX stData;
+	stData.vecPoint = m_vecPoint;
+	stData.vecDepth = m_vecDepth;
+	stData.eType = m_eTextureType;
 
-    for (int i = 0; i < vecVertex.size(); i++)
-    {
-        m_vecVertex[vecVertex[i].x + (MAP_SIZE - vecVertex[i].z)*MAP_SIZE].Pos.y = 0.f;
-    }
+	m_pdVertex = stData;
+}
+
+DirectX::ST_PD_VERTEX cMousePicking::GetMappingData()
+{
+	return m_pdVertex;
 }

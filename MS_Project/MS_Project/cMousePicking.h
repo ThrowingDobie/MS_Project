@@ -32,7 +32,7 @@ public:
 
 	std::vector<Vertex::ST_P_VERTEX> GetHeight();
 	std::vector<D3DXVECTOR3> GetVecPoint();
-	TextureType GetTextureType();
+	DirectX::TextureType GetTextureType();
 
 	bool HeightEdit();
 	bool TextureMap();
@@ -43,19 +43,18 @@ private:
 	float GetGaussian(float fX, float fZ, float fRho);
 	void CalGauss(int nX, int nZ, float fDelta);
 
-    std::vector<D3DXVECTOR3> SelectCircle(int nX, int nZ, int nRange);
+    void SelectCircle(int nX, int nZ, int nRange);
     void EraseHeight(int nRange);
 
     void KeyUpdate(bool isUpdate);
 
 	float m_fRho;
 	TerrainEditType m_eEditType;
-	TextureType m_eTextureType;
 
     KeyType m_eKeyTest;
     KeyType m_eKeyReturn;
 
-	std::vector<D3DXVECTOR3> m_vecPoint;
+
 
 private:
 	ID3D11Buffer* m_pVertexBuffer;
@@ -84,5 +83,14 @@ private:
 	XMFLOAT3 m_vPickingPoint;
 
 	bool m_isRightClick;
+
+	DirectX::ST_PD_VERTEX m_pdVertex;
+	std::vector<D3DXVECTOR3> m_vecPoint;
+	std::vector<float> m_vecDepth;
+	DirectX::TextureType m_eTextureType;
+
+	void SetMappingData();
+public:
+	DirectX::ST_PD_VERTEX GetMappingData();
 };
 

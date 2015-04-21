@@ -102,8 +102,7 @@ void cMain::Update(float fDelta)
         }
 		if (m_pMouse->TextureMap())
 		{
-			m_pTerrain->SetTextureType(m_pMouse->GetTextureType());
-			m_pTerrain->SetMappingPoint(m_pMouse->GetVecPoint());
+			m_pTerrain->SetMappingData(m_pMouse->GetMappingData());
 		}
     }
 
