@@ -1419,10 +1419,10 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
 										&& nY <= ppdVertex->vecPoint[i].z * 4 + 4)
 									{
 										float fGauss = ppdVertex->vecDepth[i];
-										BYTE test = fGauss*10.0f;
+										BYTE test = fGauss*20.0f;
 										if (ppdVertex->eType == DirectX::TextureType::E_GRASS)
 										{
-											if (ptr[0] >=  test)
+											if (ptr[0] >= test)
 											{
 												ptr[0] -= test; // blue
 											}

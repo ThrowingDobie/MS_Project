@@ -571,7 +571,7 @@ void cMousePicking::SelectCircle(int nX, int nZ, int nRange)
 	std::vector<float> vecGauss;
 	for (int i = 0; i < vecVertex.size(); i++)
 	{
-		float fGauss = GetGaussian(vecVertex[i].x-nX, vecVertex[i].z-nZ, 3.0f);
+		float fGauss = GetGaussian(vecVertex[i].x-nX, vecVertex[i].z-nZ, 2.0f);
 		vecGauss.push_back(fGauss);
 	}
 
