@@ -1,12 +1,14 @@
 #include "stdafx.h"
 #include "cMousePicking.h"
 #include "cTerrain.h"
+#include "cQuadTree.h"
 
 #define MAP_SIZE 257
 
 cMousePicking::cMousePicking()
 	: m_pVertexBuffer(NULL)
 	, m_pIndexBuffer(NULL)
+	, m_pQuadTree(NULL)
 {
 	XMMATRIX I = XMMatrixIdentity();
 	XMStoreFloat4x4(&m_matMeshWorld, I);
@@ -33,6 +35,7 @@ cMousePicking::~cMousePicking()
 {
 	SAFE_RELEASE(m_pVertexBuffer);
 	SAFE_RELEASE(m_pIndexBuffer);
+	SAFE_DELETE(m_pQuadTree);
 }
 
 void cMousePicking::Setup()
@@ -44,6 +47,9 @@ void cMousePicking::Setup()
 	m_mtPickedTriangle.Ambient = XMFLOAT4(0.0f, 0.8f, 0.4f, 1.0f);
 	m_mtPickedTriangle.Diffuse = XMFLOAT4(0.0f, 0.8f, 0.4f, 1.0f);
 	m_mtPickedTriangle.Specular = XMFLOAT4(0.0f, 0.0f, 0.0f, 16.0f);
+
+	m_pQuadTree = new cQuadTree(MAP_SIZE,MAP_SIZE);
+	m_pQuadTree->AddChild();
 }
 
 void cMousePicking::Init(ID3D11Buffer* pVertexBuffer
@@ -359,7 +365,6 @@ void cMousePicking::Pick(int nX, int nY)
 			vecPoint.push_back(vPickingPoint);
 		}
 	}
-
 }
 
 bool cMousePicking::HeightEdit()

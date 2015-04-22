@@ -1,5 +1,7 @@
 #pragma once
 
+class cQuadTree;
+
 class cMousePicking
 {
 	enum TerrainEditType
@@ -89,8 +91,13 @@ private:
 	std::vector<float> m_vecDepth;
 	DirectX::TextureType m_eTextureType;
 
+	ID3D11Buffer* m_pQuadPatchIndexBuffer;
 	void SetMappingData();
 public:
 	DirectX::ST_PD_VERTEX GetMappingData();
+
+private:
+	// QuadTree
+	cQuadTree* m_pQuadTree;
 };
 

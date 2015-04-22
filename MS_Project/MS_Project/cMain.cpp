@@ -89,10 +89,6 @@ void cMain::Update(float fDelta)
     {
         g_pD3DDevice->m_pDevCon->RSSetState(RenderStates::WireframeRS);
     }
-    //if (GetAsyncKeyState('2') & 0x8000)
-    //{
-    //    g_pD3DDevice->m_pDevCon->RSSetState(NULL);
-    //}
 
     if (m_pMouse)
     {
