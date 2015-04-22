@@ -104,7 +104,8 @@ private:
 
 	cQuadTree* m_pNode;
 
-	std::vector<float> vecTest;
+	std::vector<XMVECTOR> m_vecTest;
+	std::vector<cQuadTree*> m_vecQuad;
 
 };
 

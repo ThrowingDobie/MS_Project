@@ -15,16 +15,6 @@ cQuadTree::cQuadTree(int nX, int nY)
 {
 	m_nCenter = 0;
 
-	//for (auto p : m_vecChild)
-	//{
-	//	p = nullptr;
-	//}
-
-	//for (int i = 0; i < 4; i++)
-	//{
-	//	m_pChild[i] = nullptr;
-	//}
-
 	m_nCorner[E_CornerTL] = 0;
 	m_nCorner[E_CornerTR] = nX - 1;
 	m_nCorner[E_CornerBL] = nX * (nY - 1);
@@ -34,15 +24,6 @@ cQuadTree::cQuadTree(int nX, int nY)
 		+ m_nCorner[E_CornerBL] + m_nCorner[E_CornerBR]) / 4;
 }
 
-//cQuadTree::cQuadTree(cQuadTree* pNode)
-//{
-//	m_nCenter = 0;
-//	for (int i = 0; i < 4; i++)
-//	{
-//		m_pChild[i] = nullptr;
-//		m_nCorner[i] = 0;
-//	}
-//}
 
 cQuadTree::~cQuadTree()
 {
@@ -122,66 +103,6 @@ std::vector<UINT> cQuadTree::GetIndex()
 	return vecIndex;
 }
 
-//cQuadTree* cQuadTree::AddChild(int nCornerTL, int nCornerTR, int nCornerBL, int nCornerBR)
-//{
-//	cQuadTree* pChild = nullptr;
-//
-//	pChild = new cQuadTree(this);
-//	pChild->SetCorners(nCornerTL, nCornerTR, nCornerBL, nCornerBR);
-//
-//	return pChild;
-//}
-
-//bool cQuadTree::Build()
-//{
-//	if (SubDivide())
-//	{
-//		m_pChild[E_CornerTL]->Build();
-//		m_pChild[E_CornerTR]->Build();
-//		m_pChild[E_CornerBL]->Build();
-//		m_pChild[E_CornerBR]->Build();
-//	}
-//	return true;
-//}
-//
-//bool cQuadTree::SubDivide()
-//{
-//	int nTopEdgeCenter = 0;
-//	int nBottomEdgeCenter = 0;
-//	int nLeftEdgCenter = 0;
-//	int nRightEdgeCenter = 0;
-//	int nCentralPoint = 0;
-//
-//	// 상
-//	nTopEdgeCenter = (m_nCorner[E_CornerTL] + m_nCorner[E_CornerTR]) / 2;
-//	// 하
-//	nBottomEdgeCenter = (m_nCorner[E_CornerBL] + m_nCorner[E_CornerBR]) / 2;
-//	// 좌
-//	nLeftEdgCenter = (m_nCorner[E_CornerTL] + m_nCorner[E_CornerBL]) / 2;
-//	// 우
-//	nRightEdgeCenter = (m_nCorner[E_CornerTR] + m_nCorner[E_CornerBR]) / 2;
-//	// 중앙
-//	nCentralPoint = (m_nCorner[E_CornerTL] + m_nCorner[E_CornerTR]
-//		+ m_nCorner[E_CornerBL] + m_nCorner[E_CornerBR]) / 4;
-//
-//	if (GetIsVisible())
-//	{
-//		return false;
-//	}
-//
-//	// 4개의 자식노드 추가
-//	m_pChild[E_CornerTL] = AddChild(m_nCorner[E_CornerTL],
-//		nTopEdgeCenter, nLeftEdgCenter, nCentralPoint);
-//	m_pChild[E_CornerTR] = AddChild(nTopEdgeCenter,
-//		m_nCorner[E_CornerTR], nCentralPoint, nRightEdgeCenter);
-//	m_pChild[E_CornerBL] = AddChild(nLeftEdgCenter,
-//		nCentralPoint, m_nCorner[E_CornerBL], nBottomEdgeCenter);
-//	m_pChild[E_CornerBR] = AddChild(nCentralPoint,
-//		nRightEdgeCenter, nBottomEdgeCenter, m_nCorner[E_CornerBR]);
-//
-//	return true;
-//}
-//
 void cQuadTree::SetCorners(int nCornerTL, int nCornerTR, int nCornerBL, int nCornerBR)
 {
 	m_nCorner[E_CornerTL] = nCornerTL;

@@ -129,12 +129,12 @@ void cMousePicking::Update(float fDelta)
 
 void cMousePicking::Render(DirectionalLight lights[3])
 {
-	//std::wostringstream outs;
-	//outs.precision(3);
-	//outs << L"X = " << m_vPickingPoint.x << L"   Z = " << m_vPickingPoint.z
-	//	<< L"   Y = " << m_vPickingPoint.y;
+	std::wostringstream outs;
+	outs.precision(3);
+	outs << L"X = " << m_vPickingPoint.x << L"   Z = " << m_vPickingPoint.z
+		<< L"   Y = " << m_vPickingPoint.y;
 
-	//SetWindowText(g_hWnd, outs.str().c_str());
+	SetWindowText(g_hWnd, outs.str().c_str());
 
 	g_pD3DDevice->m_pDevCon->IASetInputLayout(InputLayouts::Basic32);
 	g_pD3DDevice->m_pDevCon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -314,8 +314,6 @@ void cMousePicking::Pick(int nX, int nY)
 	CalTail(m_pQuadTree, rayOrigin, rayDir, 0);
 	//
 
-	m_pNode;
-
 	//UINT i0 = m_pNode->GetIndex()[0];
 	//UINT i1 = m_pNode->GetIndex()[1];
 	//UINT i2 = m_pNode->GetIndex()[2];
@@ -408,7 +406,6 @@ cQuadTree* cMousePicking::CalTail(cQuadTree* pRoot, XMVECTOR vOrigin, XMVECTOR v
 			if (isColliedTri)
 			{
 				pRoot = pRoot->m_vecChild[i];
-				vecTest.push_back(fDist);
 				CalTail(pRoot, vOrigin, vDir, fDist);
 				break;
 			}
@@ -419,7 +416,6 @@ cQuadTree* cMousePicking::CalTail(cQuadTree* pRoot, XMVECTOR vOrigin, XMVECTOR v
 			if (isColliedTri)
 			{
 				pRoot = pRoot->m_vecChild[i];
-				vecTest.push_back(fDist);
 				CalTail(pRoot, vOrigin, vDir, fDist);
 				break;
 			}
@@ -431,8 +427,6 @@ cQuadTree* cMousePicking::CalTail(cQuadTree* pRoot, XMVECTOR vOrigin, XMVECTOR v
 		vPoint = vOrigin + (fDist * vDir);
 		XMStoreFloat3(&m_vPickingPoint, vPoint);
 
-		vecTest.push_back(fDist);
-		m_pNode = pRoot;
 		return pRoot;
 	}
 }
