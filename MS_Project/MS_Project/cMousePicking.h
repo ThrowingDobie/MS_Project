@@ -106,6 +106,7 @@ private:
 
 	std::vector<XMVECTOR> m_vecTest;
 	std::vector<cQuadTree*> m_vecQuad;
+	std::vector<float> m_vecDist;
 
 };
 

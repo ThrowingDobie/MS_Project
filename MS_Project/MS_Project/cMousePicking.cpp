@@ -407,18 +407,11 @@ cQuadTree* cMousePicking::CalTail(cQuadTree* pRoot, XMVECTOR vOrigin, XMVECTOR v
 			{
 				pRoot = pRoot->m_vecChild[i];
 
-				if (pRoot->GetIsVisible())
-				{
-					CalTail(pRoot, vOrigin, vDir, fDist);
-					break;
-				}
-				else
-				{
-					XMVECTOR vPoint;
-					vPoint = vOrigin + (fDist * vDir);
-					XMStoreFloat3(&m_vPickingPoint, vPoint);
-					return pRoot;
-				}
+				m_vecQuad.push_back(pRoot);
+
+				CalTail(pRoot, vOrigin, vDir, fDist);
+				break;
+
 			}
 
 			isColliedTri = XNA::IntersectRayTriangle(vOrigin, vDir,
@@ -428,23 +421,21 @@ cQuadTree* cMousePicking::CalTail(cQuadTree* pRoot, XMVECTOR vOrigin, XMVECTOR v
 			{
 				pRoot = pRoot->m_vecChild[i];
 
-				if (pRoot->GetIsVisible())
-				{
-					CalTail(pRoot, vOrigin, vDir, fDist);
-					break;
-				}
-				else
-				{
-					XMVECTOR vPoint;
-					vPoint = vOrigin + (fDist * vDir);
-					XMStoreFloat3(&m_vPickingPoint, vPoint);
-					return pRoot;
-				}
+				m_vecQuad.push_back(pRoot);
+
+				CalTail(pRoot, vOrigin, vDir, fDist);
+				break;
 			}
 		}
 	}
 	else
 	{
+		XMVECTOR vPoint;
+		vPoint = vOrigin + (fDist * vDir);
+		XMStoreFloat3(&m_vPickingPoint, vPoint);
+
+		m_vecQuad.clear();
+
 		return pRoot;
 	}
 }
