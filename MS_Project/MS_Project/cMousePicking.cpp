@@ -47,9 +47,6 @@ void cMousePicking::Setup()
 	m_mtPickedTriangle.Ambient = XMFLOAT4(0.0f, 0.8f, 0.4f, 1.0f);
 	m_mtPickedTriangle.Diffuse = XMFLOAT4(0.0f, 0.8f, 0.4f, 1.0f);
 	m_mtPickedTriangle.Specular = XMFLOAT4(0.0f, 0.0f, 0.0f, 16.0f);
-
-	m_pQuadTree = new cQuadTree(MAP_SIZE,MAP_SIZE);
-	m_pQuadTree->AddChild();
 }
 
 void cMousePicking::Init(ID3D11Buffer* pVertexBuffer
@@ -311,59 +308,132 @@ void cMousePicking::Pick(int nX, int nY)
 
 	rayDir = XMVector3Normalize(rayDir);
 
+	//
 
-	std::vector<XMVECTOR> vecPoint;
-	XMVECTOR* vFirst = nullptr;
-	XMVECTOR* vSecond = nullptr;
-	int nTest = 0;
-	//for (int i = 0; i < m_vecVertex.size() - (MAP_SIZE + 2); i++);
-	for (int i = 0; i < m_vecVertex.size(); i++)
+	m_pQuadTree = new cQuadTree(MAP_SIZE, MAP_SIZE);
+	CalTail(m_pQuadTree, rayOrigin, rayDir, 0);
+	//
+
+	m_pNode;
+
+	//UINT i0 = m_pNode->GetIndex()[0];
+	//UINT i1 = m_pNode->GetIndex()[1];
+	//UINT i2 = m_pNode->GetIndex()[2];
+	//UINT i3 = m_pNode->GetIndex()[3];
+
+	//XMVECTOR v0 = XMLoadFloat3(&m_vecVertex[i0].Pos);
+	//XMVECTOR v1 = XMLoadFloat3(&m_vecVertex[i1].Pos);
+	//XMVECTOR v2 = XMLoadFloat3(&m_vecVertex[i2].Pos);
+	//XMVECTOR v3 = XMLoadFloat3(&m_vecVertex[i3].Pos);
+
+	//std::vector<XMVECTOR> vecPoint;
+	//XMVECTOR* vFirst = nullptr;
+	//XMVECTOR* vSecond = nullptr;
+	//int nTest = 0;
+	////for (int i = 0; i < m_vecVertex.size() - (MAP_SIZE + 2); i++);
+	//for (int i = 0; i < m_vecVertex.size(); i++)
+	//{
+	//	if (i % MAP_SIZE == MAP_SIZE - 1)
+	//	{
+	//		nTest = 1;
+	//	}
+	//	else
+	//	{
+	//		nTest = 0;
+	//	}
+
+	//	UINT i0 = (i + 0) + nTest;
+	//	UINT i1 = (i + 1) + nTest;
+	//	UINT i2 = (i + 1) + MAP_SIZE + nTest;
+	//	UINT i3 = (i + 0) + MAP_SIZE + nTest;
+
+	//	if (i3 >= m_vecVertex.size())
+	//	{
+	//		if (vecPoint.size()>0)
+	//		{
+	//			XMStoreFloat3(&m_vPickingPoint, GetNearPoint(vecPoint));
+	//		}
+	//		return;
+	//	}
+
+	//	XMVECTOR v0 = XMLoadFloat3(&m_vecVertex[i0].Pos);
+	//	XMVECTOR v1 = XMLoadFloat3(&m_vecVertex[i1].Pos);
+	//	XMVECTOR v2 = XMLoadFloat3(&m_vecVertex[i2].Pos);
+	//	XMVECTOR v3 = XMLoadFloat3(&m_vecVertex[i3].Pos);
+
+	//	float fDist = 0.f;
+	//	bool isColliedTri = false;
+	//	XMVECTOR vPickingPoint;
+
+	//	isColliedTri = XNA::IntersectRayTriangle(rayOrigin, rayDir, v0, v1, v2, &fDist);
+	//	if (isColliedTri == true)
+	//	{
+	//		vPickingPoint = rayOrigin + (fDist*rayDir);
+	//		vecPoint.push_back(vPickingPoint);
+	//	}
+
+	//	isColliedTri = XNA::IntersectRayTriangle(rayOrigin, rayDir, v2, v3, v0, &fDist);
+	//	if (isColliedTri == true)
+	//	{
+	//		vPickingPoint = rayOrigin + (fDist*rayDir);
+	//		vecPoint.push_back(vPickingPoint);
+	//	}
+	//}
+}
+
+cQuadTree* cMousePicking::CalTail(cQuadTree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist)
+{
+	bool isColliedTri = false;
+
+	if (pRoot->AddChild())
 	{
-		if (i % MAP_SIZE == MAP_SIZE - 1)
+		std::vector<ST_INDEX> vecIndex;
+		vecIndex.resize(4);
+		
+		for (int i = 0; i < pRoot->m_vecChild.size(); i++)
 		{
-			nTest = 1;
-		}
-		else
-		{
-			nTest = 0;
-		}
+			vecIndex[i].i0 = pRoot->m_vecChild[i]->GetIndex()[0];
+			vecIndex[i].i1 = pRoot->m_vecChild[i]->GetIndex()[1];
+			vecIndex[i].i2 = pRoot->m_vecChild[i]->GetIndex()[2];
+			vecIndex[i].i3 = pRoot->m_vecChild[i]->GetIndex()[3];
 
-		UINT i0 = (i + 0) + nTest;
-		UINT i1 = (i + 1) + nTest;
-		UINT i2 = (i + 1) + MAP_SIZE + nTest;
-		UINT i3 = (i + 0) + MAP_SIZE + nTest;
+			vecIndex[i].v0 = XMLoadFloat3(&m_vecVertex[vecIndex[i].i0].Pos);
+			vecIndex[i].v1 = XMLoadFloat3(&m_vecVertex[vecIndex[i].i1].Pos);
+			vecIndex[i].v2 = XMLoadFloat3(&m_vecVertex[vecIndex[i].i2].Pos);
+			vecIndex[i].v3 = XMLoadFloat3(&m_vecVertex[vecIndex[i].i3].Pos);
 
-		if (i3 >= m_vecVertex.size())
-		{
-			if (vecPoint.size()>0)
+			isColliedTri = XNA::IntersectRayTriangle(vOrigin, vDir,
+				vecIndex[i].v0, vecIndex[i].v1, vecIndex[i].v3, &fDist);
+
+			if (isColliedTri)
 			{
-				XMStoreFloat3(&m_vPickingPoint, GetNearPoint(vecPoint));
+				pRoot = pRoot->m_vecChild[i];
+				vecTest.push_back(fDist);
+				CalTail(pRoot, vOrigin, vDir, fDist);
+				break;
 			}
-			return;
+
+			isColliedTri = XNA::IntersectRayTriangle(vOrigin, vDir,
+				vecIndex[i].v3, vecIndex[i].v2, vecIndex[i].v0, &fDist);
+
+			if (isColliedTri)
+			{
+				pRoot = pRoot->m_vecChild[i];
+				vecTest.push_back(fDist);
+				CalTail(pRoot, vOrigin, vDir, fDist);
+				break;
+			}
 		}
+	}
+	else
+	{
+		XMVECTOR vPoint;
+		vPoint = vOrigin + (fDist * vDir);
+		XMStoreFloat3(&m_vPickingPoint, vPoint);
 
-		XMVECTOR v0 = XMLoadFloat3(&m_vecVertex[i0].Pos);
-		XMVECTOR v1 = XMLoadFloat3(&m_vecVertex[i1].Pos);
-		XMVECTOR v2 = XMLoadFloat3(&m_vecVertex[i2].Pos);
-		XMVECTOR v3 = XMLoadFloat3(&m_vecVertex[i3].Pos);
-
-		float fDist = 0.f;
-		bool isColliedTri = false;
-		XMVECTOR vPickingPoint;
-
-		isColliedTri = XNA::IntersectRayTriangle(rayOrigin, rayDir, v0, v1, v2, &fDist);
-		if (isColliedTri == true)
-		{
-			vPickingPoint = rayOrigin + (fDist*rayDir);
-			vecPoint.push_back(vPickingPoint);
-		}
-
-		isColliedTri = XNA::IntersectRayTriangle(rayOrigin, rayDir, v2, v3, v0, &fDist);
-		if (isColliedTri == true)
-		{
-			vPickingPoint = rayOrigin + (fDist*rayDir);
-			vecPoint.push_back(vPickingPoint);
-		}
+		vecTest.push_back(fDist);
+		m_pNode = pRoot;
+		return pRoot;
 	}
 }
 

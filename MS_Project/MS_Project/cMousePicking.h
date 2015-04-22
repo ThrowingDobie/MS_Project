@@ -99,5 +99,12 @@ public:
 private:
 	// QuadTree
 	cQuadTree* m_pQuadTree;
+
+	cQuadTree* CalTail(cQuadTree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist);
+
+	cQuadTree* m_pNode;
+
+	std::vector<float> vecTest;
+
 };
 

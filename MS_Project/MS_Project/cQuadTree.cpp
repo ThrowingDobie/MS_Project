@@ -46,18 +46,21 @@ cQuadTree::cQuadTree(int nX, int nY)
 
 cQuadTree::~cQuadTree()
 {
-	//Destroy();
+	Destroy();
 }
 
-//void cQuadTree::Destroy()
-//{
-//	for (int i = 0; i < 4; i++)
-//	{
-//		delete m_pChild[i];
-//	}
-//}
+void cQuadTree::Destroy()
+{
+	for (auto p : m_vecChild)
+	{
+		if (p->m_vecChild.size() > 0)
+		{
+			p->Destroy();
+		}
+	}
+}
 
-void cQuadTree::AddChild()
+bool cQuadTree::AddChild()
 {
 	int nTopEdgeCenter = 0;
 	int nBottomEdgeCenter = 0;
@@ -79,7 +82,7 @@ void cQuadTree::AddChild()
 
 	if (GetIsVisible())
 	{
-		return;
+		return false;
 	}
 	else
 	{
@@ -104,7 +107,19 @@ void cQuadTree::AddChild()
 		pChildBR->SetCorners(nCentralPoint, nRightEdgeCenter,
 			nBottomEdgeCenter, m_nCorner[E_CornerBR]);
 		m_vecChild[3] = pChildBR;
+
+		return true;
 	}
+}
+
+std::vector<UINT> cQuadTree::GetIndex()
+{
+	std::vector<UINT> vecIndex;
+	for (int i = 0; i < 4; i++)
+	{
+		vecIndex.push_back((UINT)m_nCorner[i]);
+	}
+	return vecIndex;
 }
 
 //cQuadTree* cQuadTree::AddChild(int nCornerTL, int nCornerTR, int nCornerBL, int nCornerBR)

@@ -10,20 +10,18 @@ public:
 	bool Build();
 
 	// MS
-	void AddChild();
+	bool AddChild();
+	void Destroy();
 
-private:
-	//cQuadTree* m_pChild[4];		// 자식 4마리
-
-	int	   m_nCenter;			// 쿼드트리 인자1
-	int    m_nCorner[4];		// 쿼드트리 인자2
-
-	// MS
+	std::vector<UINT> GetIndex();
 	std::vector<cQuadTree*> m_vecChild;
 
+	int	   m_nCenter;			// 쿼드트리 인자1
 private:
-	void Destroy();
-	
+
+	int    m_nCorner[4];		// 쿼드트리 인자2
+private:
+
 	// 출력 가능한 노드인가?
 	bool GetIsVisible();
 

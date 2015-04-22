@@ -92,3 +92,16 @@ enum CornerType
 	E_CornerBL,
 	E_CornerBR
 };
+
+struct ST_INDEX
+{
+	UINT i0;
+	UINT i1;
+	UINT i2;
+	UINT i3;
+
+	XMVECTOR v0;
+	XMVECTOR v1;
+	XMVECTOR v2;
+	XMVECTOR v3;
+};
