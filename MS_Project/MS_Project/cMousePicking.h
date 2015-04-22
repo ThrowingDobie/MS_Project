@@ -100,7 +100,7 @@ private:
 	// QuadTree
 	cQuadTree* m_pQuadTree;
 
-	cQuadTree* CalTail(cQuadTree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist);
+	bool CalTail(cQuadTree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist);
 
 	cQuadTree* m_pNode;
 

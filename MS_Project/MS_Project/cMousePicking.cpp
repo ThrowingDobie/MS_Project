@@ -311,7 +311,12 @@ void cMousePicking::Pick(int nX, int nY)
 	//
 
 	m_pQuadTree = new cQuadTree(MAP_SIZE, MAP_SIZE);
-	CalTail(m_pQuadTree, rayOrigin, rayDir, 0);
+	if (CalTail(m_pQuadTree, rayOrigin, rayDir, 0) == false && m_vecTest.size() > 0)
+	{
+		XMStoreFloat3(&m_vPickingPoint, GetNearPoint(m_vecTest));
+	}
+	SAFE_DELETE(m_pQuadTree);
+
 	//
 
 	//UINT i0 = m_pNode->GetIndex()[0];
@@ -379,7 +384,7 @@ void cMousePicking::Pick(int nX, int nY)
 	//}
 }
 
-cQuadTree* cMousePicking::CalTail(cQuadTree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist)
+bool cMousePicking::CalTail(cQuadTree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist)
 {
 	bool isColliedTri = false;
 
@@ -409,8 +414,12 @@ cQuadTree* cMousePicking::CalTail(cQuadTree* pRoot, XMVECTOR vOrigin, XMVECTOR v
 
 				m_vecQuad.push_back(pRoot);
 
+				XMVECTOR vPoint;
+				vPoint = vOrigin + (fDist * vDir);
+				//XMStoreFloat3(&m_vPickingPoint, vPoint);
+				m_vecTest.push_back(vPoint);
 				CalTail(pRoot, vOrigin, vDir, fDist);
-				break;
+				return false;
 
 			}
 
@@ -423,8 +432,12 @@ cQuadTree* cMousePicking::CalTail(cQuadTree* pRoot, XMVECTOR vOrigin, XMVECTOR v
 
 				m_vecQuad.push_back(pRoot);
 
+				XMVECTOR vPoint;
+				vPoint = vOrigin + (fDist * vDir);
+				//XMStoreFloat3(&m_vPickingPoint, vPoint);
+				m_vecTest.push_back(vPoint);
 				CalTail(pRoot, vOrigin, vDir, fDist);
-				break;
+				return false;
 			}
 		}
 	}
@@ -434,9 +447,9 @@ cQuadTree* cMousePicking::CalTail(cQuadTree* pRoot, XMVECTOR vOrigin, XMVECTOR v
 		vPoint = vOrigin + (fDist * vDir);
 		XMStoreFloat3(&m_vPickingPoint, vPoint);
 
-		m_vecQuad.clear();
+		m_vecTest.clear();
 
-		return pRoot;
+		return true;
 	}
 }
 
