@@ -1,6 +1,7 @@
 #pragma once
 
 class cQuadTree;
+class cOctree;
 
 class cMousePicking
 {
@@ -107,6 +108,17 @@ private:
 	std::vector<XMVECTOR> m_vecTest;
 	std::vector<cQuadTree*> m_vecQuad;
 	std::vector<float> m_vecDist;
+
+	// Octree
+	cOctree* m_pOctree;
+
+	std::vector<cOctree*> m_vecOctree;
+
+	void CalPoint(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist);
+
+	XMFLOAT3 SetIndex(int nIndex, int nSize);
+
+	std::vector<XMFLOAT3> m_vecSavePoint;
 
 };
 

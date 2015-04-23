@@ -1,4 +1,5 @@
 #pragma once
+
 class cQuadTree
 {
 public:
@@ -23,10 +24,5 @@ private:
 
 	// 4개의 코너값을 셋팅
 	void SetCorners(int nCornerTL, int nCornerTR, int nCornerBL, int nCornerBR);
-
-	// 쿼드트리를 4개의 하위 트리로 하위분할
-	bool SubDivide();
-
-
 };
 

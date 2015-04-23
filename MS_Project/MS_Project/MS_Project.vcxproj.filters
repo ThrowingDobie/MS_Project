@@ -117,6 +117,9 @@
     <ClInclude Include="cQuadTree.h">
       <Filter>FrameWork</Filter>
     </ClInclude>
+    <ClInclude Include="cOctree.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -184,6 +187,9 @@
     </ClCompile>
     <ClCompile Include="cQuadTree.cpp">
       <Filter>FrameWork</Filter>
+    </ClCompile>
+    <ClCompile Include="cOctree.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
