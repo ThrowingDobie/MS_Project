@@ -119,6 +119,5 @@ private:
 	XMFLOAT3 SetIndex(int nIndex, int nSize);
 
 	std::vector<XMFLOAT3> m_vecSavePoint;
-
 };
 
