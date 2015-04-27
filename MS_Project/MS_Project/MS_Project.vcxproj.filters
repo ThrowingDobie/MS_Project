@@ -118,7 +118,7 @@
       <Filter>FrameWork</Filter>
     </ClInclude>
     <ClInclude Include="cOctree.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>FrameWork</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -189,7 +189,7 @@
       <Filter>FrameWork</Filter>
     </ClCompile>
     <ClCompile Include="cOctree.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>FrameWork</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
