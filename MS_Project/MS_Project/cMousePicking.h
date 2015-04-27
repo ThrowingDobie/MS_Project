@@ -120,6 +120,6 @@ private:
 
 	std::vector<XMFLOAT3> m_vecSavePoint;
 
-	void SelectTile(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist);
+	bool SelectTile(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist, int n);
 };
 

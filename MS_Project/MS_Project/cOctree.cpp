@@ -298,3 +298,8 @@ XMFLOAT3 cOctree::SetIndex(int nIndex, int nSize)
 
 	return vPos;
 }
+
+XMFLOAT3 cOctree::GetCenterVector()
+{
+	return m_vCenter;
+}

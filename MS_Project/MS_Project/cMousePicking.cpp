@@ -444,64 +444,179 @@ void cMousePicking::CalPoint(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, fl
 
 			isColliedTri0 = XNA::IntersectRayTriangle(vOrigin, vDir,
 				OctreeIndex.v4, OctreeIndex.v5, OctreeIndex.v1, &fDist);
-			isColliedTri1 = XNA::IntersectRayTriangle(vOrigin, vDir,
-				OctreeIndex.v1, OctreeIndex.v0, OctreeIndex.v4, &fDist);
-
-			isColliedTri2 = XNA::IntersectRayTriangle(vOrigin, vDir,
-				OctreeIndex.v5, OctreeIndex.v7, OctreeIndex.v3, &fDist);
-			isColliedTri3 = XNA::IntersectRayTriangle(vOrigin, vDir,
-				OctreeIndex.v3, OctreeIndex.v1, OctreeIndex.v5, &fDist);
-
-			isColliedTri4 = XNA::IntersectRayTriangle(vOrigin, vDir,
-				OctreeIndex.v7, OctreeIndex.v3, OctreeIndex.v2, &fDist);
-			isColliedTri5 = XNA::IntersectRayTriangle(vOrigin, vDir,
-				OctreeIndex.v2, OctreeIndex.v6, OctreeIndex.v7, &fDist);
-
-			isColliedTri6 = XNA::IntersectRayTriangle(vOrigin, vDir,
-				OctreeIndex.v6, OctreeIndex.v4, OctreeIndex.v0, &fDist);
-			isColliedTri7 = XNA::IntersectRayTriangle(vOrigin, vDir,
-				OctreeIndex.v0, OctreeIndex.v2, OctreeIndex.v6, &fDist);
-
-			isColliedTri8 = XNA::IntersectRayTriangle(vOrigin, vDir,
-				OctreeIndex.v6, OctreeIndex.v7, OctreeIndex.v5, &fDist);
-			isColliedTri9 = XNA::IntersectRayTriangle(vOrigin, vDir,
-				OctreeIndex.v5, OctreeIndex.v4, OctreeIndex.v6, &fDist);
-
-			isColliedTri10 = XNA::IntersectRayTriangle(vOrigin, vDir,
-				OctreeIndex.v0, OctreeIndex.v1, OctreeIndex.v3, &fDist);
-			isColliedTri11 = XNA::IntersectRayTriangle(vOrigin, vDir,
-				OctreeIndex.v3, OctreeIndex.v2, OctreeIndex.v0, &fDist);
-
-			if (!(isColliedTri0 == false
-				&& isColliedTri1 == false
-				&& isColliedTri2 == false
-				&& isColliedTri3 == false
-				&& isColliedTri4 == false
-				&& isColliedTri5 == false
-				&& isColliedTri6 == false
-				&& isColliedTri7 == false
-				&& isColliedTri8 == false
-				&& isColliedTri9 == false
-				&& isColliedTri10 == false
-				&& isColliedTri11 == false))
+			if (isColliedTri0)
 			{
-				XMFLOAT3 v3PickingPoint;
-				XMVECTOR vPickingPoint;
-				vPickingPoint = vOrigin + (fDist * vDir);
-				XMStoreFloat3(&v3PickingPoint, vPickingPoint);
-
-				float fCubeHeight = v3PickingPoint.y;
-				float fMapHeight = m_vecVertex[(v3PickingPoint.x) + (256 - v3PickingPoint.z)*(MAP_SIZE)].Pos.y;
-
-				if (fMapHeight >= fCubeHeight)
+				if (SelectTile(pRoot, vOrigin, vDir, fDist, i))
 				{
-					m_vPickingPoint = v3PickingPoint;
-					pRoot = pRoot->GetChild()[i];
-					CalPoint(pRoot, vOrigin, vDir, fDist);
 					return;
 				}
 			}
+
+			isColliedTri1 = XNA::IntersectRayTriangle(vOrigin, vDir,
+				OctreeIndex.v1, OctreeIndex.v0, OctreeIndex.v4, &fDist);
+			if (isColliedTri1)
+			{
+				if (SelectTile(pRoot, vOrigin, vDir, fDist, i))
+				{
+					return;
+				}
+			}
+
+			isColliedTri2 = XNA::IntersectRayTriangle(vOrigin, vDir,
+				OctreeIndex.v5, OctreeIndex.v7, OctreeIndex.v3, &fDist);
+			if (isColliedTri2)
+			{
+				if (SelectTile(pRoot, vOrigin, vDir, fDist, i))
+				{
+					return;
+				}
+			}
+
+			isColliedTri3 = XNA::IntersectRayTriangle(vOrigin, vDir,
+				OctreeIndex.v3, OctreeIndex.v1, OctreeIndex.v5, &fDist);
+			if (isColliedTri3)
+			{
+				if (SelectTile(pRoot, vOrigin, vDir, fDist, i))
+				{
+					return;
+				}
+			}
+
+			isColliedTri4 = XNA::IntersectRayTriangle(vOrigin, vDir,
+				OctreeIndex.v7, OctreeIndex.v3, OctreeIndex.v2, &fDist);
+			if (isColliedTri4)
+			{
+				if (SelectTile(pRoot, vOrigin, vDir, fDist, i))
+				{
+					return;
+				}
+			}
+
+			isColliedTri5 = XNA::IntersectRayTriangle(vOrigin, vDir,
+				OctreeIndex.v2, OctreeIndex.v6, OctreeIndex.v7, &fDist);
+			if (isColliedTri5)
+			{
+				if (SelectTile(pRoot, vOrigin, vDir, fDist, i))
+				{
+					return;
+				}
+			}
+
+			isColliedTri6 = XNA::IntersectRayTriangle(vOrigin, vDir,
+				OctreeIndex.v6, OctreeIndex.v4, OctreeIndex.v0, &fDist);
+			if (isColliedTri6)
+			{
+				if (SelectTile(pRoot, vOrigin, vDir, fDist, i))
+				{
+					return;
+				}
+			}
+
+			isColliedTri7 = XNA::IntersectRayTriangle(vOrigin, vDir,
+				OctreeIndex.v0, OctreeIndex.v2, OctreeIndex.v6, &fDist);
+			if (isColliedTri7)
+			{
+				if (SelectTile(pRoot, vOrigin, vDir, fDist, i))
+				{
+					return;
+				}
+			}
+
+			isColliedTri8 = XNA::IntersectRayTriangle(vOrigin, vDir,
+				OctreeIndex.v6, OctreeIndex.v7, OctreeIndex.v5, &fDist);
+			if (isColliedTri8)
+			{
+				if (SelectTile(pRoot, vOrigin, vDir, fDist, i))
+				{
+					return;
+				}
+			}
+
+			isColliedTri9 = XNA::IntersectRayTriangle(vOrigin, vDir,
+				OctreeIndex.v5, OctreeIndex.v4, OctreeIndex.v6, &fDist);
+			if (isColliedTri9)
+			{
+				if (SelectTile(pRoot, vOrigin, vDir, fDist, i))
+				{
+					return;
+				}
+			}
+
+			isColliedTri10 = XNA::IntersectRayTriangle(vOrigin, vDir,
+				OctreeIndex.v0, OctreeIndex.v1, OctreeIndex.v3, &fDist);
+			if (isColliedTri10)
+			{
+				if (SelectTile(pRoot, vOrigin, vDir, fDist, i))
+				{
+					return;
+				}
+			}
+
+			isColliedTri11 = XNA::IntersectRayTriangle(vOrigin, vDir,
+				OctreeIndex.v3, OctreeIndex.v2, OctreeIndex.v0, &fDist);
+			if (isColliedTri11)
+			{
+				if (SelectTile(pRoot, vOrigin, vDir, fDist, i))
+				{
+					return;
+				}
+			}
+
+			//if (!(isColliedTri0 == false
+			//	&& isColliedTri1 == false
+			//	&& isColliedTri2 == false
+			//	&& isColliedTri3 == false
+			//	&& isColliedTri4 == false
+			//	&& isColliedTri5 == false
+			//	&& isColliedTri6 == false
+			//	&& isColliedTri7 == false
+			//	&& isColliedTri8 == false
+			//	&& isColliedTri9 == false
+			//	&& isColliedTri10 == false
+			//	&& isColliedTri11 == false))
+			//{
+			//	XMFLOAT3 v3PickingPoint;
+			//	XMVECTOR vPickingPoint;
+			//	vPickingPoint = vOrigin + (fDist * vDir);
+			//	XMStoreFloat3(&v3PickingPoint, vPickingPoint);
+
+			//	float fCubeHeight = v3PickingPoint.y;
+			//	float fMapHeight = m_vecVertex[(v3PickingPoint.x) + (256 - v3PickingPoint.z)*(MAP_SIZE)].Pos.y;
+
+			//	if (fMapHeight >= fCubeHeight)
+			//	{
+			//		m_vPickingPoint = v3PickingPoint;
+			//		pRoot = pRoot->GetChild()[i];
+			//		CalPoint(pRoot, vOrigin, vDir, fDist);
+			//		return;
+			//	}
+			//}
 		}
+	}
+	m_vPickingPoint = pRoot->GetCenterVector();
+
+}
+
+bool cMousePicking::SelectTile(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist, int n)
+{
+	XMFLOAT3 v3PickingPoint;
+	XMVECTOR vPickingPoint;
+	vPickingPoint = vOrigin + (fDist * vDir);
+	XMStoreFloat3(&v3PickingPoint, vPickingPoint);
+
+	float fCubeHeight = v3PickingPoint.y;
+	float fMapHeight = m_vecVertex[(v3PickingPoint.x) + (256 - v3PickingPoint.z)*(MAP_SIZE)].Pos.y;
+
+	if (fMapHeight >= fCubeHeight)
+	{
+		//m_vPickingPoint = v3PickingPoint;
+		pRoot = pRoot->GetChild()[n];
+		CalPoint(pRoot, vOrigin, vDir, fDist);
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 

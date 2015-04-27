@@ -17,6 +17,8 @@ public:
 
 	std::vector<UINT> GetIndex();
 
+	XMFLOAT3 GetCenterVector();
+
 private:
 	std::vector<cOctree*> m_vecChild;
 	std::vector<int> m_vecCorner;
