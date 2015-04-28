@@ -593,8 +593,8 @@ void cMousePicking::CalPoint(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, fl
 			//}
 		}
 	}
-	m_vPickingPoint = pRoot->GetCenterVector();
 
+	//m_vPickingPoint = pRoot->GetCenterVector();
 }
 
 bool cMousePicking::SelectTile(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist, int n)
@@ -606,17 +606,100 @@ bool cMousePicking::SelectTile(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, 
 
 	float fCubeHeight = v3PickingPoint.y;
 	float fMapHeight = m_vecVertex[(v3PickingPoint.x) + (256 - v3PickingPoint.z)*(MAP_SIZE)].Pos.y;
-
+	 
 	if (fMapHeight >= fCubeHeight)
 	{
-		//m_vPickingPoint = v3PickingPoint;
-		pRoot = pRoot->GetChild()[n];
-		CalPoint(pRoot, vOrigin, vDir, fDist);
-		return true;
+		if (pRoot->GetCorner()[1] - pRoot->GetCorner()[0] == 64)
+		{
+			XMVECTOR vPoint = CulDataPicking(pRoot->GetCorner()[0],
+				pRoot->GetCorner()[2], 64, vOrigin, vDir);
+			XMStoreFloat3(&m_vPickingPoint, vPoint);
+			return true;
+		}
+		else
+		{
+			pRoot = pRoot->GetChild()[n];
+			CalPoint(pRoot, vOrigin, vDir, fDist);
+			return true;
+		}
+
 	}
 	else
 	{
 		return false;
+	}
+}
+
+XMVECTOR cMousePicking::CulDataPicking(int nIndexFirst, int nIndexSecond, int nRange, XMVECTOR vOrigin, XMVECTOR vDir)
+{
+	std::vector<XMVECTOR> vecPoint;
+
+	for (int j = 0; j < nRange - 1; j++)
+	{
+		for (int i = 0; i < nRange - 1; i++)
+		{
+			bool isColliedA = false;
+			bool isColliedB = false;
+			float fDistA = 0.f;
+			float fDistB = 0.f;
+
+			XMVECTOR v0 = XMLoadFloat3(&m_vecVertex[nIndexFirst + i + 0 + 257 * j].Pos);
+			XMVECTOR v1 = XMLoadFloat3(&m_vecVertex[nIndexFirst + i + 1 + 257 * j].Pos);
+			XMVECTOR v2 = XMLoadFloat3(&m_vecVertex[nIndexFirst + i + 0 + 257 * (j + 1)].Pos);
+			XMVECTOR v3 = XMLoadFloat3(&m_vecVertex[nIndexFirst + i + 1 + 257 * (j + 1)].Pos);
+
+			XMFLOAT3 v30;
+			XMFLOAT3 v31;
+			XMFLOAT3 v32;
+			XMFLOAT3 v33;
+
+			XMStoreFloat3(&v30, v0);
+			XMStoreFloat3(&v31, v1);
+			XMStoreFloat3(&v32, v2);
+			XMStoreFloat3(&v33, v3);
+
+			v30.z = 256 - v30.z;
+			v31.z = 256 - v31.z;
+			v32.z = 256 - v32.z;
+			v33.z = 256 - v33.z;
+
+			v30.y = m_vecVertex[v30.x + (256 - v30.z)*(MAP_SIZE)].Pos.y;
+			v31.y = m_vecVertex[v31.x + (256 - v31.z)*(MAP_SIZE)].Pos.y;
+			v32.y = m_vecVertex[v32.x + (256 - v32.z)*(MAP_SIZE)].Pos.y;
+			v33.y = m_vecVertex[v33.x + (256 - v33.z)*(MAP_SIZE)].Pos.y;
+
+			v0 = XMLoadFloat3(&v30);
+			v1 = XMLoadFloat3(&v31);
+			v2 = XMLoadFloat3(&v32);
+			v3 = XMLoadFloat3(&v33);
+
+			isColliedA = XNA::IntersectRayTriangle(vOrigin, vDir, v0, v2, v3, &fDistA);
+			isColliedB = XNA::IntersectRayTriangle(vOrigin, vDir, v3, v1, v0, &fDistB);
+
+			if (isColliedA)
+			{
+				XMFLOAT3 v3PickingPoint;
+				XMVECTOR vPickingPoint;
+				vPickingPoint = vOrigin + (fDistA * vDir);
+
+				vecPoint.push_back(vPickingPoint);
+			}
+
+			if (isColliedB)
+			{
+				XMFLOAT3 v3PickingPoint;
+				XMVECTOR vPickingPoint;
+				vPickingPoint = vOrigin + (fDistB * vDir);
+
+				vecPoint.push_back(vPickingPoint);
+			}
+
+		}
+	}
+
+	if (vecPoint.size() >= 1)
+	{
+		return GetNearPoint(vecPoint);
 	}
 }
 

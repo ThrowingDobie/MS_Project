@@ -121,5 +121,7 @@ private:
 	std::vector<XMFLOAT3> m_vecSavePoint;
 
 	bool SelectTile(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist, int n);
+
+	XMVECTOR CulDataPicking(int nIndexFirst, int nIndexSecond, int nRange, XMVECTOR vOrigin, XMVECTOR vDir);
 };
 
