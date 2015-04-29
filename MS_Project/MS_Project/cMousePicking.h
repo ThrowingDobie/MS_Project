@@ -57,8 +57,6 @@ private:
     KeyType m_eKeyTest;
     KeyType m_eKeyReturn;
 
-	XMVECTOR GetNearPoint(std::vector<XMVECTOR> vecPoint);
-
 private:
 	ID3D11Buffer* m_pVertexBuffer;
 	ID3D11Buffer* m_pIndexBuffer;
@@ -94,34 +92,30 @@ private:
 
 	ID3D11Buffer* m_pQuadPatchIndexBuffer;
 	void SetMappingData();
+
+	int m_nMapSize;
+
 public:
 	DirectX::ST_PD_VERTEX GetMappingData();
 
 private:
+	XMVECTOR GetNearPoint(std::vector<XMVECTOR> vecPoint);
+
 	// QuadTree
 	cQuadTree* m_pQuadTree;
-
 	bool CalTail(cQuadTree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist);
-
-	cQuadTree* m_pNode;
-
 	std::vector<XMVECTOR> m_vecTest;
-	std::vector<cQuadTree*> m_vecQuad;
-	std::vector<float> m_vecDist;
 
 	// Octree
 	cOctree* m_pOctree;
-
 	std::vector<cOctree*> m_vecOctree;
-
 	void CalPoint(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist);
-
 	XMFLOAT3 SetIndex(int nIndex, int nSize);
-
-	std::vector<XMFLOAT3> m_vecSavePoint;
-
 	bool SelectTile(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist, int n);
-
 	XMVECTOR CulDataPicking(int nIndexFirst, int nIndexSecond, int nRange, XMVECTOR vOrigin, XMVECTOR vDir);
+
+	XMVECTOR m_vPrevPoint;
+
+	std::vector<XMVECTOR> m_vecColliedTri;
 };
 

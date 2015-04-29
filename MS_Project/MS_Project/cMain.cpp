@@ -66,7 +66,7 @@ void cMain::Init()
 	tii.LayerMapFilename2 = L"Textures/stone.dds";
 	tii.LayerMapFilename3 = L"Textures/grass4.jpg";
 	tii.LayerMapFilename4 = L"Textures/lightdirt.dds";
-    //tii.BlendMapFilename = L"Image/blend.dds";
+    tii.BlendMapFilename = L"Image/blend.dds";
 	tii.HeightScale = 50.f;
 	tii.HeightmapWidth = 257;
 	tii.HeightmapHeight = 257;
@@ -132,6 +132,9 @@ void cMain::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
+	case WM_MOUSEMOVE:
+		//m_pMouse->Pick(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		break;
 	case WM_LBUTTONDOWN:
 	case WM_MBUTTONDOWN:
 	case WM_RBUTTONDOWN:

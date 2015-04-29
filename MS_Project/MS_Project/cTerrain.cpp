@@ -72,7 +72,6 @@ void cTerrain::Init(ID3D11Device* device, ID3D11DeviceContext* dc, const InitInf
 
 	DirectX::CreateDDSTextureFromFile(g_pD3DDevice->m_pDevice,
 		L"./Image/blend.dds", nullptr, &m_pBlendMapSRV, 0, 0, &m_pdVertex);
-
 }
 
 void cTerrain::Update(float fDelta)

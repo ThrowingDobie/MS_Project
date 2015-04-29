@@ -4,8 +4,6 @@
 #include "cQuadTree.h"
 #include "cOctree.h"
 
-#define MAP_SIZE 257
-
 cMousePicking::cMousePicking()
 	: m_pVertexBuffer(NULL)
 	, m_pIndexBuffer(NULL)
@@ -31,6 +29,8 @@ cMousePicking::cMousePicking()
 
 	m_eTextureType = DirectX::E_ALPHAEMPTY;
 	m_isRightClick = false;
+
+	m_nMapSize = 257;
 }
 
 cMousePicking::~cMousePicking()
@@ -67,7 +67,7 @@ void cMousePicking::Init(ID3D11Buffer* pVertexBuffer
 		for (int i = 0; i < m_vecHeight.size(); i++)
 		{
 			Vertex::ST_P_VERTEX vertex;
-			vertex.Pos.x = (int)(i % MAP_SIZE);
+			vertex.Pos.x = (int)(i % m_nMapSize);
 			vertex.Pos.z = 256 - (int)(i / 257);
 			vertex.Pos.y = m_vecHeight[i];
 			m_vecVertex.push_back(vertex);
@@ -132,12 +132,12 @@ void cMousePicking::Update(float fDelta)
 
 void cMousePicking::Render(DirectionalLight lights[3])
 {
-	std::wostringstream outs;
-	outs.precision(3);
-	outs << L"X = " << m_vPickingPoint.x << L"   Z = " << m_vPickingPoint.z
-		<< L"   Y = " << m_vPickingPoint.y;
+	//std::wostringstream outs;
+	//outs.precision(3);
+	//outs << L"X = " << m_vPickingPoint.x << L"   Z = " << m_vPickingPoint.z
+	//	<< L"   Y = " << m_vPickingPoint.y;
 
-	SetWindowText(g_hWnd, outs.str().c_str());
+	//SetWindowText(g_hWnd, outs.str().c_str());
 
 	g_pD3DDevice->m_pDevCon->IASetInputLayout(InputLayouts::Basic32);
 	g_pD3DDevice->m_pDevCon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -289,31 +289,35 @@ void cMousePicking::BuildMeshGeometryBuffers()
 
 void cMousePicking::Pick(int nX, int nY)
 {
-	XMMATRIX P = g_pCamera->Proj();
+	if (nX != 0 && nY != 0)
+	{
+		XMMATRIX P = g_pCamera->Proj();
 
-	float vx = (+2.0f*nX / g_pD3DDevice->m_nClientWidth - 1.0f) / P(0, 0);
-	float vy = (-2.0f*nY / g_pD3DDevice->m_nClientHeight + 1.0f) / P(1, 1);
+		float vx = (+2.0f*nX / g_pD3DDevice->m_nClientWidth - 1.0f) / P(0, 0);
+		float vy = (-2.0f*nY / g_pD3DDevice->m_nClientHeight + 1.0f) / P(1, 1);
 
-	XMVECTOR rayOrigin = XMVectorSet(0.f, 0.f, 0.f, 1.f);
-	XMVECTOR rayDir = XMVectorSet(vx, vy, 1.0f, 0.0f);
+		XMVECTOR rayOrigin = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+		XMVECTOR rayDir = XMVectorSet(vx, vy, 1.0f, 0.0f);
 
-	XMMATRIX V = g_pCamera->View();
-	XMMATRIX invView = XMMatrixInverse(&XMMatrixDeterminant(V), V);
+		XMMATRIX V = g_pCamera->View();
+		XMMATRIX invView = XMMatrixInverse(&XMMatrixDeterminant(V), V);
 
-	XMMATRIX W = XMMatrixIdentity();
-	XMMATRIX invWorld = XMMatrixInverse(&XMMatrixDeterminant(W), W);
+		XMMATRIX W = XMMatrixIdentity();
+		XMMATRIX invWorld = XMMatrixInverse(&XMMatrixDeterminant(W), W);
 
-	XMMATRIX toLocal = XMMatrixMultiply(invView, invWorld);
+		XMMATRIX toLocal = XMMatrixMultiply(invView, invWorld);
 
-	rayOrigin = XMVector3TransformCoord(rayOrigin, toLocal);
-	rayDir = XMVector3TransformNormal(rayDir, toLocal);
+		rayOrigin = XMVector3TransformCoord(rayOrigin, toLocal);
+		rayDir = XMVector3TransformNormal(rayDir, toLocal);
 
-	rayDir = XMVector3Normalize(rayDir);
+		rayDir = XMVector3Normalize(rayDir);
+
+		m_pOctree = new cOctree(m_nMapSize);
+		CalPoint(m_pOctree, rayOrigin, rayDir, 0);
+		SAFE_DELETE(m_pOctree);
+	}
 
 
-	m_pOctree = new cOctree(MAP_SIZE);
-	CalPoint(m_pOctree, rayOrigin, rayDir, 0);
-	SAFE_DELETE(m_pOctree);
 }
 
 bool cMousePicking::CalTail(cQuadTree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist)
@@ -344,13 +348,6 @@ bool cMousePicking::CalTail(cQuadTree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, f
 			if (isColliedTri)
 			{
 				pRoot = pRoot->m_vecChild[i];
-
-				m_vecQuad.push_back(pRoot);
-
-				XMVECTOR vPoint;
-				vPoint = vOrigin + (fDist * vDir);
-				//XMStoreFloat3(&m_vPickingPoint, vPoint);
-				m_vecTest.push_back(vPoint);
 				CalTail(pRoot, vOrigin, vDir, fDist);
 				return false;
 
@@ -362,19 +359,9 @@ bool cMousePicking::CalTail(cQuadTree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, f
 			if (isColliedTri)
 			{
 				pRoot = pRoot->m_vecChild[i];
-
-				m_vecQuad.push_back(pRoot);
-
-				XMVECTOR vPoint;
-				vPoint = vOrigin + (fDist * vDir);
-				//XMStoreFloat3(&m_vPickingPoint, vPoint);
-				m_vecTest.push_back(vPoint);
 				CalTail(pRoot, vOrigin, vDir, fDist);
 				return false;
 			}
-
-
-
 		}
 	}
 	else
@@ -433,14 +420,14 @@ void cMousePicking::CalPoint(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, fl
 			OctreeIndex.i6 = pRoot->GetChild()[i]->GetIndex()[6];
 			OctreeIndex.i7 = pRoot->GetChild()[i]->GetIndex()[7];
 
-			OctreeIndex.v0 = XMLoadFloat3(&SetIndex(OctreeIndex.i0, MAP_SIZE));
-			OctreeIndex.v1 = XMLoadFloat3(&SetIndex(OctreeIndex.i1, MAP_SIZE));
-			OctreeIndex.v2 = XMLoadFloat3(&SetIndex(OctreeIndex.i2, MAP_SIZE));
-			OctreeIndex.v3 = XMLoadFloat3(&SetIndex(OctreeIndex.i3, MAP_SIZE));
-			OctreeIndex.v4 = XMLoadFloat3(&SetIndex(OctreeIndex.i4, MAP_SIZE));
-			OctreeIndex.v5 = XMLoadFloat3(&SetIndex(OctreeIndex.i5, MAP_SIZE));
-			OctreeIndex.v6 = XMLoadFloat3(&SetIndex(OctreeIndex.i6, MAP_SIZE));
-			OctreeIndex.v7 = XMLoadFloat3(&SetIndex(OctreeIndex.i7, MAP_SIZE));
+			OctreeIndex.v0 = XMLoadFloat3(&SetIndex(OctreeIndex.i0, m_nMapSize));
+			OctreeIndex.v1 = XMLoadFloat3(&SetIndex(OctreeIndex.i1, m_nMapSize));
+			OctreeIndex.v2 = XMLoadFloat3(&SetIndex(OctreeIndex.i2, m_nMapSize));
+			OctreeIndex.v3 = XMLoadFloat3(&SetIndex(OctreeIndex.i3, m_nMapSize));
+			OctreeIndex.v4 = XMLoadFloat3(&SetIndex(OctreeIndex.i4, m_nMapSize));
+			OctreeIndex.v5 = XMLoadFloat3(&SetIndex(OctreeIndex.i5, m_nMapSize));
+			OctreeIndex.v6 = XMLoadFloat3(&SetIndex(OctreeIndex.i6, m_nMapSize));
+			OctreeIndex.v7 = XMLoadFloat3(&SetIndex(OctreeIndex.i7, m_nMapSize));
 
 			isColliedTri0 = XNA::IntersectRayTriangle(vOrigin, vDir,
 				OctreeIndex.v4, OctreeIndex.v5, OctreeIndex.v1, &fDist);
@@ -561,40 +548,8 @@ void cMousePicking::CalPoint(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, fl
 					return;
 				}
 			}
-
-			//if (!(isColliedTri0 == false
-			//	&& isColliedTri1 == false
-			//	&& isColliedTri2 == false
-			//	&& isColliedTri3 == false
-			//	&& isColliedTri4 == false
-			//	&& isColliedTri5 == false
-			//	&& isColliedTri6 == false
-			//	&& isColliedTri7 == false
-			//	&& isColliedTri8 == false
-			//	&& isColliedTri9 == false
-			//	&& isColliedTri10 == false
-			//	&& isColliedTri11 == false))
-			//{
-			//	XMFLOAT3 v3PickingPoint;
-			//	XMVECTOR vPickingPoint;
-			//	vPickingPoint = vOrigin + (fDist * vDir);
-			//	XMStoreFloat3(&v3PickingPoint, vPickingPoint);
-
-			//	float fCubeHeight = v3PickingPoint.y;
-			//	float fMapHeight = m_vecVertex[(v3PickingPoint.x) + (256 - v3PickingPoint.z)*(MAP_SIZE)].Pos.y;
-
-			//	if (fMapHeight >= fCubeHeight)
-			//	{
-			//		m_vPickingPoint = v3PickingPoint;
-			//		pRoot = pRoot->GetChild()[i];
-			//		CalPoint(pRoot, vOrigin, vDir, fDist);
-			//		return;
-			//	}
-			//}
 		}
 	}
-
-	//m_vPickingPoint = pRoot->GetCenterVector();
 }
 
 bool cMousePicking::SelectTile(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist, int n)
@@ -605,14 +560,14 @@ bool cMousePicking::SelectTile(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, 
 	XMStoreFloat3(&v3PickingPoint, vPickingPoint);
 
 	float fCubeHeight = v3PickingPoint.y;
-	float fMapHeight = m_vecVertex[(v3PickingPoint.x) + (256 - v3PickingPoint.z)*(MAP_SIZE)].Pos.y;
+	float fMapHeight = m_vecVertex[(v3PickingPoint.x) + (256 - v3PickingPoint.z)*(m_nMapSize)].Pos.y;
 	 
 	if (fMapHeight >= fCubeHeight)
 	{
-		if (pRoot->GetCorner()[1] - pRoot->GetCorner()[0] == 64)
+		if (pRoot->GetCorner()[1] - pRoot->GetCorner()[0] == 32)
 		{
 			XMVECTOR vPoint = CulDataPicking(pRoot->GetCorner()[0],
-				pRoot->GetCorner()[2], 64, vOrigin, vDir);
+				pRoot->GetCorner()[2], 32, vOrigin, vDir);
 			XMStoreFloat3(&m_vPickingPoint, vPoint);
 			return true;
 		}
@@ -622,7 +577,6 @@ bool cMousePicking::SelectTile(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, 
 			CalPoint(pRoot, vOrigin, vDir, fDist);
 			return true;
 		}
-
 	}
 	else
 	{
@@ -632,21 +586,25 @@ bool cMousePicking::SelectTile(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, 
 
 XMVECTOR cMousePicking::CulDataPicking(int nIndexFirst, int nIndexSecond, int nRange, XMVECTOR vOrigin, XMVECTOR vDir)
 {
-	std::vector<XMVECTOR> vecPoint;
 
-	for (int j = 0; j < nRange - 1; j++)
+
+
+	std::vector<XMVECTOR> vecPoint;
+	XMVECTOR vReturnPoint;
+
+	for (int j = 0; j < nRange; j++)
 	{
-		for (int i = 0; i < nRange - 1; i++)
+		for (int i = 0; i < nRange; i++)
 		{
 			bool isColliedA = false;
 			bool isColliedB = false;
 			float fDistA = 0.f;
 			float fDistB = 0.f;
 
-			XMVECTOR v0 = XMLoadFloat3(&m_vecVertex[nIndexFirst + i + 0 + 257 * j].Pos);
-			XMVECTOR v1 = XMLoadFloat3(&m_vecVertex[nIndexFirst + i + 1 + 257 * j].Pos);
-			XMVECTOR v2 = XMLoadFloat3(&m_vecVertex[nIndexFirst + i + 0 + 257 * (j + 1)].Pos);
-			XMVECTOR v3 = XMLoadFloat3(&m_vecVertex[nIndexFirst + i + 1 + 257 * (j + 1)].Pos);
+			XMVECTOR v0 = XMLoadFloat3(&m_vecVertex[nIndexFirst + (i + 0) + 257 * (j + 0)].Pos);
+			XMVECTOR v1 = XMLoadFloat3(&m_vecVertex[nIndexFirst + (i + 1) + 257 * (j + 0)].Pos);
+			XMVECTOR v2 = XMLoadFloat3(&m_vecVertex[nIndexFirst + (i + 0) + 257 * (j + 1)].Pos);
+			XMVECTOR v3 = XMLoadFloat3(&m_vecVertex[nIndexFirst + (i + 1) + 257 * (j + 1)].Pos);
 
 			XMFLOAT3 v30;
 			XMFLOAT3 v31;
@@ -663,10 +621,10 @@ XMVECTOR cMousePicking::CulDataPicking(int nIndexFirst, int nIndexSecond, int nR
 			v32.z = 256 - v32.z;
 			v33.z = 256 - v33.z;
 
-			v30.y = m_vecVertex[v30.x + (256 - v30.z)*(MAP_SIZE)].Pos.y;
-			v31.y = m_vecVertex[v31.x + (256 - v31.z)*(MAP_SIZE)].Pos.y;
-			v32.y = m_vecVertex[v32.x + (256 - v32.z)*(MAP_SIZE)].Pos.y;
-			v33.y = m_vecVertex[v33.x + (256 - v33.z)*(MAP_SIZE)].Pos.y;
+			v30.y = m_vecVertex[v30.x + (256 - v30.z)*(m_nMapSize)].Pos.y;
+			v31.y = m_vecVertex[v31.x + (256 - v31.z)*(m_nMapSize)].Pos.y;
+			v32.y = m_vecVertex[v32.x + (256 - v32.z)*(m_nMapSize)].Pos.y;
+			v33.y = m_vecVertex[v33.x + (256 - v33.z)*(m_nMapSize)].Pos.y;
 
 			v0 = XMLoadFloat3(&v30);
 			v1 = XMLoadFloat3(&v31);
@@ -699,7 +657,13 @@ XMVECTOR cMousePicking::CulDataPicking(int nIndexFirst, int nIndexSecond, int nR
 
 	if (vecPoint.size() >= 1)
 	{
-		return GetNearPoint(vecPoint);
+		vReturnPoint = GetNearPoint(vecPoint);
+		m_vPrevPoint = vReturnPoint;
+		return vReturnPoint;
+	}
+	else
+	{
+		return m_vPrevPoint;
 	}
 }
 
@@ -852,11 +816,12 @@ void cMousePicking::CalGauss(int nX, int nZ, float fDelta)
     {
         for (int x = nX - nRange; x <= nX + nRange; x++)
         {
-			if (x + (MAP_SIZE - z)*MAP_SIZE < 0 || x + (MAP_SIZE - z)*MAP_SIZE >= m_vecVertex.size())
+			if (x + (m_nMapSize - z)*m_nMapSize < 0 || x + (m_nMapSize - z)*m_nMapSize >= 
+				m_vecVertex.size())
 			{
 				return;
 			}
-            fAverage += m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y;
+			fAverage += m_vecVertex[x + (m_nMapSize - z)*m_nMapSize].Pos.y;
             nSize++;
         }
     }
@@ -870,29 +835,29 @@ void cMousePicking::CalGauss(int nX, int nZ, float fDelta)
 		{
 			nGaussX++;
 			fSizeCheck = GetGaussian(nGaussX, nGaussZ, 1.f + sqrt(sqrt(fDelta)));
-			if (x + (MAP_SIZE - z)*MAP_SIZE < MAP_SIZE*MAP_SIZE)
+			if (x + (m_nMapSize - z)*m_nMapSize < m_nMapSize*m_nMapSize)
 			{
 				if (m_eEditType == E_INCREASE)
 				{
-					m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y += fSizeCheck * sqrt(fDelta);
+					m_vecVertex[x + (m_nMapSize - z)*m_nMapSize].Pos.y += fSizeCheck * sqrt(fDelta);
 				}
 				if (m_eEditType == E_DECREASE)
 				{
-					if (m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y - fSizeCheck * sqrt(fDelta) >= fSizeCheck * sqrt(fDelta))
+					if (m_vecVertex[x + (m_nMapSize - z)*m_nMapSize].Pos.y - fSizeCheck * sqrt(fDelta) >= fSizeCheck * sqrt(fDelta))
 					{
-						m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y -= fSizeCheck * sqrt(fDelta);
+						m_vecVertex[x + (m_nMapSize - z)*m_nMapSize].Pos.y -= fSizeCheck * sqrt(fDelta);
 					}
 				}
                 if (m_eEditType == E_NORMALIZE)
                 {
-                    if (m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y + fSizeCheck * sqrt(fDelta) > fAverage)
+					if (m_vecVertex[x + (m_nMapSize - z)*m_nMapSize].Pos.y + fSizeCheck * sqrt(fDelta) > fAverage)
                     {
-                        m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y -=
+						m_vecVertex[x + (m_nMapSize - z)*m_nMapSize].Pos.y -=
                             fSizeCheck * sqrt(fDelta)*0.03f;
                     }
-                    else if (m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y - fSizeCheck * sqrt(fDelta) < fAverage)
+					else if (m_vecVertex[x + (m_nMapSize - z)*m_nMapSize].Pos.y - fSizeCheck * sqrt(fDelta) < fAverage)
                     {
-                        m_vecVertex[x + (MAP_SIZE - z)*MAP_SIZE].Pos.y += 
+						m_vecVertex[x + (m_nMapSize - z)*m_nMapSize].Pos.y +=
                             fSizeCheck * sqrt(fDelta)*0.03f;
                     }
                     else
