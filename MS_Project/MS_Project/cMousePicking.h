@@ -100,6 +100,7 @@ public:
 
 private:
 	XMVECTOR GetNearPoint(std::vector<XMVECTOR> vecPoint);
+	XMVECTOR GetNearPointTest(std::vector<XMFLOAT3> vecPoint);
 
 	// QuadTree
 	cQuadTree* m_pQuadTree;
@@ -111,11 +112,10 @@ private:
 	std::vector<cOctree*> m_vecOctree;
 	void CalPoint(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist);
 	XMFLOAT3 SetIndex(int nIndex, int nSize);
-	bool SelectTile(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist, int n);
+	bool SelectTile(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist);
 	bool CulDataPicking(int nIndexFirst, int nRange, XMVECTOR vOrigin, XMVECTOR vDir);
 
-	XMVECTOR m_vPrevPoint;
-
 	std::vector<XMVECTOR> m_vecColliedTri;
+	std::vector<XMFLOAT3> m_vecColliedTri3;
 };
 
