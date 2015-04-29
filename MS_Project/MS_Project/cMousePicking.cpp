@@ -492,15 +492,15 @@ bool cMousePicking::CulDataPicking(int nIndexFirst, int nRange, XMVECTOR vOrigin
 			float fDistA = 0.f;
 			float fDistB = 0.f;
 
-			if (nIndexFirst + (i + 1) + 257 * (j + 1) > m_vecVertex.size() - 1)
+			if (nIndexFirst + (i + 1) + m_nMapSize * (j + 1) > m_vecVertex.size() - 1)
 			{
 				break;
 			}
 
-			XMVECTOR v0 = XMLoadFloat3(&m_vecVertex[nIndexFirst + (i + 0) + 257 * (j + 0)].Pos);
-			XMVECTOR v1 = XMLoadFloat3(&m_vecVertex[nIndexFirst + (i + 1) + 257 * (j + 0)].Pos);
-			XMVECTOR v2 = XMLoadFloat3(&m_vecVertex[nIndexFirst + (i + 0) + 257 * (j + 1)].Pos);
-			XMVECTOR v3 = XMLoadFloat3(&m_vecVertex[nIndexFirst + (i + 1) + 257 * (j + 1)].Pos);
+			XMVECTOR v0 = XMLoadFloat3(&m_vecVertex[nIndexFirst + (i + 0) + m_nMapSize * (j + 0)].Pos);
+			XMVECTOR v1 = XMLoadFloat3(&m_vecVertex[nIndexFirst + (i + 1) + m_nMapSize * (j + 0)].Pos);
+			XMVECTOR v2 = XMLoadFloat3(&m_vecVertex[nIndexFirst + (i + 0) + m_nMapSize * (j + 1)].Pos);
+			XMVECTOR v3 = XMLoadFloat3(&m_vecVertex[nIndexFirst + (i + 1) + m_nMapSize * (j + 1)].Pos);
 
 			XMFLOAT3 v30;
 			XMFLOAT3 v31;
@@ -512,15 +512,15 @@ bool cMousePicking::CulDataPicking(int nIndexFirst, int nRange, XMVECTOR vOrigin
 			XMStoreFloat3(&v32, v2);
 			XMStoreFloat3(&v33, v3);
 
-			v30.z = 256 - v30.z;
-			v31.z = 256 - v31.z;
-			v32.z = 256 - v32.z;
-			v33.z = 256 - v33.z;
+			v30.z = (m_nMapSize - 1) - v30.z;
+			v31.z = (m_nMapSize - 1) - v31.z;
+			v32.z = (m_nMapSize - 1) - v32.z;
+			v33.z = (m_nMapSize - 1) - v33.z;
 
-			v30.y = m_vecVertex[v30.x + (256 - v30.z)*(m_nMapSize)].Pos.y;
-			v31.y = m_vecVertex[v31.x + (256 - v31.z)*(m_nMapSize)].Pos.y;
-			v32.y = m_vecVertex[v32.x + (256 - v32.z)*(m_nMapSize)].Pos.y;
-			v33.y = m_vecVertex[v33.x + (256 - v33.z)*(m_nMapSize)].Pos.y;
+			v30.y = m_vecVertex[v30.x + ((m_nMapSize - 1) - v30.z)*(m_nMapSize)].Pos.y;
+			v31.y = m_vecVertex[v31.x + ((m_nMapSize - 1) - v31.z)*(m_nMapSize)].Pos.y;
+			v32.y = m_vecVertex[v32.x + ((m_nMapSize - 1) - v32.z)*(m_nMapSize)].Pos.y;
+			v33.y = m_vecVertex[v33.x + ((m_nMapSize - 1) - v33.z)*(m_nMapSize)].Pos.y;
 
 			v0 = XMLoadFloat3(&v30);
 			v1 = XMLoadFloat3(&v31);
