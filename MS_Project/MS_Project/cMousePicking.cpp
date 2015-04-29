@@ -213,7 +213,7 @@ void cMousePicking::OnMouseDown(WPARAM btnState, int nX, int nY)
 
 void cMousePicking::BuildMeshGeometryBuffers()
 {
-	std::ifstream fin("Models/skull.txt");
+	std::ifstream fin("Models/car.txt");
 
 	if (!fin)
 	{
@@ -314,10 +314,13 @@ void cMousePicking::Pick(int nX, int nY)
 
 		m_pOctree = new cOctree(m_nMapSize);
 		CalPoint(m_pOctree, rayOrigin, rayDir, 0);
+		if (m_vecColliedTri.size() > 0)
+		{
+			XMStoreFloat3(&m_vPickingPoint, GetNearPoint(m_vecColliedTri));
+			m_vecColliedTri.clear();
+		}
 		SAFE_DELETE(m_pOctree);
 	}
-
-
 }
 
 bool cMousePicking::CalTail(cQuadTree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist)
@@ -435,6 +438,8 @@ void cMousePicking::CalPoint(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, fl
 			{
 				if (SelectTile(pRoot, vOrigin, vDir, fDist, i))
 				{
+					pRoot = pRoot->GetChild()[i];
+					CalPoint(pRoot, vOrigin, vDir, fDist);
 					return;
 				}
 			}
@@ -445,6 +450,8 @@ void cMousePicking::CalPoint(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, fl
 			{
 				if (SelectTile(pRoot, vOrigin, vDir, fDist, i))
 				{
+					pRoot = pRoot->GetChild()[i];
+					CalPoint(pRoot, vOrigin, vDir, fDist);
 					return;
 				}
 			}
@@ -455,6 +462,8 @@ void cMousePicking::CalPoint(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, fl
 			{
 				if (SelectTile(pRoot, vOrigin, vDir, fDist, i))
 				{
+					pRoot = pRoot->GetChild()[i];
+					CalPoint(pRoot, vOrigin, vDir, fDist);
 					return;
 				}
 			}
@@ -465,6 +474,8 @@ void cMousePicking::CalPoint(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, fl
 			{
 				if (SelectTile(pRoot, vOrigin, vDir, fDist, i))
 				{
+					pRoot = pRoot->GetChild()[i];
+					CalPoint(pRoot, vOrigin, vDir, fDist);
 					return;
 				}
 			}
@@ -475,6 +486,8 @@ void cMousePicking::CalPoint(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, fl
 			{
 				if (SelectTile(pRoot, vOrigin, vDir, fDist, i))
 				{
+					pRoot = pRoot->GetChild()[i];
+					CalPoint(pRoot, vOrigin, vDir, fDist);
 					return;
 				}
 			}
@@ -485,6 +498,8 @@ void cMousePicking::CalPoint(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, fl
 			{
 				if (SelectTile(pRoot, vOrigin, vDir, fDist, i))
 				{
+					pRoot = pRoot->GetChild()[i];
+					CalPoint(pRoot, vOrigin, vDir, fDist);
 					return;
 				}
 			}
@@ -495,6 +510,8 @@ void cMousePicking::CalPoint(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, fl
 			{
 				if (SelectTile(pRoot, vOrigin, vDir, fDist, i))
 				{
+					pRoot = pRoot->GetChild()[i];
+					CalPoint(pRoot, vOrigin, vDir, fDist);
 					return;
 				}
 			}
@@ -505,6 +522,8 @@ void cMousePicking::CalPoint(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, fl
 			{
 				if (SelectTile(pRoot, vOrigin, vDir, fDist, i))
 				{
+					pRoot = pRoot->GetChild()[i];
+					CalPoint(pRoot, vOrigin, vDir, fDist);
 					return;
 				}
 			}
@@ -515,6 +534,8 @@ void cMousePicking::CalPoint(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, fl
 			{
 				if (SelectTile(pRoot, vOrigin, vDir, fDist, i))
 				{
+					pRoot = pRoot->GetChild()[i];
+					CalPoint(pRoot, vOrigin, vDir, fDist);
 					return;
 				}
 			}
@@ -525,6 +546,8 @@ void cMousePicking::CalPoint(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, fl
 			{
 				if (SelectTile(pRoot, vOrigin, vDir, fDist, i))
 				{
+					pRoot = pRoot->GetChild()[i];
+					CalPoint(pRoot, vOrigin, vDir, fDist);
 					return;
 				}
 			}
@@ -535,6 +558,8 @@ void cMousePicking::CalPoint(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, fl
 			{
 				if (SelectTile(pRoot, vOrigin, vDir, fDist, i))
 				{
+					pRoot = pRoot->GetChild()[i];
+					CalPoint(pRoot, vOrigin, vDir, fDist);
 					return;
 				}
 			}
@@ -545,6 +570,8 @@ void cMousePicking::CalPoint(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, fl
 			{
 				if (SelectTile(pRoot, vOrigin, vDir, fDist, i))
 				{
+					pRoot = pRoot->GetChild()[i];
+					CalPoint(pRoot, vOrigin, vDir, fDist);
 					return;
 				}
 			}
@@ -554,29 +581,12 @@ void cMousePicking::CalPoint(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, fl
 
 bool cMousePicking::SelectTile(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist, int n)
 {
-	XMFLOAT3 v3PickingPoint;
-	XMVECTOR vPickingPoint;
-	vPickingPoint = vOrigin + (fDist * vDir);
-	XMStoreFloat3(&v3PickingPoint, vPickingPoint);
+	int nSize = pRoot->GetCorner()[1] - pRoot->GetCorner()[0];
+	bool isCollied = CulDataPicking(pRoot->GetCorner()[0], nSize, vOrigin, vDir);
 
-	float fCubeHeight = v3PickingPoint.y;
-	float fMapHeight = m_vecVertex[(v3PickingPoint.x) + (256 - v3PickingPoint.z)*(m_nMapSize)].Pos.y;
-	 
-	if (fMapHeight >= fCubeHeight)
+	if (isCollied == true)
 	{
-		if (pRoot->GetCorner()[1] - pRoot->GetCorner()[0] == 32)
-		{
-			XMVECTOR vPoint = CulDataPicking(pRoot->GetCorner()[0],
-				pRoot->GetCorner()[2], 32, vOrigin, vDir);
-			XMStoreFloat3(&m_vPickingPoint, vPoint);
-			return true;
-		}
-		else
-		{
-			pRoot = pRoot->GetChild()[n];
-			CalPoint(pRoot, vOrigin, vDir, fDist);
-			return true;
-		}
+		return true;
 	}
 	else
 	{
@@ -584,13 +594,9 @@ bool cMousePicking::SelectTile(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, 
 	}
 }
 
-XMVECTOR cMousePicking::CulDataPicking(int nIndexFirst, int nIndexSecond, int nRange, XMVECTOR vOrigin, XMVECTOR vDir)
+bool cMousePicking::CulDataPicking(int nIndexFirst, int nRange, XMVECTOR vOrigin, XMVECTOR vDir)
 {
-
-
-
-	std::vector<XMVECTOR> vecPoint;
-	XMVECTOR vReturnPoint;
+	int nVectorSize = 0;
 
 	for (int j = 0; j < nRange; j++)
 	{
@@ -600,6 +606,11 @@ XMVECTOR cMousePicking::CulDataPicking(int nIndexFirst, int nIndexSecond, int nR
 			bool isColliedB = false;
 			float fDistA = 0.f;
 			float fDistB = 0.f;
+
+			if (nIndexFirst + (i + 1) + 257 * (j + 1) > m_vecVertex.size() - 1)
+			{
+				break;
+			}
 
 			XMVECTOR v0 = XMLoadFloat3(&m_vecVertex[nIndexFirst + (i + 0) + 257 * (j + 0)].Pos);
 			XMVECTOR v1 = XMLoadFloat3(&m_vecVertex[nIndexFirst + (i + 1) + 257 * (j + 0)].Pos);
@@ -640,7 +651,8 @@ XMVECTOR cMousePicking::CulDataPicking(int nIndexFirst, int nIndexSecond, int nR
 				XMVECTOR vPickingPoint;
 				vPickingPoint = vOrigin + (fDistA * vDir);
 
-				vecPoint.push_back(vPickingPoint);
+				nVectorSize++;
+				m_vecColliedTri.push_back(vPickingPoint);
 			}
 
 			if (isColliedB)
@@ -649,21 +661,19 @@ XMVECTOR cMousePicking::CulDataPicking(int nIndexFirst, int nIndexSecond, int nR
 				XMVECTOR vPickingPoint;
 				vPickingPoint = vOrigin + (fDistB * vDir);
 
-				vecPoint.push_back(vPickingPoint);
+				nVectorSize++;
+				m_vecColliedTri.push_back(vPickingPoint);
 			}
-
 		}
 	}
 
-	if (vecPoint.size() >= 1)
+	if (nVectorSize > 0)
 	{
-		vReturnPoint = GetNearPoint(vecPoint);
-		m_vPrevPoint = vReturnPoint;
-		return vReturnPoint;
+		return true;
 	}
 	else
 	{
-		return m_vPrevPoint;
+		return false;
 	}
 }
 

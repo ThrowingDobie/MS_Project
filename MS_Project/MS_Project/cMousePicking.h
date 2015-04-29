@@ -112,7 +112,7 @@ private:
 	void CalPoint(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist);
 	XMFLOAT3 SetIndex(int nIndex, int nSize);
 	bool SelectTile(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist, int n);
-	XMVECTOR CulDataPicking(int nIndexFirst, int nIndexSecond, int nRange, XMVECTOR vOrigin, XMVECTOR vDir);
+	bool CulDataPicking(int nIndexFirst, int nRange, XMVECTOR vOrigin, XMVECTOR vDir);
 
 	XMVECTOR m_vPrevPoint;
 
