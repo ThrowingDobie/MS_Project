@@ -11,6 +11,8 @@ public:
 		std::wstring LayerMapFilename3;
 		std::wstring LayerMapFilename4;
 		std::wstring BlendMapFilename;
+		std::wstring MousePointFilename;
+		std::wstring MouseBlendFilename;
 		float HeightScale;
 		UINT HeightmapWidth;
 		UINT HeightmapHeight;
@@ -54,6 +56,7 @@ private:
 	ID3D11ShaderResourceView* m_pLayerMapArraySRV;
 	ID3D11ShaderResourceView* m_pBlendMapSRV;
 	ID3D11ShaderResourceView* m_pHeightMapSRV;
+	ID3D11ShaderResourceView* m_pMouseBlendSRV;
 
 	InitInfo m_Info;
 
@@ -80,11 +83,10 @@ public:
 	std::vector<float> m_vecHeightmap;
 
 	DirectX::ST_PD_VERTEX m_pdVertex;
-	std::vector<D3DXVECTOR3> m_vecPoint;
-	std::vector<float> m_vecDepth;
-	DirectX::TextureType m_eTextureType;
+	DirectX::ST_PD_VERTEX m_pdVertex_Mouse;
 
 	void SetMappingData(DirectX::ST_PD_VERTEX pdVertex);
+	void SetMouseMappingData(DirectX::ST_PD_VERTEX pdVertex);
 public:
 	DirectX::ST_PD_VERTEX GetMappingData();
 };

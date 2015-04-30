@@ -215,6 +215,7 @@ public:
 
 	void SetLayerMapArray(ID3D11ShaderResourceView* tex)   { LayerMapArray->SetResource(tex); }
 	void SetBlendMap(ID3D11ShaderResourceView* tex)        { BlendMap->SetResource(tex); }
+	void SetMouseBlend(ID3D11ShaderResourceView* tex)	   { MouseBlend->SetResource(tex); }
 	void SetHeightMap(ID3D11ShaderResourceView* tex)       { HeightMap->SetResource(tex); }
 
 
@@ -251,6 +252,7 @@ public:
 	ID3DX11EffectShaderResourceVariable* LayerMapArray;
 	ID3DX11EffectShaderResourceVariable* BlendMap;
 	ID3DX11EffectShaderResourceVariable* HeightMap;
+	ID3DX11EffectShaderResourceVariable* MouseBlend;
 };
 #pragma endregion
 

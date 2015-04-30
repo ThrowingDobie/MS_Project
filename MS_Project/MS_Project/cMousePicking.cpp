@@ -28,6 +28,11 @@ cMousePicking::cMousePicking()
     m_eKeyReturn = E_UP;
 
 	m_eTextureType = DirectX::E_ALPHAEMPTY;
+	m_eTextureUsingType = DirectX::E_USINGNULL;
+
+	m_eTextureType_Mouse = DirectX::E_ALPHAEMPTY;
+	m_eTextureUsingType_Mouse = DirectX::E_USINGNULL;
+
 	m_isRightClick = false;
 
 	m_nMapSize = 257;
@@ -77,6 +82,7 @@ void cMousePicking::Init(ID3D11Buffer* pVertexBuffer
 
 void cMousePicking::KeyUpdate(bool isUpdate)
 {
+
     if (GetAsyncKeyState(VK_SPACE) & 0x8000)
     {
         if (m_eKeyTest == E_UP)
@@ -160,8 +166,8 @@ void cMousePicking::Render(DirectionalLight lights[3])
 	{
 		// Draw the Mesh.
 
-		if (GetAsyncKeyState('1') & 0x8000)
-			g_pD3DDevice->m_pDevCon->RSSetState(RenderStates::WireframeRS);
+		//if (GetAsyncKeyState('1') & 0x8000)
+		//	g_pD3DDevice->m_pDevCon->RSSetState(RenderStates::WireframeRS);
 
 		g_pD3DDevice->m_pDevCon->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
 		g_pD3DDevice->m_pDevCon->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
@@ -203,6 +209,7 @@ void cMousePicking::OnMouseDown(WPARAM btnState, int nX, int nY)
 		Pick(nX, nY);
 		SelectCircle(m_vPickingPoint.x, m_vPickingPoint.z, 5);
 		SetMappingData();
+		SetMouseMappingData();
     }
 	else
 	{
@@ -697,44 +704,55 @@ bool cMousePicking::TextureMap()
 {
 	if (GetAsyncKeyState('1') & 0x8000)
 	{
+		m_eTextureUsingType = DirectX::E_MAPPINGTEXTURE;
 		m_eTextureType = DirectX::E_GRASS;
 	}
 	else if (GetAsyncKeyState('2') & 0x8000)
 	{
+		m_eTextureUsingType = DirectX::E_MAPPINGTEXTURE;
 		m_eTextureType = DirectX::E_DARKDIRT;
 	}
 	else if (GetAsyncKeyState('3') & 0x8000)
 	{
+		m_eTextureUsingType = DirectX::E_MAPPINGTEXTURE;
 		m_eTextureType = DirectX::E_STONE;
 	}
 	else if (GetAsyncKeyState('4') & 0x8000)
 	{
+		m_eTextureUsingType = DirectX::E_MAPPINGTEXTURE;
 		m_eTextureType = DirectX::E_LIGHTDIRT;
 	}
 	else if (GetAsyncKeyState('5') & 0x8000)
 	{
+		m_eTextureUsingType = DirectX::E_MAPPINGTEXTURE;
 		m_eTextureType = DirectX::E_SNOW;
 	}
-	if (m_eTextureType != DirectX::E_ALPHAEMPTY)
+	if (m_eTextureUsingType != DirectX::E_USINGNULL)
 	{
 		if (GetAsyncKeyState(VK_CONTROL) & 0x8000)
 		{
-			if (m_isRightClick)
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			return true;
 		}
-
+		else
+		{
+			return false;
+		}
 	}
-	else
+	return false;
+}
+
+bool cMousePicking::MouseRange()
+{
+	if (GetAsyncKeyState('Z') & 0x8000)
 	{
-		return false;
+		m_eTextureType_Mouse = DirectX::E_GRASS;
+		m_eTextureUsingType_Mouse = DirectX::E_MOUSE;
 	}
-
+	if (GetAsyncKeyState('X') & 0x8000)
+	{
+		return true;
+	}
+	return false;
 }
 
 std::vector<Vertex::ST_P_VERTEX> cMousePicking::GetHeight()
@@ -859,33 +877,8 @@ void cMousePicking::SelectCircle(int nX, int nZ, int nRange)
 
 	m_vecPoint = vecVertex;
 	m_vecDepth = vecGauss;
-    //std::vector<D3DXVECTOR3> vecReturn;
-
-    //for (int i = 0; i < vecVertex.size(); i++)
-    //{
-    //    D3DXVECTOR3 vFrom(0.f, 0.f, 0.f);
-    //    D3DXVECTOR3 vTo(0.f, 0.f, 0.f);
-    //    D3DXVECTOR3 vDist(0.f, 0.f, 0.f);
-
-    //    vFrom.x = nX;
-    //    vFrom.z = nZ;
-
-    //    vTo.x = vecVertex[i].x;
-    //    vTo.z = vecVertex[i].z;
-
-    //    vDist = vFrom - vTo;
-
-    //    float fDist = D3DXVec3Length(&vDist);
-
-    //    if (fDist <= nRange)
-    //    {
-    //        D3DXVECTOR3 v(0.f, 0.f, 0.f);
-    //        v = vecVertex[i];
-
-    //        vecReturn.push_back(v);
-    //    }
-    //}
-
+	m_vecPoint_Mouse = vecVertex;
+	m_vecDepth_Mouse = vecGauss;
 }
 
 void cMousePicking::SetMappingData()
@@ -894,11 +887,28 @@ void cMousePicking::SetMappingData()
 	stData.vecPoint = m_vecPoint;
 	stData.vecDepth = m_vecDepth;
 	stData.eType = m_eTextureType;
+	stData.eTextureUsingType = m_eTextureUsingType;
 
 	m_pdVertex = stData;
+}
+
+void cMousePicking::SetMouseMappingData()
+{
+	DirectX::ST_PD_VERTEX stData;
+	stData.vecPoint = m_vecPoint_Mouse;
+	stData.vecDepth = m_vecDepth_Mouse;
+	stData.eType = m_eTextureType_Mouse;
+	stData.eTextureUsingType = m_eTextureUsingType_Mouse;
+
+	m_pdVertex_Mouse = stData;
 }
 
 DirectX::ST_PD_VERTEX cMousePicking::GetMappingData()
 {
 	return m_pdVertex;
+}
+
+DirectX::ST_PD_VERTEX cMousePicking::GetMouseMappingData()
+{
+	return m_pdVertex_Mouse;
 }

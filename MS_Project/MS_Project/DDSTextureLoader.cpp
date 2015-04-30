@@ -1409,8 +1409,17 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
 							int nY = 1024 - row;
 							int nX = x;
 
+							if (ppdVertex->eTextureUsingType == DirectX::TextureUsingType::E_MOUSE)
+							{
+								ptr[0] = 0;
+								ptr[1] = 0;
+								ptr[2] = 0;
+								ptr[3] = 0;
+							}
+
 							if (nX > rt.left && nX < rt.right && nY>rt.top && nY<rt.bottom)
 							{
+
 								for (int i = 0; i < ppdVertex->vecPoint.size(); i++)
 								{
 									if (nX >= ppdVertex->vecPoint[i].x * 4 - 3
@@ -1418,79 +1427,98 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
 										&& nY >= ppdVertex->vecPoint[i].z * 4 - 3
 										&& nY <= ppdVertex->vecPoint[i].z * 4 + 4)
 									{
-										float fGauss = ppdVertex->vecDepth[i];
-										BYTE test = fGauss*20.0f;
-										if (ppdVertex->eType == DirectX::TextureType::E_GRASS)
+										if (ppdVertex->eTextureUsingType == DirectX::TextureUsingType::E_MOUSE)
 										{
-											if (ptr[0] >= test)
+											float fGauss = ppdVertex->vecDepth[i];
+											BYTE test = fGauss*200.0f;
+											if (ppdVertex->eType == DirectX::TextureType::E_GRASS)
 											{
-												ptr[0] -= test; // blue
-											}
-											if (ptr[1] >= test)
-											{
-												ptr[1] -= test; // blue
-											}
-											if (ptr[2] >= test)
-											{
-												ptr[2] -= test; // blue
-											}
-											if (ptr[3] >= test)
-											{
-												ptr[3] -= test; // blue
-											}
-
-										}
-
-										else if (ppdVertex->eType == DirectX::TextureType::E_DARKDIRT)
-										{
-											if (ptr[2] >= 0 && ptr[2] < 255 - test)
-											{
-												ptr[2] += test;
-											}
-											else
-											{
-												ptr[2] = 255;
+												ptr[0] = test;
+												ptr[1] = test;
+												ptr[2] = test;
+												ptr[3] = test;
 											}
 										}
 
-										else if (ppdVertex->eType == DirectX::TextureType::E_STONE)
+										if (ppdVertex->eTextureUsingType == DirectX::TextureUsingType::E_MAPPINGTEXTURE)
 										{
-											if (ptr[1] >= 0 && ptr[1] < 255 - test)
+											float fGauss = ppdVertex->vecDepth[i];
+											BYTE test = fGauss*20.0f;
+											if (ppdVertex->eType == DirectX::TextureType::E_GRASS)
 											{
-												ptr[1] += test;
-											}
-											else
-											{
-												ptr[1] = 255;
-											}
-										}
+												if (ptr[0] >= test)
+												{
+													ptr[0] -= test; // blue
+												}
+												if (ptr[1] >= test)
+												{
+													ptr[1] -= test; // blue
+												}
+												if (ptr[2] >= test)
+												{
+													ptr[2] -= test; // blue
+												}
+												if (ptr[3] >= test)
+												{
+													ptr[3] -= test; // blue
+												}
 
-										else if (ppdVertex->eType == DirectX::TextureType::E_LIGHTDIRT)
-										{
-											if (ptr[0] >= 0 && ptr[0] < 255 - test)
-											{
-												ptr[0] += test;
 											}
-											else
-											{
-												ptr[0] = 255;
-											}
-										}
 
-										else if (ppdVertex->eType == DirectX::TextureType::E_SNOW)
-										{
-											if (ptr[3] >= 0 && ptr[3] < 255 - test)
+											else if (ppdVertex->eType == DirectX::TextureType::E_DARKDIRT)
 											{
-												ptr[3] += test;
+												if (ptr[2] >= 0 && ptr[2] < 255 - test)
+												{
+													ptr[2] += test;
+												}
+												else
+												{
+													ptr[2] = 255;
+												}
 											}
-											else
+
+											else if (ppdVertex->eType == DirectX::TextureType::E_STONE)
 											{
-												ptr[3] = 255;
+												if (ptr[1] >= 0 && ptr[1] < 255 - test)
+												{
+													ptr[1] += test;
+												}
+												else
+												{
+													ptr[1] = 255;
+												}
+											}
+
+											else if (ppdVertex->eType == DirectX::TextureType::E_LIGHTDIRT)
+											{
+												if (ptr[0] >= 0 && ptr[0] < 255 - test)
+												{
+													ptr[0] += test;
+												}
+												else
+												{
+													ptr[0] = 255;
+												}
+											}
+
+											else if (ppdVertex->eType == DirectX::TextureType::E_SNOW)
+											{
+												if (ptr[3] >= 0 && ptr[3] < 255 - test)
+												{
+													ptr[3] += test;
+												}
+												else
+												{
+													ptr[3] = 255;
+												}
+											}
+											else if (ppdVertex->eType == DirectX::TextureType::E_ALPHAEMPTY)
+											{
+
 											}
 										}
 									}
 								}
-
 							}
 						}
 					}

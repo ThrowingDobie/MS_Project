@@ -68,10 +68,18 @@ namespace DirectX
 		E_ALPHAMAX
 	};
 
+	enum TextureUsingType
+	{
+		E_MOUSE,
+		E_MAPPINGTEXTURE,
+		E_USINGNULL
+	};
+
 	struct ST_PD_VERTEX
 	{
 		std::vector<D3DXVECTOR3> vecPoint;
 		std::vector<float> vecDepth;
+		TextureUsingType eTextureUsingType;
 		TextureType eType;
 	};
 

@@ -67,6 +67,8 @@ void cMain::Init()
 	tii.LayerMapFilename3 = L"Textures/grass4.jpg";
 	tii.LayerMapFilename4 = L"Textures/lightdirt.dds";
     tii.BlendMapFilename = L"Image/blend.dds";
+	tii.MouseBlendFilename = L"Image/MouseBlend.dds";
+	tii.MousePointFilename = L"Textures/Mouse.png";
 	tii.HeightScale = 50.f;
 	tii.HeightmapWidth = 257;
 	tii.HeightmapHeight = 257;
@@ -99,6 +101,10 @@ void cMain::Update(float fDelta)
 		if (m_pMouse->TextureMap())
 		{
 			m_pTerrain->SetMappingData(m_pMouse->GetMappingData());
+		}
+		if (m_pMouse->MouseRange())
+		{
+			m_pTerrain->SetMouseMappingData(m_pMouse->GetMouseMappingData());
 		}
     }
     if (m_pMouse)

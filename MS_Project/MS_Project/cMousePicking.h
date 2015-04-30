@@ -39,6 +39,8 @@ public:
 
 	bool HeightEdit();
 	bool TextureMap();
+	bool MouseRange();
+
 private:
 	void Pick(int nX, int nY);
 	void BuildMeshGeometryBuffers();
@@ -85,18 +87,32 @@ private:
 
 	bool m_isRightClick;
 
+	// TextureMapping
+
 	DirectX::ST_PD_VERTEX m_pdVertex;
 	std::vector<D3DXVECTOR3> m_vecPoint;
 	std::vector<float> m_vecDepth;
 	DirectX::TextureType m_eTextureType;
+	DirectX::TextureUsingType m_eTextureUsingType;
+
+	// MouseMapping
+
+	DirectX::ST_PD_VERTEX m_pdVertex_Mouse;
+	std::vector<D3DXVECTOR3> m_vecPoint_Mouse;
+	std::vector<float> m_vecDepth_Mouse;
+	DirectX::TextureType m_eTextureType_Mouse;
+	DirectX::TextureUsingType m_eTextureUsingType_Mouse;
+
 
 	ID3D11Buffer* m_pQuadPatchIndexBuffer;
 	void SetMappingData();
+	void SetMouseMappingData();
 
 	int m_nMapSize;
 
 public:
 	DirectX::ST_PD_VERTEX GetMappingData();
+	DirectX::ST_PD_VERTEX GetMouseMappingData();
 
 private:
 	XMVECTOR GetNearPoint(std::vector<XMVECTOR> vecPoint);

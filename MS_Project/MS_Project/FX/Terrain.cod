@@ -31,10 +31,11 @@ cbuffer cbPerObject
 }
 
 //
-// 6 local object(s)
+// 7 local object(s)
 //
 Texture2DArray gLayerMapArray;
 Texture2D gBlendMap;
+Texture2D gMouseBlend;
 Texture2D gHeightMap;
 SamplerState samLinear
 {
@@ -135,17 +136,17 @@ fxgroup
                 dcl_output o1.zw
                 dcl_temps 2
                 
-                #line 97 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 98 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.xyz, v0.xyzx
                 mov r0.w, l(1.000000)
                 dp4 r1.x, r0.xyzw, cb0[8].xyzw  // vout<0:NaN:Inf>
                 dp4 r1.z, r0.xyzw, cb0[10].xyzw  // vout<2:NaN:Inf>
                 
-                #line 110
+                #line 111
                 sample_l_indexable(texture2d)(float,float,float,float) r0.x, v1.xyxx, t0.xyzw, s0, l(0.000000)
                 mov r0.x, r0.x  // vout<1:Inf>
                 
-                #line 113
+                #line 114
                 mov r0.yz, v1.xxyx  // vout<3,4>
                 mov r1.yw, v2.xxxy  // vout<5,6>
                 mov o1.xy, r0.yzyy  // VS<3,4>
@@ -249,7 +250,7 @@ fxgroup
                 dcl_globalFlags refactoringAllowed
                 dcl_constantbuffer cb0[24], dynamicIndexed
                 
-                #line 248 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 249 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 hs_control_point_phase 
                 dcl_input vOutputControlPointID
                 dcl_input v[4][0].xyz
@@ -263,7 +264,7 @@ fxgroup
                 mov o0.xyz, r0.yzwy  // HS<3,4>
                 mov o1.xy, r1.xyxx
                 
-                #line 179
+                #line 180
                 ret   // minY<0>
                 hs_join_phase   // maxY<0>
                 dcl_input vicp[4][0].xyz
@@ -276,7 +277,7 @@ fxgroup
                 dcl_output_siv o5.x, finalQuadVInsideTessFactor
                 dcl_temps 7
                 
-                #line 184
+                #line 185
                 mov r0.y, vicp[0][1].z  // vMin<0,2>
                 mov r1.y, vicp[0][1].w  // vMin<1>
                 mov r0.xz, vicp[2][0].xxzx  // vMax<0,2>
@@ -290,7 +291,7 @@ fxgroup
                 mul r0.xyz, r0.xyzx, l(0.500000, 0.500000, 0.500000, 0.000000)  // center<0,1,2>
                 nop   // extents<0,1,2>
                 
-                #line 151
+                #line 152
                 mov r2.xyz, r2.xyzx  // i<0: 0>
                 mov r0.xyz, r0.xyzx  // AabbOutsideFrustumTest<0: false>
                 mov r0.w, l(0)  // i<0>
@@ -300,49 +301,49 @@ fxgroup
                 loop 
                   ilt r1.w, r1.y, l(6)
                 
-                #line 155
+                #line 156
                   mov r1.z, l(0)
                   breakc_z r1.w  // center<0,1,2>
                   nop   // extents<0,1,2>
                   mov r3.xyz, r2.xyzx
                   mov r4.xyz, r0.xyzx  // plane<0,1,2,3>
                 
-                #line 134
+                #line 135
                   mov r1.w, r1.y
                   mov r5.xyzw, cb0[r1.w + 18].xyzw  // n<0:[0f,3.40282e+038f],1:[0f,3.40282e+038f],2:[0f,3.40282e+038f]>
                 
-                #line 137
+                #line 138
                   mov r6.xyz, -r5.xyzx  // r<0:NaN:Inf>
                 
-                #line 140
+                #line 141
                   max r6.xyz, r5.xyzx, r6.xyzx
                   dp3 r1.w, r4.xyzx, r6.xyzx  // s<0:NaN:Inf>
                 
-                #line 145
+                #line 146
                   mov r3.w, l(1.000000)
                   dp4 r2.w, r3.xyzw, r5.xyzw  // AabbBehindPlaneTest<0>
                 
-                #line 155
+                #line 156
                   add r1.w, r1.w, r2.w
                   lt r1.w, r1.w, l(0.000000)  // AabbOutsideFrustumTest<0: true>
                   if_nz r1.w
                     mov r1.x, l(-1)
                     mov r1.z, l(-1)
                 
-                #line 151
+                #line 152
                     break   // i<0>
                   endif 
                   iadd r1.y, r1.y, l(1)
                 
-                #line 161
+                #line 162
                   mov r1.z, r1.w
                 endloop   // AabbOutsideFrustumTest<0: false>
                 if_z r1.z
                 
-                #line 189
+                #line 190
                   mov r1.x, l(0)
                 
-                #line 199
+                #line 200
                 endif   // ConstantHS<0: 0f>
                 if_nz r1.x  // ConstantHS<1: 0f>
                   mov o0.x, l(0)  // ConstantHS<2: 0f>
@@ -351,10 +352,10 @@ fxgroup
                   mov o3.x, l(0)  // ConstantHS<5: 0f>
                   mov o4.x, l(0)
                 
-                #line 189
+                #line 190
                   mov o5.x, l(0)
                 
-                #line 211
+                #line 212
                   ret 
                 else   // e0<0,1,2>
                   add r0.xyz, vicp[2][0].xyzx, vicp[0][0].xyzx
@@ -369,13 +370,13 @@ fxgroup
                   add r1.xyz, r1.xyzx, vicp[3][0].xyzx
                   mul r1.xyz, r1.xyzx, l(0.250000, 0.250000, 0.250000, 0.000000)  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r0.xyz, r0.xyzx
                   mov r5.xyz, -cb0[12].xyzx
                   add r0.xyz, r0.xyzx, r5.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r0.x, r0.xyzx, r0.xyzx
                   sqrt r0.x, r0.x
                   mov r0.y, -cb0[15].x
@@ -389,17 +390,17 @@ fxgroup
                   mul r0.x, r0.w, r0.x
                   add r0.x, r0.x, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 217
+                #line 218
                   mul r0.x, r0.x, l(1.000000)  // pt<0:NaN:Inf>
                   exp r0.x, r0.x
                   mov r0.x, r0.x  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r2.xyz, r2.xyzx
                   add r2.xyz, r5.xyzx, r2.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r1.w, r2.xyzx, r2.xyzx
                   sqrt r1.w, r1.w
                   add r1.w, r0.y, r1.w
@@ -409,17 +410,17 @@ fxgroup
                   mul r1.w, r0.w, r1.w
                   add r1.w, r1.w, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 218
+                #line 219
                   mul r1.w, r1.w, l(1.000000)  // pt<1:NaN:Inf>
                   exp r1.w, r1.w
                   mov r1.w, r1.w  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r3.xyz, r3.xyzx
                   add r2.xyz, r5.xyzx, r3.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r2.x, r2.xyzx, r2.xyzx
                   sqrt r2.x, r2.x
                   add r2.x, r0.y, r2.x
@@ -429,17 +430,17 @@ fxgroup
                   mul r2.x, r0.w, r2.x
                   add r2.x, r2.x, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 219
+                #line 220
                   mul r2.x, r2.x, l(1.000000)  // pt<2:NaN:Inf>
                   exp r2.x, r2.x
                   mov r2.x, r2.x  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r4.xyz, r4.xyzx
                   add r3.xyz, r5.xyzx, r4.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r3.x, r3.xyzx, r3.xyzx
                   sqrt r3.x, r3.x
                   add r3.x, r0.y, r3.x
@@ -449,17 +450,17 @@ fxgroup
                   mul r3.x, r0.w, r3.x
                   add r3.x, r3.x, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 220
+                #line 221
                   mul r3.x, r3.x, l(1.000000)  // pt<3:NaN:Inf>
                   exp r2.y, r3.x
                   mov r2.y, r2.y  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r1.xyz, r1.xyzx
                   add r1.xyz, r5.xyzx, r1.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r1.x, r1.xyzx, r1.xyzx
                   sqrt r1.x, r1.x
                   add r0.y, r0.y, r1.x
@@ -469,10 +470,10 @@ fxgroup
                   mul r0.y, r0.w, r0.y
                   add r0.y, r0.y, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 222
+                #line 223
                   mul r0.y, r0.y, l(1.000000)  // pt<4:NaN:Inf>
                 
-                #line 225
+                #line 226
                   exp r2.w, r0.y  // ConstantHS<2:NaN:Inf>
                   mov r2.z, r2.w  // ConstantHS<3:NaN:Inf>
                   mov r2.x, r2.x  // ConstantHS<4:NaN:Inf>
@@ -488,7 +489,7 @@ fxgroup
                   mov o3.x, r0.y  // ConstantHS<5:[0f,64f]>
                   mov o4.x, r0.z
                 
-                #line 189
+                #line 190
                   mov o5.x, r0.w
                   ret 
                 
@@ -601,6 +602,7 @@ fxgroup
                 // POSITION                 0   xyz         1     NONE  float   xyz 
                 // TEXCOORD                 0   xy          2     NONE  float   xy  
                 // TEXCOORD                 1     zw        2     NONE  float     zw
+                // TEXCOORD                 2   xy          3     NONE  float   xy  
                 //
                 // Tessellation Domain   # of control points
                 // -------------------- --------------------
@@ -621,9 +623,10 @@ fxgroup
                 dcl_output o1.xyz
                 dcl_output o2.xy
                 dcl_output o2.zw
+                dcl_output o3.xy
                 dcl_temps 4
                 
-                #line 274 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 276 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.xy, -vicp[0][0].xzxx
                 add r0.xy, r0.xyxx, vicp[1][0].xzxx
                 mul r0.xy, r0.xyxx, vDomain.xxxx
@@ -638,7 +641,7 @@ fxgroup
                 add r0.xz, r0.zzwz, r0.xxyx  // dout<4:NaN:Inf,6:NaN:Inf>
                 mov r1.xy, r0.xzxx  // dout<4:NaN:Inf,6:NaN:Inf>
                 
-                #line 279
+                #line 281
                 mov r1.zw, -vicp[0][1].xxxy
                 add r1.zw, r1.zzzw, vicp[1][1].xxxy
                 mul r1.zw, r1.zzzw, vDomain.xxxx
@@ -652,14 +655,14 @@ fxgroup
                 mul r2.xy, r2.xyxx, vDomain.yyyy
                 add r1.zw, r1.zzzw, r2.xxxy  // dout<7:NaN:Inf,8:NaN:Inf>
                 
-                #line 283
+                #line 290
                 mul r2.xy, r1.zwzz, cb0[17].xyxx  // dout<9:NaN:Inf,10:NaN:Inf>
                 
-                #line 286
+                #line 293
                 sample_l_indexable(texture2d)(float,float,float,float) r0.y, r1.zwzz, t0.yxzw, s0, l(0.000000)  // dout<5:Inf>
                 mov r2.z, r0.y  // dout<5:Inf>
                 
-                #line 294
+                #line 301
                 mov r0.w, l(1.000000)
                 dp4 r3.x, r0.xyzw, cb1[0].xyzw  // dout<0:NaN:Inf>
                 dp4 r3.y, r0.xyzw, cb1[1].xyzw  // dout<1:NaN:Inf>
@@ -670,8 +673,9 @@ fxgroup
                 mov o2.zw, r2.xxxy  // DS<9:NaN:Inf,10:NaN:Inf>
                 mov o1.xz, r1.xxyx  // DS<4:NaN:Inf,6:NaN:Inf>
                 mov o1.y, r2.z  // DS<5:Inf>
+                mov o3.xy, r1.zwzz  // DS<11:NaN:Inf,12:NaN:Inf>
                 ret 
-                // Approximately 39 instruction slots used
+                // Approximately 40 instruction slots used
                             
             };
             GeometryShader = NULL;
@@ -742,7 +746,8 @@ fxgroup
                 // samHeightmap                      sampler      NA          NA    2        1
                 // gLayerMapArray                    texture  float4     2darray    0        1
                 // gBlendMap                         texture  float4          2d    1        1
-                // gHeightMap                        texture  float4          2d    2        1
+                // gMouseBlend                       texture  float4          2d    2        1
+                // gHeightMap                        texture  float4          2d    3        1
                 // cbPerFrame                        cbuffer      NA          NA    0        1
                 // cbPerObject                       cbuffer      NA          NA    1        1
                 //
@@ -756,6 +761,7 @@ fxgroup
                 // POSITION                 0   xyz         1     NONE  float   xyz 
                 // TEXCOORD                 0   xy          2     NONE  float   xy  
                 // TEXCOORD                 1     zw        2     NONE  float     zw
+                // TEXCOORD                 2   xy          3     NONE  float   xy  
                 //
                 //
                 // Output signature:
@@ -774,13 +780,15 @@ fxgroup
                 dcl_resource_texture2darray (float,float,float,float) t0
                 dcl_resource_texture2d (float,float,float,float) t1
                 dcl_resource_texture2d (float,float,float,float) t2
+                dcl_resource_texture2d (float,float,float,float) t3
                 dcl_input_ps linear v1.xyz
                 dcl_input_ps linear v2.xy
                 dcl_input_ps linear v2.zw
+                dcl_input_ps linear v3.xy
                 dcl_output o0.xyzw
-                dcl_temps 10
+                dcl_temps 11
                 
-                #line 306 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 313 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.x, -cb0[16].x
                 mov r0.y, l(0)
                 add r0.xy, r0.xyxx, v2.xyxx  // leftTex<0:Inf,1>
@@ -793,13 +801,13 @@ fxgroup
                 mov r2.x, l(0)
                 mov r2.y, -cb0[16].y
                 add r1.zw, r2.xxxy, v2.xxxy  // topTex<0,1:Inf>
-                sample_l_indexable(texture2d)(float,float,float,float) r0.x, r0.xyxx, t2.xyzw, s2, l(0.000000)
+                sample_l_indexable(texture2d)(float,float,float,float) r0.x, r0.xyxx, t3.xyzw, s2, l(0.000000)
                 mov r0.x, r0.x  // leftY<0:Inf>
-                sample_l_indexable(texture2d)(float,float,float,float) r0.y, r0.zwzz, t2.yxzw, s2, l(0.000000)
+                sample_l_indexable(texture2d)(float,float,float,float) r0.y, r0.zwzz, t3.yxzw, s2, l(0.000000)
                 mov r0.y, r0.y  // rightY<0:Inf>
-                sample_l_indexable(texture2d)(float,float,float,float) r0.z, r1.xyxx, t2.yzxw, s2, l(0.000000)
+                sample_l_indexable(texture2d)(float,float,float,float) r0.z, r1.xyxx, t3.yzxw, s2, l(0.000000)
                 mov r0.z, r0.z  // bottomY<0:Inf>
-                sample_l_indexable(texture2d)(float,float,float,float) r0.w, r1.zwzz, t2.yzwx, s2, l(0.000000)
+                sample_l_indexable(texture2d)(float,float,float,float) r0.w, r1.zwzz, t3.yzwx, s2, l(0.000000)
                 mov r0.w, r0.w  // topY<0:Inf>
                 mov r0.x, -r0.x
                 add r1.z, r0.x, r0.y
@@ -809,7 +817,7 @@ fxgroup
                 rsq r0.x, r0.x
                 mul r1.xyz, r0.xxxx, r1.xyzx  // tangent<2: 0f,0:NaN:Inf,1:NaN:Inf>
                 
-                #line 317
+                #line 324
                 mov r0.x, -r0.w
                 add r0.x, r0.x, r0.z
                 mov r0.z, l(0)
@@ -822,18 +830,18 @@ fxgroup
                 mov r0.xyz, -r0.xyzx
                 add r0.xyz, r0.xyzx, r2.xyzx  // normalW<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 322
+                #line 329
                 mov r1.xyz, -v1.xyzx
                 add r1.xyz, r1.xyzx, cb0[12].xyzx  // toEye<0:Inf,1:Inf,2:Inf>
                 
-                #line 325
+                #line 332
                 dp3 r0.w, r1.xyzx, r1.xyzx
                 sqrt r0.w, r0.w  // distToEye<0:NaN:Inf>
                 
-                #line 328
+                #line 335
                 div r1.xyz, r1.xyzx, r0.wwww  // toEye<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 335
+                #line 342
                 mov r2.xy, v2.zwzz
                 mov r2.z, l(0)
                 sample_indexable(texture2darray)(float,float,float,float) r2.xyzw, r2.xyzx, t0.xyzw, s0  // c0<0:Inf,1:Inf,2:Inf,3:Inf>
@@ -850,29 +858,56 @@ fxgroup
                 mov r6.z, l(4.000000)
                 sample_indexable(texture2darray)(float,float,float,float) r6.xyzw, r6.xyzx, t0.xyzw, s0  // c4<0:Inf,1:Inf,2:Inf,3:Inf>
                 
-                #line 342
-                sample_indexable(texture2d)(float,float,float,float) r7.xyzw, v2.xyxx, t1.xyzw, s1  // t<0:Inf,1:Inf,2:Inf,3:Inf>
+                #line 349
+                mov r7.xy, v2.zwzz
+                mov r7.z, l(5.000000)
+                sample_indexable(texture2darray)(float,float,float,float) r7.xyzw, r7.xyzx, t0.xyzw, s0  // m0<0:Inf,1:Inf,2:Inf,3:Inf>
+                sample_indexable(texture2d)(float,float,float,float) r8.xyzw, v3.xyxx, t2.xyzw, s1  // mb<0:Inf,1:Inf,2:Inf,3:Inf>
                 
-                #line 345
+                #line 353
+                sample_indexable(texture2d)(float,float,float,float) r9.xyzw, v2.xyxx, t1.xyzw, s1  // t<0:Inf,1:Inf,2:Inf,3:Inf>
+                
+                #line 356
                 mov r2.xyzw, r2.xyzw  // texColor<0:Inf,1:Inf,2:Inf,3:Inf>
-                mov r8.xyzw, -r2.xyzw
-                add r3.xyzw, r3.xyzw, r8.xyzw
-                mul r3.xyzw, r3.xyzw, r7.xxxx
+                
+                #line 359
+                mov r10.xyzw, -r2.xyzw
+                add r3.xyzw, r3.xyzw, r10.xyzw
+                mul r3.xyzw, r3.xyzw, r9.xxxx
                 add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r3.xyzw, -r2.xyzw
                 add r3.xyzw, r3.xyzw, r4.xyzw
-                mul r3.xyzw, r3.xyzw, r7.yyyy
+                mul r3.xyzw, r3.xyzw, r9.yyyy
                 add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r3.xyzw, -r2.xyzw
                 add r3.xyzw, r3.xyzw, r5.xyzw
-                mul r3.xyzw, r3.xyzw, r7.zzzz
+                mul r3.xyzw, r3.xyzw, r9.zzzz
                 add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r3.xyzw, -r2.xyzw
                 add r3.xyzw, r3.xyzw, r6.xyzw
-                mul r3.xyzw, r3.xyzw, r7.wwww
+                mul r3.xyzw, r3.xyzw, r9.wwww
+                add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                add r3.xyzw, r7.xyzw, l(-0.000000, -0.000000, -0.000000, -0.000000)
+                mul r3.xyzw, r3.xyzw, r8.xxxx
+                add r3.xyzw, r3.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000)  // texMouse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                mov r4.xyzw, -r3.xyzw
+                add r4.xyzw, r4.xyzw, r7.xyzw
+                mul r4.xyzw, r4.xyzw, r8.yyyy
+                add r3.xyzw, r3.xyzw, r4.xyzw  // texMouse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                mov r4.xyzw, -r3.xyzw
+                add r4.xyzw, r4.xyzw, r7.xyzw
+                mul r4.xyzw, r4.xyzw, r8.zzzz
+                add r3.xyzw, r3.xyzw, r4.xyzw  // texMouse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                mov r4.xyzw, -r3.xyzw
+                add r4.xyzw, r4.xyzw, r7.xyzw
+                mul r4.xyzw, r4.xyzw, r8.wwww
+                add r3.xyzw, r3.xyzw, r4.xyzw  // texMouse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                mov r4.xyzw, -r3.xyzw
+                add r2.xyzw, r2.xyzw, r4.xyzw
+                mul r2.xyzw, r2.xyzw, l(0.500000, 0.500000, 0.500000, 0.500000)
                 add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 369
+                #line 390
                 nop 
                 mov r3.xyzw, cb1[4].xyzw  // mat<0,1,2,3>
                 mov r4.xyzw, cb1[5].xyzw  // mat<4,5,6,7>
@@ -915,25 +950,25 @@ fxgroup
                 movc r4.xyzw, r1.wwww, r4.xyzw, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 movc r0.xyzw, r1.wwww, r0.xyzw, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 369 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 390 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r3.xyzw, r3.xyzw  // A<0:Inf,1:Inf,2:Inf,3:Inf>
                 mov r4.xyzw, r4.xyzw  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r0.xyzw, r0.xyzw  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 372
+                #line 393
                 add r1.xyzw, r3.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000)  // ambient<0:Inf,1:Inf,2:Inf,3:Inf>
                 add r3.xyzw, r4.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 add r0.xyzw, r0.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 377
+                #line 398
                 add r1.xyzw, r1.xyzw, r3.xyzw
                 mul r1.xyzw, r1.xyzw, r2.xyzw
                 add r0.xyzw, r0.xyzw, r1.xyzw  // litColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 392
+                #line 413
                 mov o0.xyzw, r0.xyzw  // PS<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 ret 
-                // Approximately 118 instruction slots used
+                // Approximately 141 instruction slots used
                             
             };
         }
@@ -1012,17 +1047,17 @@ fxgroup
                 dcl_output o1.zw
                 dcl_temps 2
                 
-                #line 97 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 98 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.xyz, v0.xyzx
                 mov r0.w, l(1.000000)
                 dp4 r1.x, r0.xyzw, cb0[8].xyzw  // vout<0:NaN:Inf>
                 dp4 r1.z, r0.xyzw, cb0[10].xyzw  // vout<2:NaN:Inf>
                 
-                #line 110
+                #line 111
                 sample_l_indexable(texture2d)(float,float,float,float) r0.x, v1.xyxx, t0.xyzw, s0, l(0.000000)
                 mov r0.x, r0.x  // vout<1:Inf>
                 
-                #line 113
+                #line 114
                 mov r0.yz, v1.xxyx  // vout<3,4>
                 mov r1.yw, v2.xxxy  // vout<5,6>
                 mov o1.xy, r0.yzyy  // VS<3,4>
@@ -1126,7 +1161,7 @@ fxgroup
                 dcl_globalFlags refactoringAllowed
                 dcl_constantbuffer cb0[24], dynamicIndexed
                 
-                #line 248 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 249 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 hs_control_point_phase 
                 dcl_input vOutputControlPointID
                 dcl_input v[4][0].xyz
@@ -1140,7 +1175,7 @@ fxgroup
                 mov o0.xyz, r0.yzwy  // HS<3,4>
                 mov o1.xy, r1.xyxx
                 
-                #line 179
+                #line 180
                 ret   // minY<0>
                 hs_join_phase   // maxY<0>
                 dcl_input vicp[4][0].xyz
@@ -1153,7 +1188,7 @@ fxgroup
                 dcl_output_siv o5.x, finalQuadVInsideTessFactor
                 dcl_temps 7
                 
-                #line 184
+                #line 185
                 mov r0.y, vicp[0][1].z  // vMin<0,2>
                 mov r1.y, vicp[0][1].w  // vMin<1>
                 mov r0.xz, vicp[2][0].xxzx  // vMax<0,2>
@@ -1167,7 +1202,7 @@ fxgroup
                 mul r0.xyz, r0.xyzx, l(0.500000, 0.500000, 0.500000, 0.000000)  // center<0,1,2>
                 nop   // extents<0,1,2>
                 
-                #line 151
+                #line 152
                 mov r2.xyz, r2.xyzx  // i<0: 0>
                 mov r0.xyz, r0.xyzx  // AabbOutsideFrustumTest<0: false>
                 mov r0.w, l(0)  // i<0>
@@ -1177,49 +1212,49 @@ fxgroup
                 loop 
                   ilt r1.w, r1.y, l(6)
                 
-                #line 155
+                #line 156
                   mov r1.z, l(0)
                   breakc_z r1.w  // center<0,1,2>
                   nop   // extents<0,1,2>
                   mov r3.xyz, r2.xyzx
                   mov r4.xyz, r0.xyzx  // plane<0,1,2,3>
                 
-                #line 134
+                #line 135
                   mov r1.w, r1.y
                   mov r5.xyzw, cb0[r1.w + 18].xyzw  // n<0:[0f,3.40282e+038f],1:[0f,3.40282e+038f],2:[0f,3.40282e+038f]>
                 
-                #line 137
+                #line 138
                   mov r6.xyz, -r5.xyzx  // r<0:NaN:Inf>
                 
-                #line 140
+                #line 141
                   max r6.xyz, r5.xyzx, r6.xyzx
                   dp3 r1.w, r4.xyzx, r6.xyzx  // s<0:NaN:Inf>
                 
-                #line 145
+                #line 146
                   mov r3.w, l(1.000000)
                   dp4 r2.w, r3.xyzw, r5.xyzw  // AabbBehindPlaneTest<0>
                 
-                #line 155
+                #line 156
                   add r1.w, r1.w, r2.w
                   lt r1.w, r1.w, l(0.000000)  // AabbOutsideFrustumTest<0: true>
                   if_nz r1.w
                     mov r1.x, l(-1)
                     mov r1.z, l(-1)
                 
-                #line 151
+                #line 152
                     break   // i<0>
                   endif 
                   iadd r1.y, r1.y, l(1)
                 
-                #line 161
+                #line 162
                   mov r1.z, r1.w
                 endloop   // AabbOutsideFrustumTest<0: false>
                 if_z r1.z
                 
-                #line 189
+                #line 190
                   mov r1.x, l(0)
                 
-                #line 199
+                #line 200
                 endif   // ConstantHS<0: 0f>
                 if_nz r1.x  // ConstantHS<1: 0f>
                   mov o0.x, l(0)  // ConstantHS<2: 0f>
@@ -1228,10 +1263,10 @@ fxgroup
                   mov o3.x, l(0)  // ConstantHS<5: 0f>
                   mov o4.x, l(0)
                 
-                #line 189
+                #line 190
                   mov o5.x, l(0)
                 
-                #line 211
+                #line 212
                   ret 
                 else   // e0<0,1,2>
                   add r0.xyz, vicp[2][0].xyzx, vicp[0][0].xyzx
@@ -1246,13 +1281,13 @@ fxgroup
                   add r1.xyz, r1.xyzx, vicp[3][0].xyzx
                   mul r1.xyz, r1.xyzx, l(0.250000, 0.250000, 0.250000, 0.000000)  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r0.xyz, r0.xyzx
                   mov r5.xyz, -cb0[12].xyzx
                   add r0.xyz, r0.xyzx, r5.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r0.x, r0.xyzx, r0.xyzx
                   sqrt r0.x, r0.x
                   mov r0.y, -cb0[15].x
@@ -1266,17 +1301,17 @@ fxgroup
                   mul r0.x, r0.w, r0.x
                   add r0.x, r0.x, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 217
+                #line 218
                   mul r0.x, r0.x, l(1.000000)  // pt<0:NaN:Inf>
                   exp r0.x, r0.x
                   mov r0.x, r0.x  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r2.xyz, r2.xyzx
                   add r2.xyz, r5.xyzx, r2.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r1.w, r2.xyzx, r2.xyzx
                   sqrt r1.w, r1.w
                   add r1.w, r0.y, r1.w
@@ -1286,17 +1321,17 @@ fxgroup
                   mul r1.w, r0.w, r1.w
                   add r1.w, r1.w, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 218
+                #line 219
                   mul r1.w, r1.w, l(1.000000)  // pt<1:NaN:Inf>
                   exp r1.w, r1.w
                   mov r1.w, r1.w  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r3.xyz, r3.xyzx
                   add r2.xyz, r5.xyzx, r3.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r2.x, r2.xyzx, r2.xyzx
                   sqrt r2.x, r2.x
                   add r2.x, r0.y, r2.x
@@ -1306,17 +1341,17 @@ fxgroup
                   mul r2.x, r0.w, r2.x
                   add r2.x, r2.x, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 219
+                #line 220
                   mul r2.x, r2.x, l(1.000000)  // pt<2:NaN:Inf>
                   exp r2.x, r2.x
                   mov r2.x, r2.x  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r4.xyz, r4.xyzx
                   add r3.xyz, r5.xyzx, r4.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r3.x, r3.xyzx, r3.xyzx
                   sqrt r3.x, r3.x
                   add r3.x, r0.y, r3.x
@@ -1326,17 +1361,17 @@ fxgroup
                   mul r3.x, r0.w, r3.x
                   add r3.x, r3.x, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 220
+                #line 221
                   mul r3.x, r3.x, l(1.000000)  // pt<3:NaN:Inf>
                   exp r2.y, r3.x
                   mov r2.y, r2.y  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r1.xyz, r1.xyzx
                   add r1.xyz, r5.xyzx, r1.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r1.x, r1.xyzx, r1.xyzx
                   sqrt r1.x, r1.x
                   add r0.y, r0.y, r1.x
@@ -1346,10 +1381,10 @@ fxgroup
                   mul r0.y, r0.w, r0.y
                   add r0.y, r0.y, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 222
+                #line 223
                   mul r0.y, r0.y, l(1.000000)  // pt<4:NaN:Inf>
                 
-                #line 225
+                #line 226
                   exp r2.w, r0.y  // ConstantHS<2:NaN:Inf>
                   mov r2.z, r2.w  // ConstantHS<3:NaN:Inf>
                   mov r2.x, r2.x  // ConstantHS<4:NaN:Inf>
@@ -1365,7 +1400,7 @@ fxgroup
                   mov o3.x, r0.y  // ConstantHS<5:[0f,64f]>
                   mov o4.x, r0.z
                 
-                #line 189
+                #line 190
                   mov o5.x, r0.w
                   ret 
                 
@@ -1478,6 +1513,7 @@ fxgroup
                 // POSITION                 0   xyz         1     NONE  float   xyz 
                 // TEXCOORD                 0   xy          2     NONE  float   xy  
                 // TEXCOORD                 1     zw        2     NONE  float     zw
+                // TEXCOORD                 2   xy          3     NONE  float   xy  
                 //
                 // Tessellation Domain   # of control points
                 // -------------------- --------------------
@@ -1498,9 +1534,10 @@ fxgroup
                 dcl_output o1.xyz
                 dcl_output o2.xy
                 dcl_output o2.zw
+                dcl_output o3.xy
                 dcl_temps 4
                 
-                #line 274 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 276 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.xy, -vicp[0][0].xzxx
                 add r0.xy, r0.xyxx, vicp[1][0].xzxx
                 mul r0.xy, r0.xyxx, vDomain.xxxx
@@ -1515,7 +1552,7 @@ fxgroup
                 add r0.xz, r0.zzwz, r0.xxyx  // dout<4:NaN:Inf,6:NaN:Inf>
                 mov r1.xy, r0.xzxx  // dout<4:NaN:Inf,6:NaN:Inf>
                 
-                #line 279
+                #line 281
                 mov r1.zw, -vicp[0][1].xxxy
                 add r1.zw, r1.zzzw, vicp[1][1].xxxy
                 mul r1.zw, r1.zzzw, vDomain.xxxx
@@ -1529,14 +1566,14 @@ fxgroup
                 mul r2.xy, r2.xyxx, vDomain.yyyy
                 add r1.zw, r1.zzzw, r2.xxxy  // dout<7:NaN:Inf,8:NaN:Inf>
                 
-                #line 283
+                #line 290
                 mul r2.xy, r1.zwzz, cb0[17].xyxx  // dout<9:NaN:Inf,10:NaN:Inf>
                 
-                #line 286
+                #line 293
                 sample_l_indexable(texture2d)(float,float,float,float) r0.y, r1.zwzz, t0.yxzw, s0, l(0.000000)  // dout<5:Inf>
                 mov r2.z, r0.y  // dout<5:Inf>
                 
-                #line 294
+                #line 301
                 mov r0.w, l(1.000000)
                 dp4 r3.x, r0.xyzw, cb1[0].xyzw  // dout<0:NaN:Inf>
                 dp4 r3.y, r0.xyzw, cb1[1].xyzw  // dout<1:NaN:Inf>
@@ -1547,8 +1584,9 @@ fxgroup
                 mov o2.zw, r2.xxxy  // DS<9:NaN:Inf,10:NaN:Inf>
                 mov o1.xz, r1.xxyx  // DS<4:NaN:Inf,6:NaN:Inf>
                 mov o1.y, r2.z  // DS<5:Inf>
+                mov o3.xy, r1.zwzz  // DS<11:NaN:Inf,12:NaN:Inf>
                 ret 
-                // Approximately 39 instruction slots used
+                // Approximately 40 instruction slots used
                             
             };
             GeometryShader = NULL;
@@ -1619,7 +1657,8 @@ fxgroup
                 // samHeightmap                      sampler      NA          NA    2        1
                 // gLayerMapArray                    texture  float4     2darray    0        1
                 // gBlendMap                         texture  float4          2d    1        1
-                // gHeightMap                        texture  float4          2d    2        1
+                // gMouseBlend                       texture  float4          2d    2        1
+                // gHeightMap                        texture  float4          2d    3        1
                 // cbPerFrame                        cbuffer      NA          NA    0        1
                 // cbPerObject                       cbuffer      NA          NA    1        1
                 //
@@ -1633,6 +1672,7 @@ fxgroup
                 // POSITION                 0   xyz         1     NONE  float   xyz 
                 // TEXCOORD                 0   xy          2     NONE  float   xy  
                 // TEXCOORD                 1     zw        2     NONE  float     zw
+                // TEXCOORD                 2   xy          3     NONE  float   xy  
                 //
                 //
                 // Output signature:
@@ -1651,13 +1691,15 @@ fxgroup
                 dcl_resource_texture2darray (float,float,float,float) t0
                 dcl_resource_texture2d (float,float,float,float) t1
                 dcl_resource_texture2d (float,float,float,float) t2
+                dcl_resource_texture2d (float,float,float,float) t3
                 dcl_input_ps linear v1.xyz
                 dcl_input_ps linear v2.xy
                 dcl_input_ps linear v2.zw
+                dcl_input_ps linear v3.xy
                 dcl_output o0.xyzw
                 dcl_temps 13
                 
-                #line 306 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 313 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.x, -cb0[16].x
                 mov r0.y, l(0)
                 add r0.xy, r0.xyxx, v2.xyxx  // leftTex<0:Inf,1>
@@ -1670,13 +1712,13 @@ fxgroup
                 mov r2.x, l(0)
                 mov r2.y, -cb0[16].y
                 add r1.zw, r2.xxxy, v2.xxxy  // topTex<0,1:Inf>
-                sample_l_indexable(texture2d)(float,float,float,float) r0.x, r0.xyxx, t2.xyzw, s2, l(0.000000)
+                sample_l_indexable(texture2d)(float,float,float,float) r0.x, r0.xyxx, t3.xyzw, s2, l(0.000000)
                 mov r0.x, r0.x  // leftY<0:Inf>
-                sample_l_indexable(texture2d)(float,float,float,float) r0.y, r0.zwzz, t2.yxzw, s2, l(0.000000)
+                sample_l_indexable(texture2d)(float,float,float,float) r0.y, r0.zwzz, t3.yxzw, s2, l(0.000000)
                 mov r0.y, r0.y  // rightY<0:Inf>
-                sample_l_indexable(texture2d)(float,float,float,float) r0.z, r1.xyxx, t2.yzxw, s2, l(0.000000)
+                sample_l_indexable(texture2d)(float,float,float,float) r0.z, r1.xyxx, t3.yzxw, s2, l(0.000000)
                 mov r0.z, r0.z  // bottomY<0:Inf>
-                sample_l_indexable(texture2d)(float,float,float,float) r0.w, r1.zwzz, t2.yzwx, s2, l(0.000000)
+                sample_l_indexable(texture2d)(float,float,float,float) r0.w, r1.zwzz, t3.yzwx, s2, l(0.000000)
                 mov r0.w, r0.w  // topY<0:Inf>
                 mov r0.x, -r0.x
                 add r1.z, r0.x, r0.y
@@ -1686,7 +1728,7 @@ fxgroup
                 rsq r0.x, r0.x
                 mul r1.xyz, r0.xxxx, r1.xyzx  // tangent<2: 0f,0:NaN:Inf,1:NaN:Inf>
                 
-                #line 317
+                #line 324
                 mov r0.x, -r0.w
                 add r0.x, r0.x, r0.z
                 mov r0.z, l(0)
@@ -1699,18 +1741,18 @@ fxgroup
                 mov r0.xyz, -r0.xyzx
                 add r0.xyz, r0.xyzx, r2.xyzx  // normalW<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 322
+                #line 329
                 mov r1.xyz, -v1.xyzx
                 add r1.xyz, r1.xyzx, cb0[12].xyzx  // toEye<0:Inf,1:Inf,2:Inf>
                 
-                #line 325
+                #line 332
                 dp3 r0.w, r1.xyzx, r1.xyzx
                 sqrt r0.w, r0.w  // distToEye<0:NaN:Inf>
                 
-                #line 328
+                #line 335
                 div r1.xyz, r1.xyzx, r0.wwww  // toEye<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 335
+                #line 342
                 mov r2.xy, v2.zwzz
                 mov r2.z, l(0)
                 sample_indexable(texture2darray)(float,float,float,float) r2.xyzw, r2.xyzx, t0.xyzw, s0  // c0<0:Inf,1:Inf,2:Inf,3:Inf>
@@ -1727,29 +1769,56 @@ fxgroup
                 mov r6.z, l(4.000000)
                 sample_indexable(texture2darray)(float,float,float,float) r6.xyzw, r6.xyzx, t0.xyzw, s0  // c4<0:Inf,1:Inf,2:Inf,3:Inf>
                 
-                #line 342
-                sample_indexable(texture2d)(float,float,float,float) r7.xyzw, v2.xyxx, t1.xyzw, s1  // t<0:Inf,1:Inf,2:Inf,3:Inf>
+                #line 349
+                mov r7.xy, v2.zwzz
+                mov r7.z, l(5.000000)
+                sample_indexable(texture2darray)(float,float,float,float) r7.xyzw, r7.xyzx, t0.xyzw, s0  // m0<0:Inf,1:Inf,2:Inf,3:Inf>
+                sample_indexable(texture2d)(float,float,float,float) r8.xyzw, v3.xyxx, t2.xyzw, s1  // mb<0:Inf,1:Inf,2:Inf,3:Inf>
                 
-                #line 345
+                #line 353
+                sample_indexable(texture2d)(float,float,float,float) r9.xyzw, v2.xyxx, t1.xyzw, s1  // t<0:Inf,1:Inf,2:Inf,3:Inf>
+                
+                #line 356
                 mov r2.xyzw, r2.xyzw  // texColor<0:Inf,1:Inf,2:Inf,3:Inf>
-                mov r8.xyzw, -r2.xyzw
-                add r3.xyzw, r3.xyzw, r8.xyzw
-                mul r3.xyzw, r3.xyzw, r7.xxxx
+                
+                #line 359
+                mov r10.xyzw, -r2.xyzw
+                add r3.xyzw, r3.xyzw, r10.xyzw
+                mul r3.xyzw, r3.xyzw, r9.xxxx
                 add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r3.xyzw, -r2.xyzw
                 add r3.xyzw, r3.xyzw, r4.xyzw
-                mul r3.xyzw, r3.xyzw, r7.yyyy
+                mul r3.xyzw, r3.xyzw, r9.yyyy
                 add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r3.xyzw, -r2.xyzw
                 add r3.xyzw, r3.xyzw, r5.xyzw
-                mul r3.xyzw, r3.xyzw, r7.zzzz
+                mul r3.xyzw, r3.xyzw, r9.zzzz
                 add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r3.xyzw, -r2.xyzw
                 add r3.xyzw, r3.xyzw, r6.xyzw
-                mul r3.xyzw, r3.xyzw, r7.wwww
+                mul r3.xyzw, r3.xyzw, r9.wwww
+                add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                add r3.xyzw, r7.xyzw, l(-0.000000, -0.000000, -0.000000, -0.000000)
+                mul r3.xyzw, r3.xyzw, r8.xxxx
+                add r3.xyzw, r3.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000)  // texMouse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                mov r4.xyzw, -r3.xyzw
+                add r4.xyzw, r4.xyzw, r7.xyzw
+                mul r4.xyzw, r4.xyzw, r8.yyyy
+                add r3.xyzw, r3.xyzw, r4.xyzw  // texMouse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                mov r4.xyzw, -r3.xyzw
+                add r4.xyzw, r4.xyzw, r7.xyzw
+                mul r4.xyzw, r4.xyzw, r8.zzzz
+                add r3.xyzw, r3.xyzw, r4.xyzw  // texMouse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                mov r4.xyzw, -r3.xyzw
+                add r4.xyzw, r4.xyzw, r7.xyzw
+                mul r4.xyzw, r4.xyzw, r8.wwww
+                add r3.xyzw, r3.xyzw, r4.xyzw  // texMouse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                mov r4.xyzw, -r3.xyzw
+                add r2.xyzw, r2.xyzw, r4.xyzw
+                mul r2.xyzw, r2.xyzw, l(0.500000, 0.500000, 0.500000, 0.500000)
                 add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 369
+                #line 390
                 nop 
                 mov r3.xyzw, cb1[4].xyzw  // mat<0,1,2,3>
                 mov r4.xyzw, cb1[5].xyzw  // mat<4,5,6,7>
@@ -1792,17 +1861,17 @@ fxgroup
                 movc r7.xyzw, r1.wwww, r7.xyzw, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 movc r8.xyzw, r1.wwww, r8.xyzw, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 369 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 390 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r6.xyzw, r6.xyzw  // A<0:Inf,1:Inf,2:Inf,3:Inf>
                 mov r7.xyzw, r7.xyzw  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r8.xyzw, r8.xyzw  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 372
+                #line 393
                 add r6.xyzw, r6.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000)  // ambient<0:Inf,1:Inf,2:Inf,3:Inf>
                 add r7.xyzw, r7.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 add r8.xyzw, r8.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 369
+                #line 390
                 nop 
                 mov r9.xyzw, cb0[4].xyzw  // L<0,1,2,3>
                 mov r10.xyzw, cb0[5].xyzw  // L<4,5,6,7>
@@ -1840,25 +1909,25 @@ fxgroup
                 movc r4.xyzw, r1.wwww, r4.xyzw, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 movc r0.xyzw, r1.wwww, r0.xyzw, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 369 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 390 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r3.xyzw, r3.xyzw  // A<0:Inf,1:Inf,2:Inf,3:Inf>
                 mov r4.xyzw, r4.xyzw  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r0.xyzw, r0.xyzw  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 372
+                #line 393
                 add r1.xyzw, r3.xyzw, r6.xyzw  // ambient<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 add r3.xyzw, r4.xyzw, r7.xyzw  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 add r0.xyzw, r0.xyzw, r8.xyzw  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 377
+                #line 398
                 add r1.xyzw, r1.xyzw, r3.xyzw
                 mul r1.xyzw, r1.xyzw, r2.xyzw
                 add r0.xyzw, r0.xyzw, r1.xyzw  // litColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 392
+                #line 413
                 mov o0.xyzw, r0.xyzw  // PS<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 ret 
-                // Approximately 150 instruction slots used
+                // Approximately 173 instruction slots used
                             
             };
         }
@@ -1937,17 +2006,17 @@ fxgroup
                 dcl_output o1.zw
                 dcl_temps 2
                 
-                #line 97 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 98 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.xyz, v0.xyzx
                 mov r0.w, l(1.000000)
                 dp4 r1.x, r0.xyzw, cb0[8].xyzw  // vout<0:NaN:Inf>
                 dp4 r1.z, r0.xyzw, cb0[10].xyzw  // vout<2:NaN:Inf>
                 
-                #line 110
+                #line 111
                 sample_l_indexable(texture2d)(float,float,float,float) r0.x, v1.xyxx, t0.xyzw, s0, l(0.000000)
                 mov r0.x, r0.x  // vout<1:Inf>
                 
-                #line 113
+                #line 114
                 mov r0.yz, v1.xxyx  // vout<3,4>
                 mov r1.yw, v2.xxxy  // vout<5,6>
                 mov o1.xy, r0.yzyy  // VS<3,4>
@@ -2051,7 +2120,7 @@ fxgroup
                 dcl_globalFlags refactoringAllowed
                 dcl_constantbuffer cb0[24], dynamicIndexed
                 
-                #line 248 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 249 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 hs_control_point_phase 
                 dcl_input vOutputControlPointID
                 dcl_input v[4][0].xyz
@@ -2065,7 +2134,7 @@ fxgroup
                 mov o0.xyz, r0.yzwy  // HS<3,4>
                 mov o1.xy, r1.xyxx
                 
-                #line 179
+                #line 180
                 ret   // minY<0>
                 hs_join_phase   // maxY<0>
                 dcl_input vicp[4][0].xyz
@@ -2078,7 +2147,7 @@ fxgroup
                 dcl_output_siv o5.x, finalQuadVInsideTessFactor
                 dcl_temps 7
                 
-                #line 184
+                #line 185
                 mov r0.y, vicp[0][1].z  // vMin<0,2>
                 mov r1.y, vicp[0][1].w  // vMin<1>
                 mov r0.xz, vicp[2][0].xxzx  // vMax<0,2>
@@ -2092,7 +2161,7 @@ fxgroup
                 mul r0.xyz, r0.xyzx, l(0.500000, 0.500000, 0.500000, 0.000000)  // center<0,1,2>
                 nop   // extents<0,1,2>
                 
-                #line 151
+                #line 152
                 mov r2.xyz, r2.xyzx  // i<0: 0>
                 mov r0.xyz, r0.xyzx  // AabbOutsideFrustumTest<0: false>
                 mov r0.w, l(0)  // i<0>
@@ -2102,49 +2171,49 @@ fxgroup
                 loop 
                   ilt r1.w, r1.y, l(6)
                 
-                #line 155
+                #line 156
                   mov r1.z, l(0)
                   breakc_z r1.w  // center<0,1,2>
                   nop   // extents<0,1,2>
                   mov r3.xyz, r2.xyzx
                   mov r4.xyz, r0.xyzx  // plane<0,1,2,3>
                 
-                #line 134
+                #line 135
                   mov r1.w, r1.y
                   mov r5.xyzw, cb0[r1.w + 18].xyzw  // n<0:[0f,3.40282e+038f],1:[0f,3.40282e+038f],2:[0f,3.40282e+038f]>
                 
-                #line 137
+                #line 138
                   mov r6.xyz, -r5.xyzx  // r<0:NaN:Inf>
                 
-                #line 140
+                #line 141
                   max r6.xyz, r5.xyzx, r6.xyzx
                   dp3 r1.w, r4.xyzx, r6.xyzx  // s<0:NaN:Inf>
                 
-                #line 145
+                #line 146
                   mov r3.w, l(1.000000)
                   dp4 r2.w, r3.xyzw, r5.xyzw  // AabbBehindPlaneTest<0>
                 
-                #line 155
+                #line 156
                   add r1.w, r1.w, r2.w
                   lt r1.w, r1.w, l(0.000000)  // AabbOutsideFrustumTest<0: true>
                   if_nz r1.w
                     mov r1.x, l(-1)
                     mov r1.z, l(-1)
                 
-                #line 151
+                #line 152
                     break   // i<0>
                   endif 
                   iadd r1.y, r1.y, l(1)
                 
-                #line 161
+                #line 162
                   mov r1.z, r1.w
                 endloop   // AabbOutsideFrustumTest<0: false>
                 if_z r1.z
                 
-                #line 189
+                #line 190
                   mov r1.x, l(0)
                 
-                #line 199
+                #line 200
                 endif   // ConstantHS<0: 0f>
                 if_nz r1.x  // ConstantHS<1: 0f>
                   mov o0.x, l(0)  // ConstantHS<2: 0f>
@@ -2153,10 +2222,10 @@ fxgroup
                   mov o3.x, l(0)  // ConstantHS<5: 0f>
                   mov o4.x, l(0)
                 
-                #line 189
+                #line 190
                   mov o5.x, l(0)
                 
-                #line 211
+                #line 212
                   ret 
                 else   // e0<0,1,2>
                   add r0.xyz, vicp[2][0].xyzx, vicp[0][0].xyzx
@@ -2171,13 +2240,13 @@ fxgroup
                   add r1.xyz, r1.xyzx, vicp[3][0].xyzx
                   mul r1.xyz, r1.xyzx, l(0.250000, 0.250000, 0.250000, 0.000000)  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r0.xyz, r0.xyzx
                   mov r5.xyz, -cb0[12].xyzx
                   add r0.xyz, r0.xyzx, r5.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r0.x, r0.xyzx, r0.xyzx
                   sqrt r0.x, r0.x
                   mov r0.y, -cb0[15].x
@@ -2191,17 +2260,17 @@ fxgroup
                   mul r0.x, r0.w, r0.x
                   add r0.x, r0.x, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 217
+                #line 218
                   mul r0.x, r0.x, l(1.000000)  // pt<0:NaN:Inf>
                   exp r0.x, r0.x
                   mov r0.x, r0.x  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r2.xyz, r2.xyzx
                   add r2.xyz, r5.xyzx, r2.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r1.w, r2.xyzx, r2.xyzx
                   sqrt r1.w, r1.w
                   add r1.w, r0.y, r1.w
@@ -2211,17 +2280,17 @@ fxgroup
                   mul r1.w, r0.w, r1.w
                   add r1.w, r1.w, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 218
+                #line 219
                   mul r1.w, r1.w, l(1.000000)  // pt<1:NaN:Inf>
                   exp r1.w, r1.w
                   mov r1.w, r1.w  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r3.xyz, r3.xyzx
                   add r2.xyz, r5.xyzx, r3.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r2.x, r2.xyzx, r2.xyzx
                   sqrt r2.x, r2.x
                   add r2.x, r0.y, r2.x
@@ -2231,17 +2300,17 @@ fxgroup
                   mul r2.x, r0.w, r2.x
                   add r2.x, r2.x, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 219
+                #line 220
                   mul r2.x, r2.x, l(1.000000)  // pt<2:NaN:Inf>
                   exp r2.x, r2.x
                   mov r2.x, r2.x  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r4.xyz, r4.xyzx
                   add r3.xyz, r5.xyzx, r4.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r3.x, r3.xyzx, r3.xyzx
                   sqrt r3.x, r3.x
                   add r3.x, r0.y, r3.x
@@ -2251,17 +2320,17 @@ fxgroup
                   mul r3.x, r0.w, r3.x
                   add r3.x, r3.x, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 220
+                #line 221
                   mul r3.x, r3.x, l(1.000000)  // pt<3:NaN:Inf>
                   exp r2.y, r3.x
                   mov r2.y, r2.y  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r1.xyz, r1.xyzx
                   add r1.xyz, r5.xyzx, r1.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r1.x, r1.xyzx, r1.xyzx
                   sqrt r1.x, r1.x
                   add r0.y, r0.y, r1.x
@@ -2271,10 +2340,10 @@ fxgroup
                   mul r0.y, r0.w, r0.y
                   add r0.y, r0.y, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 222
+                #line 223
                   mul r0.y, r0.y, l(1.000000)  // pt<4:NaN:Inf>
                 
-                #line 225
+                #line 226
                   exp r2.w, r0.y  // ConstantHS<2:NaN:Inf>
                   mov r2.z, r2.w  // ConstantHS<3:NaN:Inf>
                   mov r2.x, r2.x  // ConstantHS<4:NaN:Inf>
@@ -2290,7 +2359,7 @@ fxgroup
                   mov o3.x, r0.y  // ConstantHS<5:[0f,64f]>
                   mov o4.x, r0.z
                 
-                #line 189
+                #line 190
                   mov o5.x, r0.w
                   ret 
                 
@@ -2403,6 +2472,7 @@ fxgroup
                 // POSITION                 0   xyz         1     NONE  float   xyz 
                 // TEXCOORD                 0   xy          2     NONE  float   xy  
                 // TEXCOORD                 1     zw        2     NONE  float     zw
+                // TEXCOORD                 2   xy          3     NONE  float   xy  
                 //
                 // Tessellation Domain   # of control points
                 // -------------------- --------------------
@@ -2423,9 +2493,10 @@ fxgroup
                 dcl_output o1.xyz
                 dcl_output o2.xy
                 dcl_output o2.zw
+                dcl_output o3.xy
                 dcl_temps 4
                 
-                #line 274 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 276 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.xy, -vicp[0][0].xzxx
                 add r0.xy, r0.xyxx, vicp[1][0].xzxx
                 mul r0.xy, r0.xyxx, vDomain.xxxx
@@ -2440,7 +2511,7 @@ fxgroup
                 add r0.xz, r0.zzwz, r0.xxyx  // dout<4:NaN:Inf,6:NaN:Inf>
                 mov r1.xy, r0.xzxx  // dout<4:NaN:Inf,6:NaN:Inf>
                 
-                #line 279
+                #line 281
                 mov r1.zw, -vicp[0][1].xxxy
                 add r1.zw, r1.zzzw, vicp[1][1].xxxy
                 mul r1.zw, r1.zzzw, vDomain.xxxx
@@ -2454,14 +2525,14 @@ fxgroup
                 mul r2.xy, r2.xyxx, vDomain.yyyy
                 add r1.zw, r1.zzzw, r2.xxxy  // dout<7:NaN:Inf,8:NaN:Inf>
                 
-                #line 283
+                #line 290
                 mul r2.xy, r1.zwzz, cb0[17].xyxx  // dout<9:NaN:Inf,10:NaN:Inf>
                 
-                #line 286
+                #line 293
                 sample_l_indexable(texture2d)(float,float,float,float) r0.y, r1.zwzz, t0.yxzw, s0, l(0.000000)  // dout<5:Inf>
                 mov r2.z, r0.y  // dout<5:Inf>
                 
-                #line 294
+                #line 301
                 mov r0.w, l(1.000000)
                 dp4 r3.x, r0.xyzw, cb1[0].xyzw  // dout<0:NaN:Inf>
                 dp4 r3.y, r0.xyzw, cb1[1].xyzw  // dout<1:NaN:Inf>
@@ -2472,8 +2543,9 @@ fxgroup
                 mov o2.zw, r2.xxxy  // DS<9:NaN:Inf,10:NaN:Inf>
                 mov o1.xz, r1.xxyx  // DS<4:NaN:Inf,6:NaN:Inf>
                 mov o1.y, r2.z  // DS<5:Inf>
+                mov o3.xy, r1.zwzz  // DS<11:NaN:Inf,12:NaN:Inf>
                 ret 
-                // Approximately 39 instruction slots used
+                // Approximately 40 instruction slots used
                             
             };
             GeometryShader = NULL;
@@ -2544,7 +2616,8 @@ fxgroup
                 // samHeightmap                      sampler      NA          NA    2        1
                 // gLayerMapArray                    texture  float4     2darray    0        1
                 // gBlendMap                         texture  float4          2d    1        1
-                // gHeightMap                        texture  float4          2d    2        1
+                // gMouseBlend                       texture  float4          2d    2        1
+                // gHeightMap                        texture  float4          2d    3        1
                 // cbPerFrame                        cbuffer      NA          NA    0        1
                 // cbPerObject                       cbuffer      NA          NA    1        1
                 //
@@ -2558,6 +2631,7 @@ fxgroup
                 // POSITION                 0   xyz         1     NONE  float   xyz 
                 // TEXCOORD                 0   xy          2     NONE  float   xy  
                 // TEXCOORD                 1     zw        2     NONE  float     zw
+                // TEXCOORD                 2   xy          3     NONE  float   xy  
                 //
                 //
                 // Output signature:
@@ -2576,13 +2650,15 @@ fxgroup
                 dcl_resource_texture2darray (float,float,float,float) t0
                 dcl_resource_texture2d (float,float,float,float) t1
                 dcl_resource_texture2d (float,float,float,float) t2
+                dcl_resource_texture2d (float,float,float,float) t3
                 dcl_input_ps linear v1.xyz
                 dcl_input_ps linear v2.xy
                 dcl_input_ps linear v2.zw
+                dcl_input_ps linear v3.xy
                 dcl_output o0.xyzw
                 dcl_temps 14
                 
-                #line 306 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 313 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.x, -cb0[16].x
                 mov r0.y, l(0)
                 add r0.xy, r0.xyxx, v2.xyxx  // leftTex<0:Inf,1>
@@ -2595,13 +2671,13 @@ fxgroup
                 mov r2.x, l(0)
                 mov r2.y, -cb0[16].y
                 add r1.zw, r2.xxxy, v2.xxxy  // topTex<0,1:Inf>
-                sample_l_indexable(texture2d)(float,float,float,float) r0.x, r0.xyxx, t2.xyzw, s2, l(0.000000)
+                sample_l_indexable(texture2d)(float,float,float,float) r0.x, r0.xyxx, t3.xyzw, s2, l(0.000000)
                 mov r0.x, r0.x  // leftY<0:Inf>
-                sample_l_indexable(texture2d)(float,float,float,float) r0.y, r0.zwzz, t2.yxzw, s2, l(0.000000)
+                sample_l_indexable(texture2d)(float,float,float,float) r0.y, r0.zwzz, t3.yxzw, s2, l(0.000000)
                 mov r0.y, r0.y  // rightY<0:Inf>
-                sample_l_indexable(texture2d)(float,float,float,float) r0.z, r1.xyxx, t2.yzxw, s2, l(0.000000)
+                sample_l_indexable(texture2d)(float,float,float,float) r0.z, r1.xyxx, t3.yzxw, s2, l(0.000000)
                 mov r0.z, r0.z  // bottomY<0:Inf>
-                sample_l_indexable(texture2d)(float,float,float,float) r0.w, r1.zwzz, t2.yzwx, s2, l(0.000000)
+                sample_l_indexable(texture2d)(float,float,float,float) r0.w, r1.zwzz, t3.yzwx, s2, l(0.000000)
                 mov r0.w, r0.w  // topY<0:Inf>
                 mov r0.x, -r0.x
                 add r1.z, r0.x, r0.y
@@ -2611,7 +2687,7 @@ fxgroup
                 rsq r0.x, r0.x
                 mul r1.xyz, r0.xxxx, r1.xyzx  // tangent<2: 0f,0:NaN:Inf,1:NaN:Inf>
                 
-                #line 317
+                #line 324
                 mov r0.x, -r0.w
                 add r0.x, r0.x, r0.z
                 mov r0.z, l(0)
@@ -2624,18 +2700,18 @@ fxgroup
                 mov r0.xyz, -r0.xyzx
                 add r0.xyz, r0.xyzx, r2.xyzx  // normalW<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 322
+                #line 329
                 mov r1.xyz, -v1.xyzx
                 add r1.xyz, r1.xyzx, cb0[12].xyzx  // toEye<0:Inf,1:Inf,2:Inf>
                 
-                #line 325
+                #line 332
                 dp3 r0.w, r1.xyzx, r1.xyzx
                 sqrt r0.w, r0.w  // distToEye<0:NaN:Inf>
                 
-                #line 328
+                #line 335
                 div r1.xyz, r1.xyzx, r0.wwww  // toEye<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 335
+                #line 342
                 mov r2.xy, v2.zwzz
                 mov r2.z, l(0)
                 sample_indexable(texture2darray)(float,float,float,float) r2.xyzw, r2.xyzx, t0.xyzw, s0  // c0<0:Inf,1:Inf,2:Inf,3:Inf>
@@ -2652,29 +2728,56 @@ fxgroup
                 mov r6.z, l(4.000000)
                 sample_indexable(texture2darray)(float,float,float,float) r6.xyzw, r6.xyzx, t0.xyzw, s0  // c4<0:Inf,1:Inf,2:Inf,3:Inf>
                 
-                #line 342
-                sample_indexable(texture2d)(float,float,float,float) r7.xyzw, v2.xyxx, t1.xyzw, s1  // t<0:Inf,1:Inf,2:Inf,3:Inf>
+                #line 349
+                mov r7.xy, v2.zwzz
+                mov r7.z, l(5.000000)
+                sample_indexable(texture2darray)(float,float,float,float) r7.xyzw, r7.xyzx, t0.xyzw, s0  // m0<0:Inf,1:Inf,2:Inf,3:Inf>
+                sample_indexable(texture2d)(float,float,float,float) r8.xyzw, v3.xyxx, t2.xyzw, s1  // mb<0:Inf,1:Inf,2:Inf,3:Inf>
                 
-                #line 345
+                #line 353
+                sample_indexable(texture2d)(float,float,float,float) r9.xyzw, v2.xyxx, t1.xyzw, s1  // t<0:Inf,1:Inf,2:Inf,3:Inf>
+                
+                #line 356
                 mov r2.xyzw, r2.xyzw  // texColor<0:Inf,1:Inf,2:Inf,3:Inf>
-                mov r8.xyzw, -r2.xyzw
-                add r3.xyzw, r3.xyzw, r8.xyzw
-                mul r3.xyzw, r3.xyzw, r7.xxxx
+                
+                #line 359
+                mov r10.xyzw, -r2.xyzw
+                add r3.xyzw, r3.xyzw, r10.xyzw
+                mul r3.xyzw, r3.xyzw, r9.xxxx
                 add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r3.xyzw, -r2.xyzw
                 add r3.xyzw, r3.xyzw, r4.xyzw
-                mul r3.xyzw, r3.xyzw, r7.yyyy
+                mul r3.xyzw, r3.xyzw, r9.yyyy
                 add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r3.xyzw, -r2.xyzw
                 add r3.xyzw, r3.xyzw, r5.xyzw
-                mul r3.xyzw, r3.xyzw, r7.zzzz
+                mul r3.xyzw, r3.xyzw, r9.zzzz
                 add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r3.xyzw, -r2.xyzw
                 add r3.xyzw, r3.xyzw, r6.xyzw
-                mul r3.xyzw, r3.xyzw, r7.wwww
+                mul r3.xyzw, r3.xyzw, r9.wwww
+                add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                add r3.xyzw, r7.xyzw, l(-0.000000, -0.000000, -0.000000, -0.000000)
+                mul r3.xyzw, r3.xyzw, r8.xxxx
+                add r3.xyzw, r3.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000)  // texMouse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                mov r4.xyzw, -r3.xyzw
+                add r4.xyzw, r4.xyzw, r7.xyzw
+                mul r4.xyzw, r4.xyzw, r8.yyyy
+                add r3.xyzw, r3.xyzw, r4.xyzw  // texMouse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                mov r4.xyzw, -r3.xyzw
+                add r4.xyzw, r4.xyzw, r7.xyzw
+                mul r4.xyzw, r4.xyzw, r8.zzzz
+                add r3.xyzw, r3.xyzw, r4.xyzw  // texMouse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                mov r4.xyzw, -r3.xyzw
+                add r4.xyzw, r4.xyzw, r7.xyzw
+                mul r4.xyzw, r4.xyzw, r8.wwww
+                add r3.xyzw, r3.xyzw, r4.xyzw  // texMouse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                mov r4.xyzw, -r3.xyzw
+                add r2.xyzw, r2.xyzw, r4.xyzw
+                mul r2.xyzw, r2.xyzw, l(0.500000, 0.500000, 0.500000, 0.500000)
                 add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 369
+                #line 390
                 nop 
                 mov r3.xyzw, cb1[4].xyzw  // mat<0,1,2,3>
                 mov r4.xyzw, cb1[5].xyzw  // mat<4,5,6,7>
@@ -2717,17 +2820,17 @@ fxgroup
                 movc r7.xyzw, r1.wwww, r7.xyzw, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 movc r8.xyzw, r1.wwww, r8.xyzw, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 369 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 390 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r6.xyzw, r6.xyzw  // A<0:Inf,1:Inf,2:Inf,3:Inf>
                 mov r7.xyzw, r7.xyzw  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r8.xyzw, r8.xyzw  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 372
+                #line 393
                 add r6.xyzw, r6.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000)  // ambient<0:Inf,1:Inf,2:Inf,3:Inf>
                 add r7.xyzw, r7.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 add r8.xyzw, r8.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 369
+                #line 390
                 nop 
                 mov r9.xyzw, cb0[4].xyzw  // L<0,1,2,3>
                 mov r10.xyzw, cb0[5].xyzw  // L<4,5,6,7>
@@ -2765,17 +2868,17 @@ fxgroup
                 movc r10.xyzw, r1.wwww, r10.xyzw, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 movc r11.xyzw, r1.wwww, r11.xyzw, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 369 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 390 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r9.xyzw, r9.xyzw  // A<0:Inf,1:Inf,2:Inf,3:Inf>
                 mov r10.xyzw, r10.xyzw  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r11.xyzw, r11.xyzw  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 372
+                #line 393
                 add r6.xyzw, r6.xyzw, r9.xyzw  // ambient<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 add r7.xyzw, r7.xyzw, r10.xyzw  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 add r8.xyzw, r8.xyzw, r11.xyzw  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 369
+                #line 390
                 nop 
                 mov r9.xyzw, cb0[8].xyzw  // L<0,1,2,3>
                 mov r10.xyzw, cb0[9].xyzw  // L<4,5,6,7>
@@ -2813,25 +2916,25 @@ fxgroup
                 movc r4.xyzw, r1.wwww, r4.xyzw, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 movc r0.xyzw, r1.wwww, r0.xyzw, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 369 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 390 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r3.xyzw, r3.xyzw  // A<0:Inf,1:Inf,2:Inf,3:Inf>
                 mov r4.xyzw, r4.xyzw  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r0.xyzw, r0.xyzw  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 372
+                #line 393
                 add r1.xyzw, r3.xyzw, r6.xyzw  // ambient<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 add r3.xyzw, r4.xyzw, r7.xyzw  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 add r0.xyzw, r0.xyzw, r8.xyzw  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 377
+                #line 398
                 add r1.xyzw, r1.xyzw, r3.xyzw
                 mul r1.xyzw, r1.xyzw, r2.xyzw
                 add r0.xyzw, r0.xyzw, r1.xyzw  // litColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 392
+                #line 413
                 mov o0.xyzw, r0.xyzw  // PS<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 ret 
-                // Approximately 182 instruction slots used
+                // Approximately 205 instruction slots used
                             
             };
         }
@@ -2910,17 +3013,17 @@ fxgroup
                 dcl_output o1.zw
                 dcl_temps 2
                 
-                #line 97 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 98 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.xyz, v0.xyzx
                 mov r0.w, l(1.000000)
                 dp4 r1.x, r0.xyzw, cb0[8].xyzw  // vout<0:NaN:Inf>
                 dp4 r1.z, r0.xyzw, cb0[10].xyzw  // vout<2:NaN:Inf>
                 
-                #line 110
+                #line 111
                 sample_l_indexable(texture2d)(float,float,float,float) r0.x, v1.xyxx, t0.xyzw, s0, l(0.000000)
                 mov r0.x, r0.x  // vout<1:Inf>
                 
-                #line 113
+                #line 114
                 mov r0.yz, v1.xxyx  // vout<3,4>
                 mov r1.yw, v2.xxxy  // vout<5,6>
                 mov o1.xy, r0.yzyy  // VS<3,4>
@@ -3024,7 +3127,7 @@ fxgroup
                 dcl_globalFlags refactoringAllowed
                 dcl_constantbuffer cb0[24], dynamicIndexed
                 
-                #line 248 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 249 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 hs_control_point_phase 
                 dcl_input vOutputControlPointID
                 dcl_input v[4][0].xyz
@@ -3038,7 +3141,7 @@ fxgroup
                 mov o0.xyz, r0.yzwy  // HS<3,4>
                 mov o1.xy, r1.xyxx
                 
-                #line 179
+                #line 180
                 ret   // minY<0>
                 hs_join_phase   // maxY<0>
                 dcl_input vicp[4][0].xyz
@@ -3051,7 +3154,7 @@ fxgroup
                 dcl_output_siv o5.x, finalQuadVInsideTessFactor
                 dcl_temps 7
                 
-                #line 184
+                #line 185
                 mov r0.y, vicp[0][1].z  // vMin<0,2>
                 mov r1.y, vicp[0][1].w  // vMin<1>
                 mov r0.xz, vicp[2][0].xxzx  // vMax<0,2>
@@ -3065,7 +3168,7 @@ fxgroup
                 mul r0.xyz, r0.xyzx, l(0.500000, 0.500000, 0.500000, 0.000000)  // center<0,1,2>
                 nop   // extents<0,1,2>
                 
-                #line 151
+                #line 152
                 mov r2.xyz, r2.xyzx  // i<0: 0>
                 mov r0.xyz, r0.xyzx  // AabbOutsideFrustumTest<0: false>
                 mov r0.w, l(0)  // i<0>
@@ -3075,49 +3178,49 @@ fxgroup
                 loop 
                   ilt r1.w, r1.y, l(6)
                 
-                #line 155
+                #line 156
                   mov r1.z, l(0)
                   breakc_z r1.w  // center<0,1,2>
                   nop   // extents<0,1,2>
                   mov r3.xyz, r2.xyzx
                   mov r4.xyz, r0.xyzx  // plane<0,1,2,3>
                 
-                #line 134
+                #line 135
                   mov r1.w, r1.y
                   mov r5.xyzw, cb0[r1.w + 18].xyzw  // n<0:[0f,3.40282e+038f],1:[0f,3.40282e+038f],2:[0f,3.40282e+038f]>
                 
-                #line 137
+                #line 138
                   mov r6.xyz, -r5.xyzx  // r<0:NaN:Inf>
                 
-                #line 140
+                #line 141
                   max r6.xyz, r5.xyzx, r6.xyzx
                   dp3 r1.w, r4.xyzx, r6.xyzx  // s<0:NaN:Inf>
                 
-                #line 145
+                #line 146
                   mov r3.w, l(1.000000)
                   dp4 r2.w, r3.xyzw, r5.xyzw  // AabbBehindPlaneTest<0>
                 
-                #line 155
+                #line 156
                   add r1.w, r1.w, r2.w
                   lt r1.w, r1.w, l(0.000000)  // AabbOutsideFrustumTest<0: true>
                   if_nz r1.w
                     mov r1.x, l(-1)
                     mov r1.z, l(-1)
                 
-                #line 151
+                #line 152
                     break   // i<0>
                   endif 
                   iadd r1.y, r1.y, l(1)
                 
-                #line 161
+                #line 162
                   mov r1.z, r1.w
                 endloop   // AabbOutsideFrustumTest<0: false>
                 if_z r1.z
                 
-                #line 189
+                #line 190
                   mov r1.x, l(0)
                 
-                #line 199
+                #line 200
                 endif   // ConstantHS<0: 0f>
                 if_nz r1.x  // ConstantHS<1: 0f>
                   mov o0.x, l(0)  // ConstantHS<2: 0f>
@@ -3126,10 +3229,10 @@ fxgroup
                   mov o3.x, l(0)  // ConstantHS<5: 0f>
                   mov o4.x, l(0)
                 
-                #line 189
+                #line 190
                   mov o5.x, l(0)
                 
-                #line 211
+                #line 212
                   ret 
                 else   // e0<0,1,2>
                   add r0.xyz, vicp[2][0].xyzx, vicp[0][0].xyzx
@@ -3144,13 +3247,13 @@ fxgroup
                   add r1.xyz, r1.xyzx, vicp[3][0].xyzx
                   mul r1.xyz, r1.xyzx, l(0.250000, 0.250000, 0.250000, 0.000000)  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r0.xyz, r0.xyzx
                   mov r5.xyz, -cb0[12].xyzx
                   add r0.xyz, r0.xyzx, r5.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r0.x, r0.xyzx, r0.xyzx
                   sqrt r0.x, r0.x
                   mov r0.y, -cb0[15].x
@@ -3164,17 +3267,17 @@ fxgroup
                   mul r0.x, r0.w, r0.x
                   add r0.x, r0.x, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 217
+                #line 218
                   mul r0.x, r0.x, l(1.000000)  // pt<0:NaN:Inf>
                   exp r0.x, r0.x
                   mov r0.x, r0.x  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r2.xyz, r2.xyzx
                   add r2.xyz, r5.xyzx, r2.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r1.w, r2.xyzx, r2.xyzx
                   sqrt r1.w, r1.w
                   add r1.w, r0.y, r1.w
@@ -3184,17 +3287,17 @@ fxgroup
                   mul r1.w, r0.w, r1.w
                   add r1.w, r1.w, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 218
+                #line 219
                   mul r1.w, r1.w, l(1.000000)  // pt<1:NaN:Inf>
                   exp r1.w, r1.w
                   mov r1.w, r1.w  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r3.xyz, r3.xyzx
                   add r2.xyz, r5.xyzx, r3.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r2.x, r2.xyzx, r2.xyzx
                   sqrt r2.x, r2.x
                   add r2.x, r0.y, r2.x
@@ -3204,17 +3307,17 @@ fxgroup
                   mul r2.x, r0.w, r2.x
                   add r2.x, r2.x, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 219
+                #line 220
                   mul r2.x, r2.x, l(1.000000)  // pt<2:NaN:Inf>
                   exp r2.x, r2.x
                   mov r2.x, r2.x  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r4.xyz, r4.xyzx
                   add r3.xyz, r5.xyzx, r4.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r3.x, r3.xyzx, r3.xyzx
                   sqrt r3.x, r3.x
                   add r3.x, r0.y, r3.x
@@ -3224,17 +3327,17 @@ fxgroup
                   mul r3.x, r0.w, r3.x
                   add r3.x, r3.x, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 220
+                #line 221
                   mul r3.x, r3.x, l(1.000000)  // pt<3:NaN:Inf>
                   exp r2.y, r3.x
                   mov r2.y, r2.y  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r1.xyz, r1.xyzx
                   add r1.xyz, r5.xyzx, r1.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r1.x, r1.xyzx, r1.xyzx
                   sqrt r1.x, r1.x
                   add r0.y, r0.y, r1.x
@@ -3244,10 +3347,10 @@ fxgroup
                   mul r0.y, r0.w, r0.y
                   add r0.y, r0.y, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 222
+                #line 223
                   mul r0.y, r0.y, l(1.000000)  // pt<4:NaN:Inf>
                 
-                #line 225
+                #line 226
                   exp r2.w, r0.y  // ConstantHS<2:NaN:Inf>
                   mov r2.z, r2.w  // ConstantHS<3:NaN:Inf>
                   mov r2.x, r2.x  // ConstantHS<4:NaN:Inf>
@@ -3263,7 +3366,7 @@ fxgroup
                   mov o3.x, r0.y  // ConstantHS<5:[0f,64f]>
                   mov o4.x, r0.z
                 
-                #line 189
+                #line 190
                   mov o5.x, r0.w
                   ret 
                 
@@ -3376,6 +3479,7 @@ fxgroup
                 // POSITION                 0   xyz         1     NONE  float   xyz 
                 // TEXCOORD                 0   xy          2     NONE  float   xy  
                 // TEXCOORD                 1     zw        2     NONE  float     zw
+                // TEXCOORD                 2   xy          3     NONE  float   xy  
                 //
                 // Tessellation Domain   # of control points
                 // -------------------- --------------------
@@ -3396,9 +3500,10 @@ fxgroup
                 dcl_output o1.xyz
                 dcl_output o2.xy
                 dcl_output o2.zw
+                dcl_output o3.xy
                 dcl_temps 4
                 
-                #line 274 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 276 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.xy, -vicp[0][0].xzxx
                 add r0.xy, r0.xyxx, vicp[1][0].xzxx
                 mul r0.xy, r0.xyxx, vDomain.xxxx
@@ -3413,7 +3518,7 @@ fxgroup
                 add r0.xz, r0.zzwz, r0.xxyx  // dout<4:NaN:Inf,6:NaN:Inf>
                 mov r1.xy, r0.xzxx  // dout<4:NaN:Inf,6:NaN:Inf>
                 
-                #line 279
+                #line 281
                 mov r1.zw, -vicp[0][1].xxxy
                 add r1.zw, r1.zzzw, vicp[1][1].xxxy
                 mul r1.zw, r1.zzzw, vDomain.xxxx
@@ -3427,14 +3532,14 @@ fxgroup
                 mul r2.xy, r2.xyxx, vDomain.yyyy
                 add r1.zw, r1.zzzw, r2.xxxy  // dout<7:NaN:Inf,8:NaN:Inf>
                 
-                #line 283
+                #line 290
                 mul r2.xy, r1.zwzz, cb0[17].xyxx  // dout<9:NaN:Inf,10:NaN:Inf>
                 
-                #line 286
+                #line 293
                 sample_l_indexable(texture2d)(float,float,float,float) r0.y, r1.zwzz, t0.yxzw, s0, l(0.000000)  // dout<5:Inf>
                 mov r2.z, r0.y  // dout<5:Inf>
                 
-                #line 294
+                #line 301
                 mov r0.w, l(1.000000)
                 dp4 r3.x, r0.xyzw, cb1[0].xyzw  // dout<0:NaN:Inf>
                 dp4 r3.y, r0.xyzw, cb1[1].xyzw  // dout<1:NaN:Inf>
@@ -3445,8 +3550,9 @@ fxgroup
                 mov o2.zw, r2.xxxy  // DS<9:NaN:Inf,10:NaN:Inf>
                 mov o1.xz, r1.xxyx  // DS<4:NaN:Inf,6:NaN:Inf>
                 mov o1.y, r2.z  // DS<5:Inf>
+                mov o3.xy, r1.zwzz  // DS<11:NaN:Inf,12:NaN:Inf>
                 ret 
-                // Approximately 39 instruction slots used
+                // Approximately 40 instruction slots used
                             
             };
             GeometryShader = NULL;
@@ -3517,7 +3623,8 @@ fxgroup
                 // samHeightmap                      sampler      NA          NA    2        1
                 // gLayerMapArray                    texture  float4     2darray    0        1
                 // gBlendMap                         texture  float4          2d    1        1
-                // gHeightMap                        texture  float4          2d    2        1
+                // gMouseBlend                       texture  float4          2d    2        1
+                // gHeightMap                        texture  float4          2d    3        1
                 // cbPerFrame                        cbuffer      NA          NA    0        1
                 // cbPerObject                       cbuffer      NA          NA    1        1
                 //
@@ -3531,6 +3638,7 @@ fxgroup
                 // POSITION                 0   xyz         1     NONE  float   xyz 
                 // TEXCOORD                 0   xy          2     NONE  float   xy  
                 // TEXCOORD                 1     zw        2     NONE  float     zw
+                // TEXCOORD                 2   xy          3     NONE  float   xy  
                 //
                 //
                 // Output signature:
@@ -3549,13 +3657,15 @@ fxgroup
                 dcl_resource_texture2darray (float,float,float,float) t0
                 dcl_resource_texture2d (float,float,float,float) t1
                 dcl_resource_texture2d (float,float,float,float) t2
+                dcl_resource_texture2d (float,float,float,float) t3
                 dcl_input_ps linear v1.xyz
                 dcl_input_ps linear v2.xy
                 dcl_input_ps linear v2.zw
+                dcl_input_ps linear v3.xy
                 dcl_output o0.xyzw
-                dcl_temps 10
+                dcl_temps 11
                 
-                #line 306 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 313 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.x, -cb0[16].x
                 mov r0.y, l(0)
                 add r0.xy, r0.xyxx, v2.xyxx  // leftTex<0:Inf,1>
@@ -3568,13 +3678,13 @@ fxgroup
                 mov r2.x, l(0)
                 mov r2.y, -cb0[16].y
                 add r1.zw, r2.xxxy, v2.xxxy  // topTex<0,1:Inf>
-                sample_l_indexable(texture2d)(float,float,float,float) r0.x, r0.xyxx, t2.xyzw, s2, l(0.000000)
+                sample_l_indexable(texture2d)(float,float,float,float) r0.x, r0.xyxx, t3.xyzw, s2, l(0.000000)
                 mov r0.x, r0.x  // leftY<0:Inf>
-                sample_l_indexable(texture2d)(float,float,float,float) r0.y, r0.zwzz, t2.yxzw, s2, l(0.000000)
+                sample_l_indexable(texture2d)(float,float,float,float) r0.y, r0.zwzz, t3.yxzw, s2, l(0.000000)
                 mov r0.y, r0.y  // rightY<0:Inf>
-                sample_l_indexable(texture2d)(float,float,float,float) r0.z, r1.xyxx, t2.yzxw, s2, l(0.000000)
+                sample_l_indexable(texture2d)(float,float,float,float) r0.z, r1.xyxx, t3.yzxw, s2, l(0.000000)
                 mov r0.z, r0.z  // bottomY<0:Inf>
-                sample_l_indexable(texture2d)(float,float,float,float) r0.w, r1.zwzz, t2.yzwx, s2, l(0.000000)
+                sample_l_indexable(texture2d)(float,float,float,float) r0.w, r1.zwzz, t3.yzwx, s2, l(0.000000)
                 mov r0.w, r0.w  // topY<0:Inf>
                 mov r0.x, -r0.x
                 add r1.z, r0.x, r0.y
@@ -3584,7 +3694,7 @@ fxgroup
                 rsq r0.x, r0.x
                 mul r1.xyz, r0.xxxx, r1.xyzx  // tangent<2: 0f,0:NaN:Inf,1:NaN:Inf>
                 
-                #line 317
+                #line 324
                 mov r0.x, -r0.w
                 add r0.x, r0.x, r0.z
                 mov r0.z, l(0)
@@ -3597,18 +3707,18 @@ fxgroup
                 mov r0.xyz, -r0.xyzx
                 add r0.xyz, r0.xyzx, r2.xyzx  // normalW<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 322
+                #line 329
                 mov r1.xyz, -v1.xyzx
                 add r1.xyz, r1.xyzx, cb0[12].xyzx  // toEye<0:Inf,1:Inf,2:Inf>
                 
-                #line 325
+                #line 332
                 dp3 r0.w, r1.xyzx, r1.xyzx
                 sqrt r0.w, r0.w  // distToEye<0:NaN:Inf>
                 
-                #line 328
+                #line 335
                 div r1.xyz, r1.xyzx, r0.wwww  // toEye<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 335
+                #line 342
                 mov r2.xy, v2.zwzz
                 mov r2.z, l(0)
                 sample_indexable(texture2darray)(float,float,float,float) r2.xyzw, r2.xyzx, t0.xyzw, s0  // c0<0:Inf,1:Inf,2:Inf,3:Inf>
@@ -3625,29 +3735,56 @@ fxgroup
                 mov r6.z, l(4.000000)
                 sample_indexable(texture2darray)(float,float,float,float) r6.xyzw, r6.xyzx, t0.xyzw, s0  // c4<0:Inf,1:Inf,2:Inf,3:Inf>
                 
-                #line 342
-                sample_indexable(texture2d)(float,float,float,float) r7.xyzw, v2.xyxx, t1.xyzw, s1  // t<0:Inf,1:Inf,2:Inf,3:Inf>
+                #line 349
+                mov r7.xy, v2.zwzz
+                mov r7.z, l(5.000000)
+                sample_indexable(texture2darray)(float,float,float,float) r7.xyzw, r7.xyzx, t0.xyzw, s0  // m0<0:Inf,1:Inf,2:Inf,3:Inf>
+                sample_indexable(texture2d)(float,float,float,float) r8.xyzw, v3.xyxx, t2.xyzw, s1  // mb<0:Inf,1:Inf,2:Inf,3:Inf>
                 
-                #line 345
+                #line 353
+                sample_indexable(texture2d)(float,float,float,float) r9.xyzw, v2.xyxx, t1.xyzw, s1  // t<0:Inf,1:Inf,2:Inf,3:Inf>
+                
+                #line 356
                 mov r2.xyzw, r2.xyzw  // texColor<0:Inf,1:Inf,2:Inf,3:Inf>
-                mov r8.xyzw, -r2.xyzw
-                add r3.xyzw, r3.xyzw, r8.xyzw
-                mul r3.xyzw, r3.xyzw, r7.xxxx
+                
+                #line 359
+                mov r10.xyzw, -r2.xyzw
+                add r3.xyzw, r3.xyzw, r10.xyzw
+                mul r3.xyzw, r3.xyzw, r9.xxxx
                 add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r3.xyzw, -r2.xyzw
                 add r3.xyzw, r3.xyzw, r4.xyzw
-                mul r3.xyzw, r3.xyzw, r7.yyyy
+                mul r3.xyzw, r3.xyzw, r9.yyyy
                 add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r3.xyzw, -r2.xyzw
                 add r3.xyzw, r3.xyzw, r5.xyzw
-                mul r3.xyzw, r3.xyzw, r7.zzzz
+                mul r3.xyzw, r3.xyzw, r9.zzzz
                 add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r3.xyzw, -r2.xyzw
                 add r3.xyzw, r3.xyzw, r6.xyzw
-                mul r3.xyzw, r3.xyzw, r7.wwww
+                mul r3.xyzw, r3.xyzw, r9.wwww
+                add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                add r3.xyzw, r7.xyzw, l(-0.000000, -0.000000, -0.000000, -0.000000)
+                mul r3.xyzw, r3.xyzw, r8.xxxx
+                add r3.xyzw, r3.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000)  // texMouse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                mov r4.xyzw, -r3.xyzw
+                add r4.xyzw, r4.xyzw, r7.xyzw
+                mul r4.xyzw, r4.xyzw, r8.yyyy
+                add r3.xyzw, r3.xyzw, r4.xyzw  // texMouse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                mov r4.xyzw, -r3.xyzw
+                add r4.xyzw, r4.xyzw, r7.xyzw
+                mul r4.xyzw, r4.xyzw, r8.zzzz
+                add r3.xyzw, r3.xyzw, r4.xyzw  // texMouse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                mov r4.xyzw, -r3.xyzw
+                add r4.xyzw, r4.xyzw, r7.xyzw
+                mul r4.xyzw, r4.xyzw, r8.wwww
+                add r3.xyzw, r3.xyzw, r4.xyzw  // texMouse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                mov r4.xyzw, -r3.xyzw
+                add r2.xyzw, r2.xyzw, r4.xyzw
+                mul r2.xyzw, r2.xyzw, l(0.500000, 0.500000, 0.500000, 0.500000)
                 add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 369
+                #line 390
                 nop 
                 mov r3.xyzw, cb1[4].xyzw  // mat<0,1,2,3>
                 mov r4.xyzw, cb1[5].xyzw  // mat<4,5,6,7>
@@ -3690,38 +3827,38 @@ fxgroup
                 movc r1.xyzw, r6.xxxx, r1.xyzw, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 movc r4.xyzw, r6.xxxx, r4.xyzw, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 369 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 390 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r3.xyzw, r3.xyzw  // A<0:Inf,1:Inf,2:Inf,3:Inf>
                 mov r1.xyzw, r1.xyzw  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r4.xyzw, r4.xyzw  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 372
+                #line 393
                 add r3.xyzw, r3.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000)  // ambient<0:Inf,1:Inf,2:Inf,3:Inf>
                 add r1.xyzw, r1.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 add r4.xyzw, r4.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 377
+                #line 398
                 add r1.xyzw, r1.xyzw, r3.xyzw
                 mul r1.xyzw, r1.xyzw, r2.xyzw
                 add r1.xyzw, r4.xyzw, r1.xyzw  // litColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 386
+                #line 407
                 mov r0.x, -cb0[12].w
                 add r0.x, r0.x, r0.w
                 div r0.x, r0.x, cb0[13].x
                 max r0.x, r0.x, l(0.000000)
                 min r0.x, r0.x, l(1.000000)  // fogLerp<0:[0f,1f]>
                 
-                #line 389
+                #line 410
                 mov r2.xyzw, -r1.xyzw
                 add r2.xyzw, r2.xyzw, cb0[14].xyzw
                 mul r0.xyzw, r0.xxxx, r2.xyzw
                 add r0.xyzw, r0.xyzw, r1.xyzw  // litColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 392
+                #line 413
                 mov o0.xyzw, r0.xyzw  // PS<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 ret 
-                // Approximately 127 instruction slots used
+                // Approximately 150 instruction slots used
                             
             };
         }
@@ -3800,17 +3937,17 @@ fxgroup
                 dcl_output o1.zw
                 dcl_temps 2
                 
-                #line 97 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 98 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.xyz, v0.xyzx
                 mov r0.w, l(1.000000)
                 dp4 r1.x, r0.xyzw, cb0[8].xyzw  // vout<0:NaN:Inf>
                 dp4 r1.z, r0.xyzw, cb0[10].xyzw  // vout<2:NaN:Inf>
                 
-                #line 110
+                #line 111
                 sample_l_indexable(texture2d)(float,float,float,float) r0.x, v1.xyxx, t0.xyzw, s0, l(0.000000)
                 mov r0.x, r0.x  // vout<1:Inf>
                 
-                #line 113
+                #line 114
                 mov r0.yz, v1.xxyx  // vout<3,4>
                 mov r1.yw, v2.xxxy  // vout<5,6>
                 mov o1.xy, r0.yzyy  // VS<3,4>
@@ -3914,7 +4051,7 @@ fxgroup
                 dcl_globalFlags refactoringAllowed
                 dcl_constantbuffer cb0[24], dynamicIndexed
                 
-                #line 248 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 249 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 hs_control_point_phase 
                 dcl_input vOutputControlPointID
                 dcl_input v[4][0].xyz
@@ -3928,7 +4065,7 @@ fxgroup
                 mov o0.xyz, r0.yzwy  // HS<3,4>
                 mov o1.xy, r1.xyxx
                 
-                #line 179
+                #line 180
                 ret   // minY<0>
                 hs_join_phase   // maxY<0>
                 dcl_input vicp[4][0].xyz
@@ -3941,7 +4078,7 @@ fxgroup
                 dcl_output_siv o5.x, finalQuadVInsideTessFactor
                 dcl_temps 7
                 
-                #line 184
+                #line 185
                 mov r0.y, vicp[0][1].z  // vMin<0,2>
                 mov r1.y, vicp[0][1].w  // vMin<1>
                 mov r0.xz, vicp[2][0].xxzx  // vMax<0,2>
@@ -3955,7 +4092,7 @@ fxgroup
                 mul r0.xyz, r0.xyzx, l(0.500000, 0.500000, 0.500000, 0.000000)  // center<0,1,2>
                 nop   // extents<0,1,2>
                 
-                #line 151
+                #line 152
                 mov r2.xyz, r2.xyzx  // i<0: 0>
                 mov r0.xyz, r0.xyzx  // AabbOutsideFrustumTest<0: false>
                 mov r0.w, l(0)  // i<0>
@@ -3965,49 +4102,49 @@ fxgroup
                 loop 
                   ilt r1.w, r1.y, l(6)
                 
-                #line 155
+                #line 156
                   mov r1.z, l(0)
                   breakc_z r1.w  // center<0,1,2>
                   nop   // extents<0,1,2>
                   mov r3.xyz, r2.xyzx
                   mov r4.xyz, r0.xyzx  // plane<0,1,2,3>
                 
-                #line 134
+                #line 135
                   mov r1.w, r1.y
                   mov r5.xyzw, cb0[r1.w + 18].xyzw  // n<0:[0f,3.40282e+038f],1:[0f,3.40282e+038f],2:[0f,3.40282e+038f]>
                 
-                #line 137
+                #line 138
                   mov r6.xyz, -r5.xyzx  // r<0:NaN:Inf>
                 
-                #line 140
+                #line 141
                   max r6.xyz, r5.xyzx, r6.xyzx
                   dp3 r1.w, r4.xyzx, r6.xyzx  // s<0:NaN:Inf>
                 
-                #line 145
+                #line 146
                   mov r3.w, l(1.000000)
                   dp4 r2.w, r3.xyzw, r5.xyzw  // AabbBehindPlaneTest<0>
                 
-                #line 155
+                #line 156
                   add r1.w, r1.w, r2.w
                   lt r1.w, r1.w, l(0.000000)  // AabbOutsideFrustumTest<0: true>
                   if_nz r1.w
                     mov r1.x, l(-1)
                     mov r1.z, l(-1)
                 
-                #line 151
+                #line 152
                     break   // i<0>
                   endif 
                   iadd r1.y, r1.y, l(1)
                 
-                #line 161
+                #line 162
                   mov r1.z, r1.w
                 endloop   // AabbOutsideFrustumTest<0: false>
                 if_z r1.z
                 
-                #line 189
+                #line 190
                   mov r1.x, l(0)
                 
-                #line 199
+                #line 200
                 endif   // ConstantHS<0: 0f>
                 if_nz r1.x  // ConstantHS<1: 0f>
                   mov o0.x, l(0)  // ConstantHS<2: 0f>
@@ -4016,10 +4153,10 @@ fxgroup
                   mov o3.x, l(0)  // ConstantHS<5: 0f>
                   mov o4.x, l(0)
                 
-                #line 189
+                #line 190
                   mov o5.x, l(0)
                 
-                #line 211
+                #line 212
                   ret 
                 else   // e0<0,1,2>
                   add r0.xyz, vicp[2][0].xyzx, vicp[0][0].xyzx
@@ -4034,13 +4171,13 @@ fxgroup
                   add r1.xyz, r1.xyzx, vicp[3][0].xyzx
                   mul r1.xyz, r1.xyzx, l(0.250000, 0.250000, 0.250000, 0.000000)  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r0.xyz, r0.xyzx
                   mov r5.xyz, -cb0[12].xyzx
                   add r0.xyz, r0.xyzx, r5.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r0.x, r0.xyzx, r0.xyzx
                   sqrt r0.x, r0.x
                   mov r0.y, -cb0[15].x
@@ -4054,17 +4191,17 @@ fxgroup
                   mul r0.x, r0.w, r0.x
                   add r0.x, r0.x, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 217
+                #line 218
                   mul r0.x, r0.x, l(1.000000)  // pt<0:NaN:Inf>
                   exp r0.x, r0.x
                   mov r0.x, r0.x  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r2.xyz, r2.xyzx
                   add r2.xyz, r5.xyzx, r2.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r1.w, r2.xyzx, r2.xyzx
                   sqrt r1.w, r1.w
                   add r1.w, r0.y, r1.w
@@ -4074,17 +4211,17 @@ fxgroup
                   mul r1.w, r0.w, r1.w
                   add r1.w, r1.w, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 218
+                #line 219
                   mul r1.w, r1.w, l(1.000000)  // pt<1:NaN:Inf>
                   exp r1.w, r1.w
                   mov r1.w, r1.w  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r3.xyz, r3.xyzx
                   add r2.xyz, r5.xyzx, r3.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r2.x, r2.xyzx, r2.xyzx
                   sqrt r2.x, r2.x
                   add r2.x, r0.y, r2.x
@@ -4094,17 +4231,17 @@ fxgroup
                   mul r2.x, r0.w, r2.x
                   add r2.x, r2.x, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 219
+                #line 220
                   mul r2.x, r2.x, l(1.000000)  // pt<2:NaN:Inf>
                   exp r2.x, r2.x
                   mov r2.x, r2.x  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r4.xyz, r4.xyzx
                   add r3.xyz, r5.xyzx, r4.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r3.x, r3.xyzx, r3.xyzx
                   sqrt r3.x, r3.x
                   add r3.x, r0.y, r3.x
@@ -4114,17 +4251,17 @@ fxgroup
                   mul r3.x, r0.w, r3.x
                   add r3.x, r3.x, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 220
+                #line 221
                   mul r3.x, r3.x, l(1.000000)  // pt<3:NaN:Inf>
                   exp r2.y, r3.x
                   mov r2.y, r2.y  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r1.xyz, r1.xyzx
                   add r1.xyz, r5.xyzx, r1.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r1.x, r1.xyzx, r1.xyzx
                   sqrt r1.x, r1.x
                   add r0.y, r0.y, r1.x
@@ -4134,10 +4271,10 @@ fxgroup
                   mul r0.y, r0.w, r0.y
                   add r0.y, r0.y, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 222
+                #line 223
                   mul r0.y, r0.y, l(1.000000)  // pt<4:NaN:Inf>
                 
-                #line 225
+                #line 226
                   exp r2.w, r0.y  // ConstantHS<2:NaN:Inf>
                   mov r2.z, r2.w  // ConstantHS<3:NaN:Inf>
                   mov r2.x, r2.x  // ConstantHS<4:NaN:Inf>
@@ -4153,7 +4290,7 @@ fxgroup
                   mov o3.x, r0.y  // ConstantHS<5:[0f,64f]>
                   mov o4.x, r0.z
                 
-                #line 189
+                #line 190
                   mov o5.x, r0.w
                   ret 
                 
@@ -4266,6 +4403,7 @@ fxgroup
                 // POSITION                 0   xyz         1     NONE  float   xyz 
                 // TEXCOORD                 0   xy          2     NONE  float   xy  
                 // TEXCOORD                 1     zw        2     NONE  float     zw
+                // TEXCOORD                 2   xy          3     NONE  float   xy  
                 //
                 // Tessellation Domain   # of control points
                 // -------------------- --------------------
@@ -4286,9 +4424,10 @@ fxgroup
                 dcl_output o1.xyz
                 dcl_output o2.xy
                 dcl_output o2.zw
+                dcl_output o3.xy
                 dcl_temps 4
                 
-                #line 274 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 276 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.xy, -vicp[0][0].xzxx
                 add r0.xy, r0.xyxx, vicp[1][0].xzxx
                 mul r0.xy, r0.xyxx, vDomain.xxxx
@@ -4303,7 +4442,7 @@ fxgroup
                 add r0.xz, r0.zzwz, r0.xxyx  // dout<4:NaN:Inf,6:NaN:Inf>
                 mov r1.xy, r0.xzxx  // dout<4:NaN:Inf,6:NaN:Inf>
                 
-                #line 279
+                #line 281
                 mov r1.zw, -vicp[0][1].xxxy
                 add r1.zw, r1.zzzw, vicp[1][1].xxxy
                 mul r1.zw, r1.zzzw, vDomain.xxxx
@@ -4317,14 +4456,14 @@ fxgroup
                 mul r2.xy, r2.xyxx, vDomain.yyyy
                 add r1.zw, r1.zzzw, r2.xxxy  // dout<7:NaN:Inf,8:NaN:Inf>
                 
-                #line 283
+                #line 290
                 mul r2.xy, r1.zwzz, cb0[17].xyxx  // dout<9:NaN:Inf,10:NaN:Inf>
                 
-                #line 286
+                #line 293
                 sample_l_indexable(texture2d)(float,float,float,float) r0.y, r1.zwzz, t0.yxzw, s0, l(0.000000)  // dout<5:Inf>
                 mov r2.z, r0.y  // dout<5:Inf>
                 
-                #line 294
+                #line 301
                 mov r0.w, l(1.000000)
                 dp4 r3.x, r0.xyzw, cb1[0].xyzw  // dout<0:NaN:Inf>
                 dp4 r3.y, r0.xyzw, cb1[1].xyzw  // dout<1:NaN:Inf>
@@ -4335,8 +4474,9 @@ fxgroup
                 mov o2.zw, r2.xxxy  // DS<9:NaN:Inf,10:NaN:Inf>
                 mov o1.xz, r1.xxyx  // DS<4:NaN:Inf,6:NaN:Inf>
                 mov o1.y, r2.z  // DS<5:Inf>
+                mov o3.xy, r1.zwzz  // DS<11:NaN:Inf,12:NaN:Inf>
                 ret 
-                // Approximately 39 instruction slots used
+                // Approximately 40 instruction slots used
                             
             };
             GeometryShader = NULL;
@@ -4407,7 +4547,8 @@ fxgroup
                 // samHeightmap                      sampler      NA          NA    2        1
                 // gLayerMapArray                    texture  float4     2darray    0        1
                 // gBlendMap                         texture  float4          2d    1        1
-                // gHeightMap                        texture  float4          2d    2        1
+                // gMouseBlend                       texture  float4          2d    2        1
+                // gHeightMap                        texture  float4          2d    3        1
                 // cbPerFrame                        cbuffer      NA          NA    0        1
                 // cbPerObject                       cbuffer      NA          NA    1        1
                 //
@@ -4421,6 +4562,7 @@ fxgroup
                 // POSITION                 0   xyz         1     NONE  float   xyz 
                 // TEXCOORD                 0   xy          2     NONE  float   xy  
                 // TEXCOORD                 1     zw        2     NONE  float     zw
+                // TEXCOORD                 2   xy          3     NONE  float   xy  
                 //
                 //
                 // Output signature:
@@ -4439,13 +4581,15 @@ fxgroup
                 dcl_resource_texture2darray (float,float,float,float) t0
                 dcl_resource_texture2d (float,float,float,float) t1
                 dcl_resource_texture2d (float,float,float,float) t2
+                dcl_resource_texture2d (float,float,float,float) t3
                 dcl_input_ps linear v1.xyz
                 dcl_input_ps linear v2.xy
                 dcl_input_ps linear v2.zw
+                dcl_input_ps linear v3.xy
                 dcl_output o0.xyzw
                 dcl_temps 13
                 
-                #line 306 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 313 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.x, -cb0[16].x
                 mov r0.y, l(0)
                 add r0.xy, r0.xyxx, v2.xyxx  // leftTex<0:Inf,1>
@@ -4458,13 +4602,13 @@ fxgroup
                 mov r2.x, l(0)
                 mov r2.y, -cb0[16].y
                 add r1.zw, r2.xxxy, v2.xxxy  // topTex<0,1:Inf>
-                sample_l_indexable(texture2d)(float,float,float,float) r0.x, r0.xyxx, t2.xyzw, s2, l(0.000000)
+                sample_l_indexable(texture2d)(float,float,float,float) r0.x, r0.xyxx, t3.xyzw, s2, l(0.000000)
                 mov r0.x, r0.x  // leftY<0:Inf>
-                sample_l_indexable(texture2d)(float,float,float,float) r0.y, r0.zwzz, t2.yxzw, s2, l(0.000000)
+                sample_l_indexable(texture2d)(float,float,float,float) r0.y, r0.zwzz, t3.yxzw, s2, l(0.000000)
                 mov r0.y, r0.y  // rightY<0:Inf>
-                sample_l_indexable(texture2d)(float,float,float,float) r0.z, r1.xyxx, t2.yzxw, s2, l(0.000000)
+                sample_l_indexable(texture2d)(float,float,float,float) r0.z, r1.xyxx, t3.yzxw, s2, l(0.000000)
                 mov r0.z, r0.z  // bottomY<0:Inf>
-                sample_l_indexable(texture2d)(float,float,float,float) r0.w, r1.zwzz, t2.yzwx, s2, l(0.000000)
+                sample_l_indexable(texture2d)(float,float,float,float) r0.w, r1.zwzz, t3.yzwx, s2, l(0.000000)
                 mov r0.w, r0.w  // topY<0:Inf>
                 mov r0.x, -r0.x
                 add r1.z, r0.x, r0.y
@@ -4474,7 +4618,7 @@ fxgroup
                 rsq r0.x, r0.x
                 mul r1.xyz, r0.xxxx, r1.xyzx  // tangent<2: 0f,0:NaN:Inf,1:NaN:Inf>
                 
-                #line 317
+                #line 324
                 mov r0.x, -r0.w
                 add r0.x, r0.x, r0.z
                 mov r0.z, l(0)
@@ -4487,18 +4631,18 @@ fxgroup
                 mov r0.xyz, -r0.xyzx
                 add r0.xyz, r0.xyzx, r2.xyzx  // normalW<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 322
+                #line 329
                 mov r1.xyz, -v1.xyzx
                 add r1.xyz, r1.xyzx, cb0[12].xyzx  // toEye<0:Inf,1:Inf,2:Inf>
                 
-                #line 325
+                #line 332
                 dp3 r0.w, r1.xyzx, r1.xyzx
                 sqrt r0.w, r0.w  // distToEye<0:NaN:Inf>
                 
-                #line 328
+                #line 335
                 div r1.xyz, r1.xyzx, r0.wwww  // toEye<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 335
+                #line 342
                 mov r2.xy, v2.zwzz
                 mov r2.z, l(0)
                 sample_indexable(texture2darray)(float,float,float,float) r2.xyzw, r2.xyzx, t0.xyzw, s0  // c0<0:Inf,1:Inf,2:Inf,3:Inf>
@@ -4515,29 +4659,56 @@ fxgroup
                 mov r6.z, l(4.000000)
                 sample_indexable(texture2darray)(float,float,float,float) r6.xyzw, r6.xyzx, t0.xyzw, s0  // c4<0:Inf,1:Inf,2:Inf,3:Inf>
                 
-                #line 342
-                sample_indexable(texture2d)(float,float,float,float) r7.xyzw, v2.xyxx, t1.xyzw, s1  // t<0:Inf,1:Inf,2:Inf,3:Inf>
+                #line 349
+                mov r7.xy, v2.zwzz
+                mov r7.z, l(5.000000)
+                sample_indexable(texture2darray)(float,float,float,float) r7.xyzw, r7.xyzx, t0.xyzw, s0  // m0<0:Inf,1:Inf,2:Inf,3:Inf>
+                sample_indexable(texture2d)(float,float,float,float) r8.xyzw, v3.xyxx, t2.xyzw, s1  // mb<0:Inf,1:Inf,2:Inf,3:Inf>
                 
-                #line 345
+                #line 353
+                sample_indexable(texture2d)(float,float,float,float) r9.xyzw, v2.xyxx, t1.xyzw, s1  // t<0:Inf,1:Inf,2:Inf,3:Inf>
+                
+                #line 356
                 mov r2.xyzw, r2.xyzw  // texColor<0:Inf,1:Inf,2:Inf,3:Inf>
-                mov r8.xyzw, -r2.xyzw
-                add r3.xyzw, r3.xyzw, r8.xyzw
-                mul r3.xyzw, r3.xyzw, r7.xxxx
+                
+                #line 359
+                mov r10.xyzw, -r2.xyzw
+                add r3.xyzw, r3.xyzw, r10.xyzw
+                mul r3.xyzw, r3.xyzw, r9.xxxx
                 add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r3.xyzw, -r2.xyzw
                 add r3.xyzw, r3.xyzw, r4.xyzw
-                mul r3.xyzw, r3.xyzw, r7.yyyy
+                mul r3.xyzw, r3.xyzw, r9.yyyy
                 add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r3.xyzw, -r2.xyzw
                 add r3.xyzw, r3.xyzw, r5.xyzw
-                mul r3.xyzw, r3.xyzw, r7.zzzz
+                mul r3.xyzw, r3.xyzw, r9.zzzz
                 add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r3.xyzw, -r2.xyzw
                 add r3.xyzw, r3.xyzw, r6.xyzw
-                mul r3.xyzw, r3.xyzw, r7.wwww
+                mul r3.xyzw, r3.xyzw, r9.wwww
+                add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                add r3.xyzw, r7.xyzw, l(-0.000000, -0.000000, -0.000000, -0.000000)
+                mul r3.xyzw, r3.xyzw, r8.xxxx
+                add r3.xyzw, r3.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000)  // texMouse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                mov r4.xyzw, -r3.xyzw
+                add r4.xyzw, r4.xyzw, r7.xyzw
+                mul r4.xyzw, r4.xyzw, r8.yyyy
+                add r3.xyzw, r3.xyzw, r4.xyzw  // texMouse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                mov r4.xyzw, -r3.xyzw
+                add r4.xyzw, r4.xyzw, r7.xyzw
+                mul r4.xyzw, r4.xyzw, r8.zzzz
+                add r3.xyzw, r3.xyzw, r4.xyzw  // texMouse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                mov r4.xyzw, -r3.xyzw
+                add r4.xyzw, r4.xyzw, r7.xyzw
+                mul r4.xyzw, r4.xyzw, r8.wwww
+                add r3.xyzw, r3.xyzw, r4.xyzw  // texMouse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                mov r4.xyzw, -r3.xyzw
+                add r2.xyzw, r2.xyzw, r4.xyzw
+                mul r2.xyzw, r2.xyzw, l(0.500000, 0.500000, 0.500000, 0.500000)
                 add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 369
+                #line 390
                 nop 
                 mov r3.xyzw, cb1[4].xyzw  // mat<0,1,2,3>
                 mov r4.xyzw, cb1[5].xyzw  // mat<4,5,6,7>
@@ -4580,17 +4751,17 @@ fxgroup
                 movc r7.xyzw, r9.wwww, r7.xyzw, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 movc r8.xyzw, r9.wwww, r8.xyzw, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 369 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 390 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r6.xyzw, r6.xyzw  // A<0:Inf,1:Inf,2:Inf,3:Inf>
                 mov r7.xyzw, r7.xyzw  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r8.xyzw, r8.xyzw  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 372
+                #line 393
                 add r6.xyzw, r6.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000)  // ambient<0:Inf,1:Inf,2:Inf,3:Inf>
                 add r7.xyzw, r7.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 add r8.xyzw, r8.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 369
+                #line 390
                 nop 
                 mov r9.xyzw, cb0[4].xyzw  // L<0,1,2,3>
                 mov r10.xyzw, cb0[5].xyzw  // L<4,5,6,7>
@@ -4628,38 +4799,38 @@ fxgroup
                 movc r1.xyzw, r9.xxxx, r1.xyzw, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 movc r4.xyzw, r9.xxxx, r4.xyzw, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 369 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 390 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r3.xyzw, r3.xyzw  // A<0:Inf,1:Inf,2:Inf,3:Inf>
                 mov r1.xyzw, r1.xyzw  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r4.xyzw, r4.xyzw  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 372
+                #line 393
                 add r3.xyzw, r3.xyzw, r6.xyzw  // ambient<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 add r1.xyzw, r1.xyzw, r7.xyzw  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 add r4.xyzw, r4.xyzw, r8.xyzw  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 377
+                #line 398
                 add r1.xyzw, r1.xyzw, r3.xyzw
                 mul r1.xyzw, r1.xyzw, r2.xyzw
                 add r1.xyzw, r4.xyzw, r1.xyzw  // litColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 386
+                #line 407
                 mov r0.x, -cb0[12].w
                 add r0.x, r0.x, r0.w
                 div r0.x, r0.x, cb0[13].x
                 max r0.x, r0.x, l(0.000000)
                 min r0.x, r0.x, l(1.000000)  // fogLerp<0:[0f,1f]>
                 
-                #line 389
+                #line 410
                 mov r2.xyzw, -r1.xyzw
                 add r2.xyzw, r2.xyzw, cb0[14].xyzw
                 mul r0.xyzw, r0.xxxx, r2.xyzw
                 add r0.xyzw, r0.xyzw, r1.xyzw  // litColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 392
+                #line 413
                 mov o0.xyzw, r0.xyzw  // PS<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 ret 
-                // Approximately 159 instruction slots used
+                // Approximately 182 instruction slots used
                             
             };
         }
@@ -4738,17 +4909,17 @@ fxgroup
                 dcl_output o1.zw
                 dcl_temps 2
                 
-                #line 97 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 98 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.xyz, v0.xyzx
                 mov r0.w, l(1.000000)
                 dp4 r1.x, r0.xyzw, cb0[8].xyzw  // vout<0:NaN:Inf>
                 dp4 r1.z, r0.xyzw, cb0[10].xyzw  // vout<2:NaN:Inf>
                 
-                #line 110
+                #line 111
                 sample_l_indexable(texture2d)(float,float,float,float) r0.x, v1.xyxx, t0.xyzw, s0, l(0.000000)
                 mov r0.x, r0.x  // vout<1:Inf>
                 
-                #line 113
+                #line 114
                 mov r0.yz, v1.xxyx  // vout<3,4>
                 mov r1.yw, v2.xxxy  // vout<5,6>
                 mov o1.xy, r0.yzyy  // VS<3,4>
@@ -4852,7 +5023,7 @@ fxgroup
                 dcl_globalFlags refactoringAllowed
                 dcl_constantbuffer cb0[24], dynamicIndexed
                 
-                #line 248 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 249 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 hs_control_point_phase 
                 dcl_input vOutputControlPointID
                 dcl_input v[4][0].xyz
@@ -4866,7 +5037,7 @@ fxgroup
                 mov o0.xyz, r0.yzwy  // HS<3,4>
                 mov o1.xy, r1.xyxx
                 
-                #line 179
+                #line 180
                 ret   // minY<0>
                 hs_join_phase   // maxY<0>
                 dcl_input vicp[4][0].xyz
@@ -4879,7 +5050,7 @@ fxgroup
                 dcl_output_siv o5.x, finalQuadVInsideTessFactor
                 dcl_temps 7
                 
-                #line 184
+                #line 185
                 mov r0.y, vicp[0][1].z  // vMin<0,2>
                 mov r1.y, vicp[0][1].w  // vMin<1>
                 mov r0.xz, vicp[2][0].xxzx  // vMax<0,2>
@@ -4893,7 +5064,7 @@ fxgroup
                 mul r0.xyz, r0.xyzx, l(0.500000, 0.500000, 0.500000, 0.000000)  // center<0,1,2>
                 nop   // extents<0,1,2>
                 
-                #line 151
+                #line 152
                 mov r2.xyz, r2.xyzx  // i<0: 0>
                 mov r0.xyz, r0.xyzx  // AabbOutsideFrustumTest<0: false>
                 mov r0.w, l(0)  // i<0>
@@ -4903,49 +5074,49 @@ fxgroup
                 loop 
                   ilt r1.w, r1.y, l(6)
                 
-                #line 155
+                #line 156
                   mov r1.z, l(0)
                   breakc_z r1.w  // center<0,1,2>
                   nop   // extents<0,1,2>
                   mov r3.xyz, r2.xyzx
                   mov r4.xyz, r0.xyzx  // plane<0,1,2,3>
                 
-                #line 134
+                #line 135
                   mov r1.w, r1.y
                   mov r5.xyzw, cb0[r1.w + 18].xyzw  // n<0:[0f,3.40282e+038f],1:[0f,3.40282e+038f],2:[0f,3.40282e+038f]>
                 
-                #line 137
+                #line 138
                   mov r6.xyz, -r5.xyzx  // r<0:NaN:Inf>
                 
-                #line 140
+                #line 141
                   max r6.xyz, r5.xyzx, r6.xyzx
                   dp3 r1.w, r4.xyzx, r6.xyzx  // s<0:NaN:Inf>
                 
-                #line 145
+                #line 146
                   mov r3.w, l(1.000000)
                   dp4 r2.w, r3.xyzw, r5.xyzw  // AabbBehindPlaneTest<0>
                 
-                #line 155
+                #line 156
                   add r1.w, r1.w, r2.w
                   lt r1.w, r1.w, l(0.000000)  // AabbOutsideFrustumTest<0: true>
                   if_nz r1.w
                     mov r1.x, l(-1)
                     mov r1.z, l(-1)
                 
-                #line 151
+                #line 152
                     break   // i<0>
                   endif 
                   iadd r1.y, r1.y, l(1)
                 
-                #line 161
+                #line 162
                   mov r1.z, r1.w
                 endloop   // AabbOutsideFrustumTest<0: false>
                 if_z r1.z
                 
-                #line 189
+                #line 190
                   mov r1.x, l(0)
                 
-                #line 199
+                #line 200
                 endif   // ConstantHS<0: 0f>
                 if_nz r1.x  // ConstantHS<1: 0f>
                   mov o0.x, l(0)  // ConstantHS<2: 0f>
@@ -4954,10 +5125,10 @@ fxgroup
                   mov o3.x, l(0)  // ConstantHS<5: 0f>
                   mov o4.x, l(0)
                 
-                #line 189
+                #line 190
                   mov o5.x, l(0)
                 
-                #line 211
+                #line 212
                   ret 
                 else   // e0<0,1,2>
                   add r0.xyz, vicp[2][0].xyzx, vicp[0][0].xyzx
@@ -4972,13 +5143,13 @@ fxgroup
                   add r1.xyz, r1.xyzx, vicp[3][0].xyzx
                   mul r1.xyz, r1.xyzx, l(0.250000, 0.250000, 0.250000, 0.000000)  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r0.xyz, r0.xyzx
                   mov r5.xyz, -cb0[12].xyzx
                   add r0.xyz, r0.xyzx, r5.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r0.x, r0.xyzx, r0.xyzx
                   sqrt r0.x, r0.x
                   mov r0.y, -cb0[15].x
@@ -4992,17 +5163,17 @@ fxgroup
                   mul r0.x, r0.w, r0.x
                   add r0.x, r0.x, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 217
+                #line 218
                   mul r0.x, r0.x, l(1.000000)  // pt<0:NaN:Inf>
                   exp r0.x, r0.x
                   mov r0.x, r0.x  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r2.xyz, r2.xyzx
                   add r2.xyz, r5.xyzx, r2.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r1.w, r2.xyzx, r2.xyzx
                   sqrt r1.w, r1.w
                   add r1.w, r0.y, r1.w
@@ -5012,17 +5183,17 @@ fxgroup
                   mul r1.w, r0.w, r1.w
                   add r1.w, r1.w, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 218
+                #line 219
                   mul r1.w, r1.w, l(1.000000)  // pt<1:NaN:Inf>
                   exp r1.w, r1.w
                   mov r1.w, r1.w  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r3.xyz, r3.xyzx
                   add r2.xyz, r5.xyzx, r3.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r2.x, r2.xyzx, r2.xyzx
                   sqrt r2.x, r2.x
                   add r2.x, r0.y, r2.x
@@ -5032,17 +5203,17 @@ fxgroup
                   mul r2.x, r0.w, r2.x
                   add r2.x, r2.x, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 219
+                #line 220
                   mul r2.x, r2.x, l(1.000000)  // pt<2:NaN:Inf>
                   exp r2.x, r2.x
                   mov r2.x, r2.x  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r4.xyz, r4.xyzx
                   add r3.xyz, r5.xyzx, r4.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r3.x, r3.xyzx, r3.xyzx
                   sqrt r3.x, r3.x
                   add r3.x, r0.y, r3.x
@@ -5052,17 +5223,17 @@ fxgroup
                   mul r3.x, r0.w, r3.x
                   add r3.x, r3.x, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 220
+                #line 221
                   mul r3.x, r3.x, l(1.000000)  // pt<3:NaN:Inf>
                   exp r2.y, r3.x
                   mov r2.y, r2.y  // p<0,1,2>
                 
-                #line 121
+                #line 122
                   nop 
                   mov r1.xyz, r1.xyzx
                   add r1.xyz, r5.xyzx, r1.xyzx  // d<0:NaN:Inf>
                 
-                #line 126
+                #line 127
                   dp3 r1.x, r1.xyzx, r1.xyzx
                   sqrt r1.x, r1.x
                   add r0.y, r0.y, r1.x
@@ -5072,10 +5243,10 @@ fxgroup
                   mul r0.y, r0.w, r0.y
                   add r0.y, r0.y, cb0[15].w  // CalcTessFactor<0:NaN:Inf>
                 
-                #line 222
+                #line 223
                   mul r0.y, r0.y, l(1.000000)  // pt<4:NaN:Inf>
                 
-                #line 225
+                #line 226
                   exp r2.w, r0.y  // ConstantHS<2:NaN:Inf>
                   mov r2.z, r2.w  // ConstantHS<3:NaN:Inf>
                   mov r2.x, r2.x  // ConstantHS<4:NaN:Inf>
@@ -5091,7 +5262,7 @@ fxgroup
                   mov o3.x, r0.y  // ConstantHS<5:[0f,64f]>
                   mov o4.x, r0.z
                 
-                #line 189
+                #line 190
                   mov o5.x, r0.w
                   ret 
                 
@@ -5204,6 +5375,7 @@ fxgroup
                 // POSITION                 0   xyz         1     NONE  float   xyz 
                 // TEXCOORD                 0   xy          2     NONE  float   xy  
                 // TEXCOORD                 1     zw        2     NONE  float     zw
+                // TEXCOORD                 2   xy          3     NONE  float   xy  
                 //
                 // Tessellation Domain   # of control points
                 // -------------------- --------------------
@@ -5224,9 +5396,10 @@ fxgroup
                 dcl_output o1.xyz
                 dcl_output o2.xy
                 dcl_output o2.zw
+                dcl_output o3.xy
                 dcl_temps 4
                 
-                #line 274 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 276 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.xy, -vicp[0][0].xzxx
                 add r0.xy, r0.xyxx, vicp[1][0].xzxx
                 mul r0.xy, r0.xyxx, vDomain.xxxx
@@ -5241,7 +5414,7 @@ fxgroup
                 add r0.xz, r0.zzwz, r0.xxyx  // dout<4:NaN:Inf,6:NaN:Inf>
                 mov r1.xy, r0.xzxx  // dout<4:NaN:Inf,6:NaN:Inf>
                 
-                #line 279
+                #line 281
                 mov r1.zw, -vicp[0][1].xxxy
                 add r1.zw, r1.zzzw, vicp[1][1].xxxy
                 mul r1.zw, r1.zzzw, vDomain.xxxx
@@ -5255,14 +5428,14 @@ fxgroup
                 mul r2.xy, r2.xyxx, vDomain.yyyy
                 add r1.zw, r1.zzzw, r2.xxxy  // dout<7:NaN:Inf,8:NaN:Inf>
                 
-                #line 283
+                #line 290
                 mul r2.xy, r1.zwzz, cb0[17].xyxx  // dout<9:NaN:Inf,10:NaN:Inf>
                 
-                #line 286
+                #line 293
                 sample_l_indexable(texture2d)(float,float,float,float) r0.y, r1.zwzz, t0.yxzw, s0, l(0.000000)  // dout<5:Inf>
                 mov r2.z, r0.y  // dout<5:Inf>
                 
-                #line 294
+                #line 301
                 mov r0.w, l(1.000000)
                 dp4 r3.x, r0.xyzw, cb1[0].xyzw  // dout<0:NaN:Inf>
                 dp4 r3.y, r0.xyzw, cb1[1].xyzw  // dout<1:NaN:Inf>
@@ -5273,8 +5446,9 @@ fxgroup
                 mov o2.zw, r2.xxxy  // DS<9:NaN:Inf,10:NaN:Inf>
                 mov o1.xz, r1.xxyx  // DS<4:NaN:Inf,6:NaN:Inf>
                 mov o1.y, r2.z  // DS<5:Inf>
+                mov o3.xy, r1.zwzz  // DS<11:NaN:Inf,12:NaN:Inf>
                 ret 
-                // Approximately 39 instruction slots used
+                // Approximately 40 instruction slots used
                             
             };
             GeometryShader = NULL;
@@ -5345,7 +5519,8 @@ fxgroup
                 // samHeightmap                      sampler      NA          NA    2        1
                 // gLayerMapArray                    texture  float4     2darray    0        1
                 // gBlendMap                         texture  float4          2d    1        1
-                // gHeightMap                        texture  float4          2d    2        1
+                // gMouseBlend                       texture  float4          2d    2        1
+                // gHeightMap                        texture  float4          2d    3        1
                 // cbPerFrame                        cbuffer      NA          NA    0        1
                 // cbPerObject                       cbuffer      NA          NA    1        1
                 //
@@ -5359,6 +5534,7 @@ fxgroup
                 // POSITION                 0   xyz         1     NONE  float   xyz 
                 // TEXCOORD                 0   xy          2     NONE  float   xy  
                 // TEXCOORD                 1     zw        2     NONE  float     zw
+                // TEXCOORD                 2   xy          3     NONE  float   xy  
                 //
                 //
                 // Output signature:
@@ -5377,13 +5553,15 @@ fxgroup
                 dcl_resource_texture2darray (float,float,float,float) t0
                 dcl_resource_texture2d (float,float,float,float) t1
                 dcl_resource_texture2d (float,float,float,float) t2
+                dcl_resource_texture2d (float,float,float,float) t3
                 dcl_input_ps linear v1.xyz
                 dcl_input_ps linear v2.xy
                 dcl_input_ps linear v2.zw
+                dcl_input_ps linear v3.xy
                 dcl_output o0.xyzw
                 dcl_temps 14
                 
-                #line 306 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 313 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r0.x, -cb0[16].x
                 mov r0.y, l(0)
                 add r0.xy, r0.xyxx, v2.xyxx  // leftTex<0:Inf,1>
@@ -5396,13 +5574,13 @@ fxgroup
                 mov r2.x, l(0)
                 mov r2.y, -cb0[16].y
                 add r1.zw, r2.xxxy, v2.xxxy  // topTex<0,1:Inf>
-                sample_l_indexable(texture2d)(float,float,float,float) r0.x, r0.xyxx, t2.xyzw, s2, l(0.000000)
+                sample_l_indexable(texture2d)(float,float,float,float) r0.x, r0.xyxx, t3.xyzw, s2, l(0.000000)
                 mov r0.x, r0.x  // leftY<0:Inf>
-                sample_l_indexable(texture2d)(float,float,float,float) r0.y, r0.zwzz, t2.yxzw, s2, l(0.000000)
+                sample_l_indexable(texture2d)(float,float,float,float) r0.y, r0.zwzz, t3.yxzw, s2, l(0.000000)
                 mov r0.y, r0.y  // rightY<0:Inf>
-                sample_l_indexable(texture2d)(float,float,float,float) r0.z, r1.xyxx, t2.yzxw, s2, l(0.000000)
+                sample_l_indexable(texture2d)(float,float,float,float) r0.z, r1.xyxx, t3.yzxw, s2, l(0.000000)
                 mov r0.z, r0.z  // bottomY<0:Inf>
-                sample_l_indexable(texture2d)(float,float,float,float) r0.w, r1.zwzz, t2.yzwx, s2, l(0.000000)
+                sample_l_indexable(texture2d)(float,float,float,float) r0.w, r1.zwzz, t3.yzwx, s2, l(0.000000)
                 mov r0.w, r0.w  // topY<0:Inf>
                 mov r0.x, -r0.x
                 add r1.z, r0.x, r0.y
@@ -5412,7 +5590,7 @@ fxgroup
                 rsq r0.x, r0.x
                 mul r1.xyz, r0.xxxx, r1.xyzx  // tangent<2: 0f,0:NaN:Inf,1:NaN:Inf>
                 
-                #line 317
+                #line 324
                 mov r0.x, -r0.w
                 add r0.x, r0.x, r0.z
                 mov r0.z, l(0)
@@ -5425,18 +5603,18 @@ fxgroup
                 mov r0.xyz, -r0.xyzx
                 add r0.xyz, r0.xyzx, r2.xyzx  // normalW<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 322
+                #line 329
                 mov r1.xyz, -v1.xyzx
                 add r1.xyz, r1.xyzx, cb0[12].xyzx  // toEye<0:Inf,1:Inf,2:Inf>
                 
-                #line 325
+                #line 332
                 dp3 r0.w, r1.xyzx, r1.xyzx
                 sqrt r0.w, r0.w  // distToEye<0:NaN:Inf>
                 
-                #line 328
+                #line 335
                 div r1.xyz, r1.xyzx, r0.wwww  // toEye<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 335
+                #line 342
                 mov r2.xy, v2.zwzz
                 mov r2.z, l(0)
                 sample_indexable(texture2darray)(float,float,float,float) r2.xyzw, r2.xyzx, t0.xyzw, s0  // c0<0:Inf,1:Inf,2:Inf,3:Inf>
@@ -5453,29 +5631,56 @@ fxgroup
                 mov r6.z, l(4.000000)
                 sample_indexable(texture2darray)(float,float,float,float) r6.xyzw, r6.xyzx, t0.xyzw, s0  // c4<0:Inf,1:Inf,2:Inf,3:Inf>
                 
-                #line 342
-                sample_indexable(texture2d)(float,float,float,float) r7.xyzw, v2.xyxx, t1.xyzw, s1  // t<0:Inf,1:Inf,2:Inf,3:Inf>
+                #line 349
+                mov r7.xy, v2.zwzz
+                mov r7.z, l(5.000000)
+                sample_indexable(texture2darray)(float,float,float,float) r7.xyzw, r7.xyzx, t0.xyzw, s0  // m0<0:Inf,1:Inf,2:Inf,3:Inf>
+                sample_indexable(texture2d)(float,float,float,float) r8.xyzw, v3.xyxx, t2.xyzw, s1  // mb<0:Inf,1:Inf,2:Inf,3:Inf>
                 
-                #line 345
+                #line 353
+                sample_indexable(texture2d)(float,float,float,float) r9.xyzw, v2.xyxx, t1.xyzw, s1  // t<0:Inf,1:Inf,2:Inf,3:Inf>
+                
+                #line 356
                 mov r2.xyzw, r2.xyzw  // texColor<0:Inf,1:Inf,2:Inf,3:Inf>
-                mov r8.xyzw, -r2.xyzw
-                add r3.xyzw, r3.xyzw, r8.xyzw
-                mul r3.xyzw, r3.xyzw, r7.xxxx
+                
+                #line 359
+                mov r10.xyzw, -r2.xyzw
+                add r3.xyzw, r3.xyzw, r10.xyzw
+                mul r3.xyzw, r3.xyzw, r9.xxxx
                 add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r3.xyzw, -r2.xyzw
                 add r3.xyzw, r3.xyzw, r4.xyzw
-                mul r3.xyzw, r3.xyzw, r7.yyyy
+                mul r3.xyzw, r3.xyzw, r9.yyyy
                 add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r3.xyzw, -r2.xyzw
                 add r3.xyzw, r3.xyzw, r5.xyzw
-                mul r3.xyzw, r3.xyzw, r7.zzzz
+                mul r3.xyzw, r3.xyzw, r9.zzzz
                 add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r3.xyzw, -r2.xyzw
                 add r3.xyzw, r3.xyzw, r6.xyzw
-                mul r3.xyzw, r3.xyzw, r7.wwww
+                mul r3.xyzw, r3.xyzw, r9.wwww
+                add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                add r3.xyzw, r7.xyzw, l(-0.000000, -0.000000, -0.000000, -0.000000)
+                mul r3.xyzw, r3.xyzw, r8.xxxx
+                add r3.xyzw, r3.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000)  // texMouse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                mov r4.xyzw, -r3.xyzw
+                add r4.xyzw, r4.xyzw, r7.xyzw
+                mul r4.xyzw, r4.xyzw, r8.yyyy
+                add r3.xyzw, r3.xyzw, r4.xyzw  // texMouse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                mov r4.xyzw, -r3.xyzw
+                add r4.xyzw, r4.xyzw, r7.xyzw
+                mul r4.xyzw, r4.xyzw, r8.zzzz
+                add r3.xyzw, r3.xyzw, r4.xyzw  // texMouse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                mov r4.xyzw, -r3.xyzw
+                add r4.xyzw, r4.xyzw, r7.xyzw
+                mul r4.xyzw, r4.xyzw, r8.wwww
+                add r3.xyzw, r3.xyzw, r4.xyzw  // texMouse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
+                mov r4.xyzw, -r3.xyzw
+                add r2.xyzw, r2.xyzw, r4.xyzw
+                mul r2.xyzw, r2.xyzw, l(0.500000, 0.500000, 0.500000, 0.500000)
                 add r2.xyzw, r2.xyzw, r3.xyzw  // texColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 369
+                #line 390
                 nop 
                 mov r3.xyzw, cb1[4].xyzw  // mat<0,1,2,3>
                 mov r4.xyzw, cb1[5].xyzw  // mat<4,5,6,7>
@@ -5518,17 +5723,17 @@ fxgroup
                 movc r7.xyzw, r9.wwww, r7.xyzw, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 movc r8.xyzw, r9.wwww, r8.xyzw, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 369 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 390 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r6.xyzw, r6.xyzw  // A<0:Inf,1:Inf,2:Inf,3:Inf>
                 mov r7.xyzw, r7.xyzw  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r8.xyzw, r8.xyzw  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 372
+                #line 393
                 add r6.xyzw, r6.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000)  // ambient<0:Inf,1:Inf,2:Inf,3:Inf>
                 add r7.xyzw, r7.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 add r8.xyzw, r8.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 369
+                #line 390
                 nop 
                 mov r9.xyzw, cb0[4].xyzw  // L<0,1,2,3>
                 mov r10.xyzw, cb0[5].xyzw  // L<4,5,6,7>
@@ -5566,17 +5771,17 @@ fxgroup
                 movc r10.xyzw, r12.wwww, r10.xyzw, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 movc r11.xyzw, r12.wwww, r11.xyzw, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 369 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 390 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r9.xyzw, r9.xyzw  // A<0:Inf,1:Inf,2:Inf,3:Inf>
                 mov r10.xyzw, r10.xyzw  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r11.xyzw, r11.xyzw  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 372
+                #line 393
                 add r6.xyzw, r6.xyzw, r9.xyzw  // ambient<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 add r7.xyzw, r7.xyzw, r10.xyzw  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 add r8.xyzw, r8.xyzw, r11.xyzw  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 369
+                #line 390
                 nop 
                 mov r9.xyzw, cb0[8].xyzw  // L<0,1,2,3>
                 mov r10.xyzw, cb0[9].xyzw  // L<4,5,6,7>
@@ -5614,38 +5819,38 @@ fxgroup
                 movc r1.xyzw, r9.xxxx, r1.xyzw, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 movc r4.xyzw, r9.xxxx, r4.xyzw, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 369 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
+                #line 390 "C:\Users\Mansu\Documents\GitHub\MS_Project\MS_Project\MS_Project\FX\Terrain.fx"
                 mov r3.xyzw, r3.xyzw  // A<0:Inf,1:Inf,2:Inf,3:Inf>
                 mov r1.xyzw, r1.xyzw  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 mov r4.xyzw, r4.xyzw  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 372
+                #line 393
                 add r3.xyzw, r3.xyzw, r6.xyzw  // ambient<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 add r1.xyzw, r1.xyzw, r7.xyzw  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 add r4.xyzw, r4.xyzw, r8.xyzw  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 377
+                #line 398
                 add r1.xyzw, r1.xyzw, r3.xyzw
                 mul r1.xyzw, r1.xyzw, r2.xyzw
                 add r1.xyzw, r4.xyzw, r1.xyzw  // litColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 386
+                #line 407
                 mov r0.x, -cb0[12].w
                 add r0.x, r0.x, r0.w
                 div r0.x, r0.x, cb0[13].x
                 max r0.x, r0.x, l(0.000000)
                 min r0.x, r0.x, l(1.000000)  // fogLerp<0:[0f,1f]>
                 
-                #line 389
+                #line 410
                 mov r2.xyzw, -r1.xyzw
                 add r2.xyzw, r2.xyzw, cb0[14].xyzw
                 mul r0.xyzw, r0.xxxx, r2.xyzw
                 add r0.xyzw, r0.xyzw, r1.xyzw  // litColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 
-                #line 392
+                #line 413
                 mov o0.xyzw, r0.xyzw  // PS<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf,3:NaN:Inf>
                 ret 
-                // Approximately 191 instruction slots used
+                // Approximately 214 instruction slots used
                             
             };
         }

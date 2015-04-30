@@ -48,6 +48,7 @@ cbuffer cbPerObject
 // Nonnumeric values cannot be added to a cbuffer.
 Texture2DArray gLayerMapArray;
 Texture2D gBlendMap;
+Texture2D gMouseBlend;
 Texture2D gHeightMap;
 
 SamplerState samLinear
@@ -257,6 +258,7 @@ struct DomainOut
     float3 PosW     : POSITION;
 	float2 Tex      : TEXCOORD0;
 	float2 TiledTex : TEXCOORD1;
+	float2 MouseTex : TEXCOORD2;
 };
 
 // The domain shader is called for every vertex created by the tessellator.  
@@ -278,6 +280,11 @@ DomainOut DS(PatchTess patchTess,
 		lerp(quad[0].Tex, quad[1].Tex, uv.x),
 		lerp(quad[2].Tex, quad[3].Tex, uv.x),
 		uv.y); 
+
+	dout.MouseTex = lerp(
+		lerp(quad[0].Tex, quad[1].Tex, uv.x),
+		lerp(quad[2].Tex, quad[3].Tex, uv.x),
+		uv.y);
 
 	// Tile layer textures over terrain.
 	dout.TiledTex = dout.Tex*gTexScale; 
@@ -338,16 +345,30 @@ float4 PS(DomainOut pin,
 	float4 c3 = gLayerMapArray.Sample(samLinear, float3(pin.TiledTex, 3.0f));
 	float4 c4 = gLayerMapArray.Sample(samLinear, float3(pin.TiledTex, 4.0f));
 
+	// MS Mouse Cursor
+	float4 m0 = gLayerMapArray.Sample(samLinear, float3(pin.TiledTex, 5.0f));
+	float4 mb = gMouseBlend.Sample(samBlend, pin.MouseTex);
+
 	// Sample the blend map.
 	float4 t = gBlendMap.Sample(samBlend, pin.Tex);
 
 	// Blend the layers on top of each other.
 	float4 texColor = c0;
+	float4 texMouse = 0;
 
 	texColor = lerp(texColor, c1, t.r);
 	texColor = lerp(texColor, c2, t.g);
 	texColor = lerp(texColor, c3, t.b);
 	texColor = lerp(texColor, c4, t.a);
+
+	texMouse = lerp(texMouse, m0, mb.r);
+	texMouse = lerp(texMouse, m0, mb.g);
+	texMouse = lerp(texMouse, m0, mb.b);
+	texMouse = lerp(texMouse, m0, mb.a);
+
+	texColor = lerp(texMouse, texColor, 0.5);
+
+
  
 	//
 	// Lighting.

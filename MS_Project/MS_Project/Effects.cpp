@@ -174,6 +174,7 @@ TerrainEffect::TerrainEffect(ID3D11Device* device, const std::wstring& filename)
 	LayerMapArray = mFX->GetVariableByName("gLayerMapArray")->AsShaderResource();
 	BlendMap = mFX->GetVariableByName("gBlendMap")->AsShaderResource();
 	HeightMap = mFX->GetVariableByName("gHeightMap")->AsShaderResource();
+	MouseBlend = mFX->GetVariableByName("gMouseBlend")->AsShaderResource();
 
 	// MS
 	World = mFX->GetVariableByName("gWorld")->AsMatrix();

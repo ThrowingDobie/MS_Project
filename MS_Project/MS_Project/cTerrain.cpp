@@ -7,6 +7,7 @@ cTerrain::cTerrain()
 	, m_pLayerMapArraySRV(NULL)
 	, m_pBlendMapSRV(NULL)
 	, m_pHeightMapSRV(NULL)
+	, m_pMouseBlendSRV(NULL)
 {
 	XMMATRIX I = XMMatrixIdentity();
 	I = XMMatrixTranslation(0, 0, 0);
@@ -28,6 +29,12 @@ cTerrain::cTerrain()
 	m_mtTerrain.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	m_mtTerrain.Specular = XMFLOAT4(0.0f, 0.0f, 0.0f, 64.0f);
 	m_mtTerrain.Reflect = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+
+	m_pdVertex.eType = DirectX::E_ALPHAEMPTY;
+	m_pdVertex.eTextureUsingType = DirectX::E_MAPPINGTEXTURE;
+
+	m_pdVertex_Mouse.eType = DirectX::E_ALPHAEMPTY;
+	m_pdVertex_Mouse.eTextureUsingType = DirectX::E_MOUSE;
 }
 
 cTerrain::~cTerrain()
@@ -37,6 +44,7 @@ cTerrain::~cTerrain()
 	SAFE_RELEASE(m_pLayerMapArraySRV);
 	SAFE_RELEASE(m_pBlendMapSRV);
 	SAFE_RELEASE(m_pHeightMapSRV);
+	SAFE_RELEASE(m_pMouseBlendSRV);
 }
 
 void cTerrain::Setup()
@@ -68,10 +76,14 @@ void cTerrain::Init(ID3D11Device* device, ID3D11DeviceContext* dc, const InitInf
 	layerFilenames.push_back(m_Info.LayerMapFilename2);
 	layerFilenames.push_back(m_Info.LayerMapFilename3);
 	layerFilenames.push_back(m_Info.LayerMapFilename4);
+	layerFilenames.push_back(m_Info.MousePointFilename);
 	m_pLayerMapArraySRV = d3dHelper::CreateTexture2DArraySRV(device, dc, layerFilenames);
 
 	DirectX::CreateDDSTextureFromFile(g_pD3DDevice->m_pDevice,
 		L"./Image/blend.dds", nullptr, &m_pBlendMapSRV, 0, 0, &m_pdVertex);
+
+	DirectX::CreateDDSTextureFromFile(g_pD3DDevice->m_pDevice,
+		L"./Image/MouseBlend.dds", nullptr, &m_pMouseBlendSRV, 0, 0, &m_pdVertex_Mouse);
 }
 
 void cTerrain::Update(float fDelta)
@@ -130,6 +142,7 @@ void cTerrain::Render(ID3D11DeviceContext* dc, const Camera& cam, DirectionalLig
 	Effects::TerrainFX->SetWorldFrustumPlanes(worldPlanes);
 
 	Effects::TerrainFX->SetLayerMapArray(m_pLayerMapArraySRV);
+	Effects::TerrainFX->SetMouseBlend(m_pMouseBlendSRV);
 	Effects::TerrainFX->SetBlendMap(m_pBlendMapSRV);
 	Effects::TerrainFX->SetHeightMap(m_pHeightMapSRV);
 
@@ -486,33 +499,21 @@ void cTerrain::ChangeHeightData(std::vector<Vertex::ST_P_VERTEX> vecVertex)
 void cTerrain::SetMappingData(DirectX::ST_PD_VERTEX pdVertex)
 {
 	SAFE_RELEASE(m_pBlendMapSRV);
-
 	m_pdVertex = pdVertex;
 	ID3D11Resource* pSave;
 	DirectX::CreateDDSTextureFromFile(g_pD3DDevice->m_pDevice,
 		L"./Image/blend.dds", &pSave, &m_pBlendMapSRV, 0, 0, &m_pdVertex);
-
-	DXGI_FORMAT format = DXGI_FORMAT_FROM_FILE;
-	UINT filter = D3DX11_FILTER_NONE;
-	UINT mipFilter = D3DX11_FILTER_LINEAR;
-
-	D3DX11_IMAGE_LOAD_INFO loadInfo;
-
-	loadInfo.Width = D3DX11_FROM_FILE;
-	loadInfo.Height = D3DX11_FROM_FILE;
-	loadInfo.Depth = D3DX11_FROM_FILE;
-	loadInfo.FirstMipLevel = 0;
-	loadInfo.MipLevels = D3DX11_FROM_FILE;
-	loadInfo.Usage = D3D11_USAGE_STAGING;
-	loadInfo.BindFlags = 0;
-	loadInfo.CpuAccessFlags = D3D11_CPU_ACCESS_WRITE | D3D11_CPU_ACCESS_READ;
-	loadInfo.MiscFlags = 0;
-	loadInfo.Format = format;
-	loadInfo.Filter = filter;
-	loadInfo.MipFilter = mipFilter;
-	loadInfo.pSrcInfo = 0;
-
 	D3DX11SaveTextureToFile(g_pD3DDevice->m_pDevCon, pSave, D3DX11_IFF_DDS, L"./Image/blend.dds");
+	SAFE_RELEASE(pSave);
+}
+
+void cTerrain::SetMouseMappingData(DirectX::ST_PD_VERTEX pdVertex)
+{
+	SAFE_RELEASE(m_pMouseBlendSRV);
+	m_pdVertex_Mouse = pdVertex;
+	ID3D11Resource* pSave;
+	DirectX::CreateDDSTextureFromFile(g_pD3DDevice->m_pDevice,
+		L"./Image/MouseBlend.dds", &pSave, &m_pMouseBlendSRV, 0, 0, &m_pdVertex_Mouse);
 	SAFE_RELEASE(pSave);
 }
 //DXGI_FORMAT format = DXGI_FORMAT_FROM_FILE;
