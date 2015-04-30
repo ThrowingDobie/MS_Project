@@ -1,6 +1,5 @@
 #pragma once
 
-class cQuadTree;
 class cOctree;
 
 class cMousePicking
@@ -40,6 +39,9 @@ public:
 	bool HeightEdit();
 	bool TextureMap();
 	bool MouseRange();
+
+	void SetMouseRbutton(bool isClick);
+	bool GetMouseRbutton();
 
 private:
 	void Pick(int nX, int nY);
@@ -118,10 +120,10 @@ private:
 	XMVECTOR GetNearPoint(std::vector<XMVECTOR> vecPoint);
 	XMVECTOR GetNearPointTest(std::vector<XMFLOAT3> vecPoint);
 
-	// QuadTree
-	cQuadTree* m_pQuadTree;
-	bool CalTail(cQuadTree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist);
-	std::vector<XMVECTOR> m_vecTest;
+	//// QuadTree
+	//cQuadTree* m_pQuadTree;
+	//bool CalTail(cQuadTree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist);
+	//std::vector<XMVECTOR> m_vecTest;
 
 	// Octree
 	cOctree* m_pOctree;

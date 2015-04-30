@@ -1,13 +1,12 @@
 #include "stdafx.h"
 #include "cMousePicking.h"
 #include "cTerrain.h"
-#include "cQuadTree.h"
 #include "cOctree.h"
 
 cMousePicking::cMousePicking()
 	: m_pVertexBuffer(NULL)
 	, m_pIndexBuffer(NULL)
-	, m_pQuadTree(NULL)
+	//, m_pQuadTree(NULL)
 	, m_pOctree(NULL)
 {
 	XMMATRIX I = XMMatrixIdentity();
@@ -42,7 +41,7 @@ cMousePicking::~cMousePicking()
 {
 	SAFE_RELEASE(m_pVertexBuffer);
 	SAFE_RELEASE(m_pIndexBuffer);
-	SAFE_DELETE(m_pQuadTree);
+	//SAFE_DELETE(m_pQuadTree);
 	SAFE_DELETE(m_pOctree);
 }
 
@@ -61,7 +60,7 @@ void cMousePicking::Init(ID3D11Buffer* pVertexBuffer
 	, ID3D11Buffer* pIndexBuffer
 	, std::vector<float> vecHeight)
 {
-	BuildMeshGeometryBuffers();
+	//BuildMeshGeometryBuffers();
 	m_vecHeight = vecHeight;
 
 	if (m_vecVertex.size() == 0)
@@ -205,16 +204,11 @@ void cMousePicking::OnMouseDown(WPARAM btnState, int nX, int nY)
 {
 	if ((btnState & MK_RBUTTON) != 0)
 	{
-		m_isRightClick = true;
 		Pick(nX, nY);
 		SelectCircle(m_vPickingPoint.x, m_vPickingPoint.z, 5);
 		SetMappingData();
 		SetMouseMappingData();
     }
-	else
-	{
-		m_isRightClick = false;
-	}
 }
 
 
@@ -330,59 +324,59 @@ void cMousePicking::Pick(int nX, int nY)
 	}
 }
 
-bool cMousePicking::CalTail(cQuadTree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist)
-{
-
-	bool isColliedTri = false;
-
-	if (pRoot->AddChild())
-	{
-		std::vector<ST_INDEX> vecIndex;
-		vecIndex.resize(4);
-		
-		for (int i = 0; i < pRoot->m_vecChild.size(); i++)
-		{
-			vecIndex[i].i0 = pRoot->m_vecChild[i]->GetIndex()[0];
-			vecIndex[i].i1 = pRoot->m_vecChild[i]->GetIndex()[1];
-			vecIndex[i].i2 = pRoot->m_vecChild[i]->GetIndex()[2];
-			vecIndex[i].i3 = pRoot->m_vecChild[i]->GetIndex()[3];
-
-			vecIndex[i].v0 = XMLoadFloat3(&m_vecVertex[vecIndex[i].i0].Pos);
-			vecIndex[i].v1 = XMLoadFloat3(&m_vecVertex[vecIndex[i].i1].Pos);
-			vecIndex[i].v2 = XMLoadFloat3(&m_vecVertex[vecIndex[i].i2].Pos);
-			vecIndex[i].v3 = XMLoadFloat3(&m_vecVertex[vecIndex[i].i3].Pos);
-
-			isColliedTri = XNA::IntersectRayTriangle(vOrigin, vDir,
-				vecIndex[i].v0, vecIndex[i].v2, vecIndex[i].v3, &fDist);
-
-			if (isColliedTri)
-			{
-				pRoot = pRoot->m_vecChild[i];
-				CalTail(pRoot, vOrigin, vDir, fDist);
-				return false;
-
-			}
-
-			isColliedTri = XNA::IntersectRayTriangle(vOrigin, vDir,
-				vecIndex[i].v3, vecIndex[i].v1, vecIndex[i].v0, &fDist);
-
-			if (isColliedTri)
-			{
-				pRoot = pRoot->m_vecChild[i];
-				CalTail(pRoot, vOrigin, vDir, fDist);
-				return false;
-			}
-		}
-	}
-	else
-	{
-		XMVECTOR vPoint;
-		vPoint = vOrigin + (fDist * vDir);
-		XMStoreFloat3(&m_vPickingPoint, vPoint);
-		m_vecTest.clear();
-		return true;
-	}
-}
+//bool cMousePicking::CalTail(cQuadTree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist)
+//{
+//
+//	bool isColliedTri = false;
+//
+//	if (pRoot->AddChild())
+//	{
+//		std::vector<ST_INDEX> vecIndex;
+//		vecIndex.resize(4);
+//		
+//		for (int i = 0; i < pRoot->m_vecChild.size(); i++)
+//		{
+//			vecIndex[i].i0 = pRoot->m_vecChild[i]->GetIndex()[0];
+//			vecIndex[i].i1 = pRoot->m_vecChild[i]->GetIndex()[1];
+//			vecIndex[i].i2 = pRoot->m_vecChild[i]->GetIndex()[2];
+//			vecIndex[i].i3 = pRoot->m_vecChild[i]->GetIndex()[3];
+//
+//			vecIndex[i].v0 = XMLoadFloat3(&m_vecVertex[vecIndex[i].i0].Pos);
+//			vecIndex[i].v1 = XMLoadFloat3(&m_vecVertex[vecIndex[i].i1].Pos);
+//			vecIndex[i].v2 = XMLoadFloat3(&m_vecVertex[vecIndex[i].i2].Pos);
+//			vecIndex[i].v3 = XMLoadFloat3(&m_vecVertex[vecIndex[i].i3].Pos);
+//
+//			isColliedTri = XNA::IntersectRayTriangle(vOrigin, vDir,
+//				vecIndex[i].v0, vecIndex[i].v2, vecIndex[i].v3, &fDist);
+//
+//			if (isColliedTri)
+//			{
+//				pRoot = pRoot->m_vecChild[i];
+//				CalTail(pRoot, vOrigin, vDir, fDist);
+//				return false;
+//
+//			}
+//
+//			isColliedTri = XNA::IntersectRayTriangle(vOrigin, vDir,
+//				vecIndex[i].v3, vecIndex[i].v1, vecIndex[i].v0, &fDist);
+//
+//			if (isColliedTri)
+//			{
+//				pRoot = pRoot->m_vecChild[i];
+//				CalTail(pRoot, vOrigin, vDir, fDist);
+//				return false;
+//			}
+//		}
+//	}
+//	else
+//	{
+//		XMVECTOR vPoint;
+//		vPoint = vOrigin + (fDist * vDir);
+//		XMStoreFloat3(&m_vPickingPoint, vPoint);
+//		m_vecTest.clear();
+//		return true;
+//	}
+//}
 
 XMFLOAT3 cMousePicking::SetIndex(int nIndex, int nSize)
 {
@@ -743,16 +737,17 @@ bool cMousePicking::TextureMap()
 
 bool cMousePicking::MouseRange()
 {
-	if (GetAsyncKeyState('Z') & 0x8000)
+	if (m_isRightClick)
 	{
 		m_eTextureType_Mouse = DirectX::E_GRASS;
 		m_eTextureUsingType_Mouse = DirectX::E_MOUSE;
-	}
-	if (GetAsyncKeyState('X') & 0x8000)
-	{
 		return true;
 	}
-	return false;
+	else
+	{
+		return false;
+	}
+
 }
 
 std::vector<Vertex::ST_P_VERTEX> cMousePicking::GetHeight()
@@ -911,4 +906,14 @@ DirectX::ST_PD_VERTEX cMousePicking::GetMappingData()
 DirectX::ST_PD_VERTEX cMousePicking::GetMouseMappingData()
 {
 	return m_pdVertex_Mouse;
+}
+
+void cMousePicking::SetMouseRbutton(bool isClick)
+{
+	m_isRightClick = isClick;
+}
+
+bool cMousePicking::GetMouseRbutton()
+{
+	return m_isRightClick;
 }

@@ -13,6 +13,7 @@ cMain::cMain()
 	, m_pTerrain(NULL)
 	, m_pMouse(NULL)
 {
+	m_fAccumTime = 0.f;
 }
 
 cMain::~cMain()
@@ -68,7 +69,7 @@ void cMain::Init()
 	tii.LayerMapFilename4 = L"Textures/lightdirt.dds";
     tii.BlendMapFilename = L"Image/blend.dds";
 	tii.MouseBlendFilename = L"Image/MouseBlend.dds";
-	tii.MousePointFilename = L"Textures/Mouse.png";
+	tii.MousePointFilename = L"Textures/Mouse1.png";
 	tii.HeightScale = 50.f;
 	tii.HeightmapWidth = 257;
 	tii.HeightmapHeight = 257;
@@ -91,9 +92,14 @@ void cMain::Update(float fDelta)
     {
         g_pD3DDevice->m_pDevCon->RSSetState(RenderStates::WireframeRS);
     }
+	else
+	{
+		g_pD3DDevice->m_pDevCon->RSSetState(NULL);
+	}
 
     if (m_pMouse)
     {
+		m_pMouse->Update(fDelta);
         if (m_pMouse->HeightEdit())
         {
             m_pTerrain->ChangeHeightData(m_pMouse->GetHeight());
@@ -102,16 +108,8 @@ void cMain::Update(float fDelta)
 		{
 			m_pTerrain->SetMappingData(m_pMouse->GetMappingData());
 		}
-		if (m_pMouse->MouseRange())
-		{
-			m_pTerrain->SetMouseMappingData(m_pMouse->GetMouseMappingData());
-		}
-    }
-    if (m_pMouse)
-    {
-        m_pMouse->Update(fDelta);
-    }
 
+    }
 }
 
 void cMain::Render()
@@ -125,12 +123,6 @@ void cMain::Render()
 		m_pTerrain->Render(g_pD3DDevice->m_pDevCon, *g_pCamera, m_DirLights);
 	}
 
-    if (m_pMouse)
-    {
-       m_pMouse->Render(m_DirLights);
-    }
-
-
 	g_pD3DDevice->m_pSwapChain->Present(0, 0);
 }
 
@@ -138,13 +130,16 @@ void cMain::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
-	case WM_MOUSEMOVE:
-		//m_pMouse->Pick(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-		break;
-	case WM_LBUTTONDOWN:
-	case WM_MBUTTONDOWN:
 	case WM_RBUTTONDOWN:
+		m_pMouse->SetMouseRbutton(true);
 		m_pMouse->OnMouseDown(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		if (m_pMouse->MouseRange())
+		{
+			m_pTerrain->SetMouseMappingData(m_pMouse->GetMouseMappingData());
+		}
+		break;
+	case WM_RBUTTONUP:
+		m_pMouse->SetMouseRbutton(false);
 		break;
 	}
 }

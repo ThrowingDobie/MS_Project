@@ -514,6 +514,7 @@ void cTerrain::SetMouseMappingData(DirectX::ST_PD_VERTEX pdVertex)
 	ID3D11Resource* pSave;
 	DirectX::CreateDDSTextureFromFile(g_pD3DDevice->m_pDevice,
 		L"./Image/MouseBlend.dds", &pSave, &m_pMouseBlendSRV, 0, 0, &m_pdVertex_Mouse);
+	//D3DX11SaveTextureToFile(g_pD3DDevice->m_pDevCon, pSave, D3DX11_IFF_DDS, L"./Image/MouseBlend.dds");
 	SAFE_RELEASE(pSave);
 }
 //DXGI_FORMAT format = DXGI_FORMAT_FROM_FILE;

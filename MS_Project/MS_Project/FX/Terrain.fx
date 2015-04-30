@@ -366,8 +366,8 @@ float4 PS(DomainOut pin,
 	texMouse = lerp(texMouse, m0, mb.b);
 	texMouse = lerp(texMouse, m0, mb.a);
 
-	texColor = lerp(texMouse, texColor, 0.5);
-
+	//texColor = lerp(texMouse, texColor, 0.5);
+	texColor = texMouse + texColor;
 
  
 	//

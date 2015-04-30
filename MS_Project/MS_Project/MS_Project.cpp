@@ -223,18 +223,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return 0;
 
 	case WM_LBUTTONDOWN:
+		break;
 	case WM_MBUTTONDOWN:
+		break;
 	case WM_RBUTTONDOWN:
 		g_pCamera->MouseDown(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		return 0;
+		break;
 	case WM_LBUTTONUP:
+		break;
 	case WM_MBUTTONUP:
+		break;
 	case WM_RBUTTONUP:
 		g_pCamera->MouseUp(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		return 0;
+		break;
 	case WM_MOUSEMOVE:
 		g_pCamera->MouseMove(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		return 0;
+		break;
 	case WM_COMMAND:
 		wmId    = LOWORD(wParam);
 		wmEvent = HIWORD(wParam);

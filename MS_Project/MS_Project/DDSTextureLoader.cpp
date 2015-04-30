@@ -1422,10 +1422,10 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
 
 								for (int i = 0; i < ppdVertex->vecPoint.size(); i++)
 								{
-									if (nX >= ppdVertex->vecPoint[i].x * 4 - 3
-										&& nX <= ppdVertex->vecPoint[i].x * 4 + 4
-										&& nY >= ppdVertex->vecPoint[i].z * 4 - 3
-										&& nY <= ppdVertex->vecPoint[i].z * 4 + 4)
+									if (nX >= ppdVertex->vecPoint[i].x * 4 - 4
+										&& nX < ppdVertex->vecPoint[i].x * 4 + 4
+										&& nY >= ppdVertex->vecPoint[i].z * 4 - 4
+										&& nY < ppdVertex->vecPoint[i].z * 4 + 4)
 									{
 										if (ppdVertex->eTextureUsingType == DirectX::TextureUsingType::E_MOUSE)
 										{
