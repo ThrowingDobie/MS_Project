@@ -106,6 +106,7 @@ void cMain::Update(float fDelta)
         }
 		if (m_pMouse->TextureMap())
 		{
+			m_pMouse->SetMappingData();
 			m_pTerrain->SetMappingData(m_pMouse->GetMappingData());
 		}
 
@@ -135,6 +136,7 @@ void cMain::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		m_pMouse->OnMouseDown(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		if (m_pMouse->MouseRange())
 		{
+			m_pMouse->SetMouseMappingData();
 			m_pTerrain->SetMouseMappingData(m_pMouse->GetMouseMappingData());
 		}
 		break;

@@ -72,8 +72,8 @@ private:
 	XMFLOAT4X4 m_matMeshWorld;
 	XMFLOAT4X4 m_matScale;
 
-	Material m_mtMesh;
-	Material m_mtPickedTriangle;
+	//Material m_mtMesh;
+	//Material m_mtPickedTriangle;
 
 	UINT m_nMeshIndexCount;
 	UINT m_nPickedTriangle;
@@ -107,14 +107,13 @@ private:
 
 
 	ID3D11Buffer* m_pQuadPatchIndexBuffer;
-	void SetMappingData();
-	void SetMouseMappingData();
-
 	int m_nMapSize;
 
 public:
 	DirectX::ST_PD_VERTEX GetMappingData();
 	DirectX::ST_PD_VERTEX GetMouseMappingData();
+	void SetMappingData();
+	void SetMouseMappingData();
 
 private:
 	XMVECTOR GetNearPoint(std::vector<XMVECTOR> vecPoint);
