@@ -35,6 +35,8 @@ cMousePicking::cMousePicking()
 	m_isRightClick = false;
 
 	m_nMapSize = 257;
+
+	m_isChangeMappingData = false;
 }
 
 cMousePicking::~cMousePicking()
@@ -47,13 +49,13 @@ cMousePicking::~cMousePicking()
 
 void cMousePicking::Setup()
 {
-	m_mtMesh.Ambient = XMFLOAT4(0.4f, 0.4f, 0.4f, 1.0f);
-	m_mtMesh.Diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
-	m_mtMesh.Specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 16.0f);
+	//m_mtMesh.Ambient = XMFLOAT4(0.4f, 0.4f, 0.4f, 1.0f);
+	//m_mtMesh.Diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+	//m_mtMesh.Specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 16.0f);
 
-	m_mtPickedTriangle.Ambient = XMFLOAT4(0.0f, 0.8f, 0.4f, 1.0f);
-	m_mtPickedTriangle.Diffuse = XMFLOAT4(0.0f, 0.8f, 0.4f, 1.0f);
-	m_mtPickedTriangle.Specular = XMFLOAT4(0.0f, 0.0f, 0.0f, 16.0f);
+	//m_mtPickedTriangle.Ambient = XMFLOAT4(0.0f, 0.8f, 0.4f, 1.0f);
+	//m_mtPickedTriangle.Diffuse = XMFLOAT4(0.0f, 0.8f, 0.4f, 1.0f);
+	//m_mtPickedTriangle.Specular = XMFLOAT4(0.0f, 0.0f, 0.0f, 16.0f);
 }
 
 void cMousePicking::Init(ID3D11Buffer* pVertexBuffer
@@ -133,71 +135,7 @@ void cMousePicking::Update(float fDelta)
 {
     KeyUpdate(true);
     HeightEdit();
-}
-
-void cMousePicking::Render(DirectionalLight lights[3])
-{
-	//std::wostringstream outs;
-	//outs.precision(3);
-	//outs << L"X = " << m_vPickingPoint.x << L"   Z = " << m_vPickingPoint.z
-	//	<< L"   Y = " << m_vPickingPoint.y;
-
-	//SetWindowText(g_hWnd, outs.str().c_str());
-
-	g_pD3DDevice->m_pDevCon->IASetInputLayout(InputLayouts::Basic32);
-	g_pD3DDevice->m_pDevCon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	UINT stride = sizeof(Vertex::Basic32);
-	UINT offset = 0;
-
-	XMMATRIX view = g_pCamera->View();
-	XMMATRIX proj = g_pCamera->Proj();
-	XMMATRIX viewProj = g_pCamera->ViewProj();
-
-	Effects::BasicFX->SetEyePosW(g_pCamera->GetPosition());
-	Effects::BasicFX->SetDirLights(lights);
-
-	ID3DX11EffectTechnique* activeMeshTech = Effects::BasicFX->Light3Tech;
-
-	D3DX11_TECHNIQUE_DESC techDesc;
-	activeMeshTech->GetDesc(&techDesc);
-	for (UINT p = 0; p < techDesc.Passes; ++p)
-	{
-		// Draw the Mesh.
-
-		//if (GetAsyncKeyState('1') & 0x8000)
-		//	g_pD3DDevice->m_pDevCon->RSSetState(RenderStates::WireframeRS);
-
-		g_pD3DDevice->m_pDevCon->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
-		g_pD3DDevice->m_pDevCon->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-
-		XMFLOAT4X4 matWorld;
-		XMMATRIX I = XMMatrixIdentity();
-		I = XMMatrixTranslation(m_vPickingPoint.x, m_vPickingPoint.y, m_vPickingPoint.z);
-		
-		
-		XMMATRIX scale = XMLoadFloat4x4(&m_matScale);
-		I = scale * I;
-		
-		XMStoreFloat4x4(&matWorld, I);
-
-		XMMATRIX world = XMLoadFloat4x4(&matWorld);
-		XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
-		XMMATRIX worldViewProj = world*view*proj;
-
-		Effects::BasicFX->SetWorld(world);
-		Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
-		Effects::BasicFX->SetWorldViewProj(worldViewProj);
-
-		//////////
-		Effects::BasicFX->SetMaterial(m_mtMesh);
-		activeMeshTech->GetPassByIndex(p)->Apply(0, g_pD3DDevice->m_pDevCon);
-		g_pD3DDevice->m_pDevCon->DrawIndexed(m_nMeshIndexCount, 0, 0);
-
-		// Restore default
-		g_pD3DDevice->m_pDevCon->RSSetState(0);
-		//////////
-	}
+	m_isChangeMappingData = TextureMap();
 }
 
 void cMousePicking::OnMouseDown(WPARAM btnState, int nX, int nY)
@@ -206,86 +144,7 @@ void cMousePicking::OnMouseDown(WPARAM btnState, int nX, int nY)
 	{
 		Pick(nX, nY);
 		SelectCircle(m_vPickingPoint.x, m_vPickingPoint.z, 5);
-		SetMappingData();
-		SetMouseMappingData();
     }
-}
-
-
-void cMousePicking::BuildMeshGeometryBuffers()
-{
-	std::ifstream fin("Models/car.txt");
-
-	if (!fin)
-	{
-		MessageBox(0, L"Models/car.txt not found.", 0, 0);
-		return;
-	}
-
-	UINT vcount = 0;
-	UINT tcount = 0;
-	std::string ignore;
-
-	fin >> ignore >> vcount;
-	fin >> ignore >> tcount;
-	fin >> ignore >> ignore >> ignore >> ignore;
-
-	XMFLOAT3 vMinf3(+MathHelper::Infinity, +MathHelper::Infinity, +MathHelper::Infinity);
-	XMFLOAT3 vMaxf3(-MathHelper::Infinity, -MathHelper::Infinity, -MathHelper::Infinity);
-
-	XMVECTOR vMin = XMLoadFloat3(&vMinf3);
-	XMVECTOR vMax = XMLoadFloat3(&vMaxf3);
-	m_vecMeshVertices.resize(vcount);
-	for (UINT i = 0; i < vcount; ++i)
-	{
-		fin >> m_vecMeshVertices[i].Pos.x >> m_vecMeshVertices[i].Pos.y >> m_vecMeshVertices[i].Pos.z;
-		fin >> m_vecMeshVertices[i].Normal.x >> m_vecMeshVertices[i].Normal.y >> m_vecMeshVertices[i].Normal.z;
-
-		XMVECTOR P = XMLoadFloat3(&m_vecMeshVertices[i].Pos);
-
-		vMin = XMVectorMin(vMin, P);
-		vMax = XMVectorMax(vMax, P);
-	}
-
-	XMStoreFloat3(&mMeshBox.Center, 0.5f*(vMin + vMax));
-	XMStoreFloat3(&mMeshBox.Extents, 0.5f*(vMax - vMin));
-
-	fin >> ignore;
-	fin >> ignore;
-	fin >> ignore;
-
-	m_nMeshIndexCount = 3 * tcount;
-	m_vecMeshIndices.resize(m_nMeshIndexCount);
-	for (UINT i = 0; i < tcount; ++i)
-	{
-		fin >> m_vecMeshIndices[i * 3 + 0] >> m_vecMeshIndices[i * 3 + 1] >> m_vecMeshIndices[i * 3 + 2];
-	}
-
-	fin.close();
-
-	D3D11_BUFFER_DESC vbd;
-	vbd.Usage = D3D11_USAGE_IMMUTABLE;
-	vbd.ByteWidth = sizeof(Vertex::Basic32) * vcount;
-	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vbd.CPUAccessFlags = 0;
-	vbd.MiscFlags = 0;
-	D3D11_SUBRESOURCE_DATA vinitData;
-	vinitData.pSysMem = &m_vecMeshVertices[0];
-	HR(g_pD3DDevice->m_pDevice->CreateBuffer(&vbd, &vinitData, &m_pVertexBuffer));
-
-	//
-	// Pack the indices of all the meshes into one index buffer.
-	//
-
-	D3D11_BUFFER_DESC ibd;
-	ibd.Usage = D3D11_USAGE_IMMUTABLE;
-	ibd.ByteWidth = sizeof(UINT) * m_nMeshIndexCount;
-	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	ibd.CPUAccessFlags = 0;
-	ibd.MiscFlags = 0;
-	D3D11_SUBRESOURCE_DATA iinitData;
-	iinitData.pSysMem = &m_vecMeshIndices[0];
-	HR(g_pD3DDevice->m_pDevice->CreateBuffer(&ibd, &iinitData, &m_pIndexBuffer));
 }
 
 void cMousePicking::Pick(int nX, int nY)
@@ -324,61 +183,7 @@ void cMousePicking::Pick(int nX, int nY)
 	}
 }
 
-//bool cMousePicking::CalTail(cQuadTree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist)
-//{
-//
-//	bool isColliedTri = false;
-//
-//	if (pRoot->AddChild())
-//	{
-//		std::vector<ST_INDEX> vecIndex;
-//		vecIndex.resize(4);
-//		
-//		for (int i = 0; i < pRoot->m_vecChild.size(); i++)
-//		{
-//			vecIndex[i].i0 = pRoot->m_vecChild[i]->GetIndex()[0];
-//			vecIndex[i].i1 = pRoot->m_vecChild[i]->GetIndex()[1];
-//			vecIndex[i].i2 = pRoot->m_vecChild[i]->GetIndex()[2];
-//			vecIndex[i].i3 = pRoot->m_vecChild[i]->GetIndex()[3];
-//
-//			vecIndex[i].v0 = XMLoadFloat3(&m_vecVertex[vecIndex[i].i0].Pos);
-//			vecIndex[i].v1 = XMLoadFloat3(&m_vecVertex[vecIndex[i].i1].Pos);
-//			vecIndex[i].v2 = XMLoadFloat3(&m_vecVertex[vecIndex[i].i2].Pos);
-//			vecIndex[i].v3 = XMLoadFloat3(&m_vecVertex[vecIndex[i].i3].Pos);
-//
-//			isColliedTri = XNA::IntersectRayTriangle(vOrigin, vDir,
-//				vecIndex[i].v0, vecIndex[i].v2, vecIndex[i].v3, &fDist);
-//
-//			if (isColliedTri)
-//			{
-//				pRoot = pRoot->m_vecChild[i];
-//				CalTail(pRoot, vOrigin, vDir, fDist);
-//				return false;
-//
-//			}
-//
-//			isColliedTri = XNA::IntersectRayTriangle(vOrigin, vDir,
-//				vecIndex[i].v3, vecIndex[i].v1, vecIndex[i].v0, &fDist);
-//
-//			if (isColliedTri)
-//			{
-//				pRoot = pRoot->m_vecChild[i];
-//				CalTail(pRoot, vOrigin, vDir, fDist);
-//				return false;
-//			}
-//		}
-//	}
-//	else
-//	{
-//		XMVECTOR vPoint;
-//		vPoint = vOrigin + (fDist * vDir);
-//		XMStoreFloat3(&m_vPickingPoint, vPoint);
-//		m_vecTest.clear();
-//		return true;
-//	}
-//}
-
-XMFLOAT3 cMousePicking::SetIndex(int nIndex, int nSize)
+XMFLOAT3 cMousePicking::GetPosByIndex(int nIndex, int nSize)
 {
 	XMFLOAT3 vPos;
 	
@@ -414,14 +219,14 @@ void cMousePicking::CalPoint(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, fl
 			OctreeIndex.i6 = pRoot->GetChild()[i]->GetIndex()[6];
 			OctreeIndex.i7 = pRoot->GetChild()[i]->GetIndex()[7];
 
-			OctreeIndex.v0 = XMLoadFloat3(&SetIndex(OctreeIndex.i0, m_nMapSize));
-			OctreeIndex.v1 = XMLoadFloat3(&SetIndex(OctreeIndex.i1, m_nMapSize));
-			OctreeIndex.v2 = XMLoadFloat3(&SetIndex(OctreeIndex.i2, m_nMapSize));
-			OctreeIndex.v3 = XMLoadFloat3(&SetIndex(OctreeIndex.i3, m_nMapSize));
-			OctreeIndex.v4 = XMLoadFloat3(&SetIndex(OctreeIndex.i4, m_nMapSize));
-			OctreeIndex.v5 = XMLoadFloat3(&SetIndex(OctreeIndex.i5, m_nMapSize));
-			OctreeIndex.v6 = XMLoadFloat3(&SetIndex(OctreeIndex.i6, m_nMapSize));
-			OctreeIndex.v7 = XMLoadFloat3(&SetIndex(OctreeIndex.i7, m_nMapSize));
+			OctreeIndex.v0 = XMLoadFloat3(&GetPosByIndex(OctreeIndex.i0, m_nMapSize));
+			OctreeIndex.v1 = XMLoadFloat3(&GetPosByIndex(OctreeIndex.i1, m_nMapSize));
+			OctreeIndex.v2 = XMLoadFloat3(&GetPosByIndex(OctreeIndex.i2, m_nMapSize));
+			OctreeIndex.v3 = XMLoadFloat3(&GetPosByIndex(OctreeIndex.i3, m_nMapSize));
+			OctreeIndex.v4 = XMLoadFloat3(&GetPosByIndex(OctreeIndex.i4, m_nMapSize));
+			OctreeIndex.v5 = XMLoadFloat3(&GetPosByIndex(OctreeIndex.i5, m_nMapSize));
+			OctreeIndex.v6 = XMLoadFloat3(&GetPosByIndex(OctreeIndex.i6, m_nMapSize));
+			OctreeIndex.v7 = XMLoadFloat3(&GetPosByIndex(OctreeIndex.i7, m_nMapSize));
 
 			vecIsColliedTri[0] = XNA::IntersectRayTriangle(vOrigin, vDir,
 				OctreeIndex.v4, OctreeIndex.v5, OctreeIndex.v1, &fDist);
@@ -539,8 +344,6 @@ bool cMousePicking::CulDataPicking(int nIndexFirst, int nRange, XMVECTOR vOrigin
 				XMStoreFloat3(&v3PickingPoint, vPickingPoint);
 
 				nVectorSize++;
-				//m_vecColliedTri.push_back(vPickingPoint);
-
 				m_vecColliedTri3.push_back(v3PickingPoint);
 			}
 
@@ -552,8 +355,6 @@ bool cMousePicking::CulDataPicking(int nIndexFirst, int nRange, XMVECTOR vOrigin
 				XMStoreFloat3(&v3PickingPoint, vPickingPoint);
 
 				nVectorSize++;
-				//m_vecColliedTri.push_back(vPickingPoint);
-
 				m_vecColliedTri3.push_back(v3PickingPoint);
 			}
 		}
@@ -649,13 +450,9 @@ bool cMousePicking::HeightEdit()
 	{
 		m_eEditType = E_DECREASE;
 	}
-    else if(GetAsyncKeyState('V') & 0x8000)
+    else if(GetAsyncKeyState('B') & 0x8000)
     {
         m_eEditType = E_NORMALIZE;
-    }
-    else if (GetAsyncKeyState('C') & 0x8000)
-    {
-        m_eEditType = E_TEST;
     }
 	if (GetAsyncKeyState(VK_ESCAPE) & 0x8000)
 	{
@@ -680,7 +477,6 @@ bool cMousePicking::HeightEdit()
             {
                 CalGauss(m_vPickingPoint.x, m_vPickingPoint.z, m_fRho);
             }
-
 			return true;
 		}
 		else
@@ -735,11 +531,10 @@ bool cMousePicking::TextureMap()
 	return false;
 }
 
-bool cMousePicking::MouseRange()
+bool cMousePicking::GetIsMousePosChange()
 {
 	if (m_isRightClick)
 	{
-		m_eTextureType_Mouse = DirectX::E_GRASS;
 		m_eTextureUsingType_Mouse = DirectX::E_MOUSE;
 		return true;
 	}
@@ -747,7 +542,6 @@ bool cMousePicking::MouseRange()
 	{
 		return false;
 	}
-
 }
 
 std::vector<Vertex::ST_P_VERTEX> cMousePicking::GetHeight()
@@ -917,3 +711,203 @@ bool cMousePicking::GetMouseRbutton()
 {
 	return m_isRightClick;
 }
+
+bool cMousePicking::GetIsChangeMappingData()
+{
+	return m_isChangeMappingData;
+}
+
+//void cMousePicking::Render(DirectionalLight lights[3])
+//{
+	////std::wostringstream outs;
+	////outs.precision(3);
+	////outs << L"X = " << m_vPickingPoint.x << L"   Z = " << m_vPickingPoint.z
+	////	<< L"   Y = " << m_vPickingPoint.y;
+
+	////SetWindowText(g_hWnd, outs.str().c_str());
+
+	//g_pD3DDevice->m_pDevCon->IASetInputLayout(InputLayouts::Basic32);
+	//g_pD3DDevice->m_pDevCon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	//UINT stride = sizeof(Vertex::Basic32);
+	//UINT offset = 0;
+
+	//XMMATRIX view = g_pCamera->View();
+	//XMMATRIX proj = g_pCamera->Proj();
+	//XMMATRIX viewProj = g_pCamera->ViewProj();
+
+	//Effects::BasicFX->SetEyePosW(g_pCamera->GetPosition());
+	//Effects::BasicFX->SetDirLights(lights);
+
+	//ID3DX11EffectTechnique* activeMeshTech = Effects::BasicFX->Light3Tech;
+
+	//D3DX11_TECHNIQUE_DESC techDesc;
+	//activeMeshTech->GetDesc(&techDesc);
+	//for (UINT p = 0; p < techDesc.Passes; ++p)
+	//{
+	//	// Draw the Mesh.
+
+	//	//if (GetAsyncKeyState('1') & 0x8000)
+	//	//	g_pD3DDevice->m_pDevCon->RSSetState(RenderStates::WireframeRS);
+
+	//	g_pD3DDevice->m_pDevCon->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
+	//	g_pD3DDevice->m_pDevCon->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+	//	XMFLOAT4X4 matWorld;
+	//	XMMATRIX I = XMMatrixIdentity();
+	//	I = XMMatrixTranslation(m_vPickingPoint.x, m_vPickingPoint.y, m_vPickingPoint.z);
+	//	
+	//	
+	//	XMMATRIX scale = XMLoadFloat4x4(&m_matScale);
+	//	I = scale * I;
+	//	
+	//	XMStoreFloat4x4(&matWorld, I);
+
+	//	XMMATRIX world = XMLoadFloat4x4(&matWorld);
+	//	XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
+	//	XMMATRIX worldViewProj = world*view*proj;
+
+	//	Effects::BasicFX->SetWorld(world);
+	//	Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
+	//	Effects::BasicFX->SetWorldViewProj(worldViewProj);
+
+	//	//////////
+	//	Effects::BasicFX->SetMaterial(m_mtMesh);
+	//	activeMeshTech->GetPassByIndex(p)->Apply(0, g_pD3DDevice->m_pDevCon);
+	//	g_pD3DDevice->m_pDevCon->DrawIndexed(m_nMeshIndexCount, 0, 0);
+
+	//	// Restore default
+	//	g_pD3DDevice->m_pDevCon->RSSetState(0);
+	//	//////////
+	//}
+//}
+
+//bool cMousePicking::CalTail(cQuadTree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist)
+//{
+//
+//	bool isColliedTri = false;
+//
+//	if (pRoot->AddChild())
+//	{
+//		std::vector<ST_INDEX> vecIndex;
+//		vecIndex.resize(4);
+//		
+//		for (int i = 0; i < pRoot->m_vecChild.size(); i++)
+//		{
+//			vecIndex[i].i0 = pRoot->m_vecChild[i]->GetIndex()[0];
+//			vecIndex[i].i1 = pRoot->m_vecChild[i]->GetIndex()[1];
+//			vecIndex[i].i2 = pRoot->m_vecChild[i]->GetIndex()[2];
+//			vecIndex[i].i3 = pRoot->m_vecChild[i]->GetIndex()[3];
+//
+//			vecIndex[i].v0 = XMLoadFloat3(&m_vecVertex[vecIndex[i].i0].Pos);
+//			vecIndex[i].v1 = XMLoadFloat3(&m_vecVertex[vecIndex[i].i1].Pos);
+//			vecIndex[i].v2 = XMLoadFloat3(&m_vecVertex[vecIndex[i].i2].Pos);
+//			vecIndex[i].v3 = XMLoadFloat3(&m_vecVertex[vecIndex[i].i3].Pos);
+//
+//			isColliedTri = XNA::IntersectRayTriangle(vOrigin, vDir,
+//				vecIndex[i].v0, vecIndex[i].v2, vecIndex[i].v3, &fDist);
+//
+//			if (isColliedTri)
+//			{
+//				pRoot = pRoot->m_vecChild[i];
+//				CalTail(pRoot, vOrigin, vDir, fDist);
+//				return false;
+//
+//			}
+//
+//			isColliedTri = XNA::IntersectRayTriangle(vOrigin, vDir,
+//				vecIndex[i].v3, vecIndex[i].v1, vecIndex[i].v0, &fDist);
+//
+//			if (isColliedTri)
+//			{
+//				pRoot = pRoot->m_vecChild[i];
+//				CalTail(pRoot, vOrigin, vDir, fDist);
+//				return false;
+//			}
+//		}
+//	}
+//	else
+//	{
+//		XMVECTOR vPoint;
+//		vPoint = vOrigin + (fDist * vDir);
+//		XMStoreFloat3(&m_vPickingPoint, vPoint);
+//		m_vecTest.clear();
+//		return true;
+//	}
+//}
+
+//void cMousePicking::BuildMeshGeometryBuffers()
+//{
+//	std::ifstream fin("Models/car.txt");
+//
+//	if (!fin)
+//	{
+//		MessageBox(0, L"Models/car.txt not found.", 0, 0);
+//		return;
+//	}
+//
+//	UINT vcount = 0;
+//	UINT tcount = 0;
+//	std::string ignore;
+//
+//	fin >> ignore >> vcount;
+//	fin >> ignore >> tcount;
+//	fin >> ignore >> ignore >> ignore >> ignore;
+//
+//	XMFLOAT3 vMinf3(+MathHelper::Infinity, +MathHelper::Infinity, +MathHelper::Infinity);
+//	XMFLOAT3 vMaxf3(-MathHelper::Infinity, -MathHelper::Infinity, -MathHelper::Infinity);
+//
+//	XMVECTOR vMin = XMLoadFloat3(&vMinf3);
+//	XMVECTOR vMax = XMLoadFloat3(&vMaxf3);
+//	m_vecMeshVertices.resize(vcount);
+//	for (UINT i = 0; i < vcount; ++i)
+//	{
+//		fin >> m_vecMeshVertices[i].Pos.x >> m_vecMeshVertices[i].Pos.y >> m_vecMeshVertices[i].Pos.z;
+//		fin >> m_vecMeshVertices[i].Normal.x >> m_vecMeshVertices[i].Normal.y >> m_vecMeshVertices[i].Normal.z;
+//
+//		XMVECTOR P = XMLoadFloat3(&m_vecMeshVertices[i].Pos);
+//
+//		vMin = XMVectorMin(vMin, P);
+//		vMax = XMVectorMax(vMax, P);
+//	}
+//
+//	XMStoreFloat3(&mMeshBox.Center, 0.5f*(vMin + vMax));
+//	XMStoreFloat3(&mMeshBox.Extents, 0.5f*(vMax - vMin));
+//
+//	fin >> ignore;
+//	fin >> ignore;
+//	fin >> ignore;
+//
+//	m_nMeshIndexCount = 3 * tcount;
+//	m_vecMeshIndices.resize(m_nMeshIndexCount);
+//	for (UINT i = 0; i < tcount; ++i)
+//	{
+//		fin >> m_vecMeshIndices[i * 3 + 0] >> m_vecMeshIndices[i * 3 + 1] >> m_vecMeshIndices[i * 3 + 2];
+//	}
+//
+//	fin.close();
+//
+//	D3D11_BUFFER_DESC vbd;
+//	vbd.Usage = D3D11_USAGE_IMMUTABLE;
+//	vbd.ByteWidth = sizeof(Vertex::Basic32) * vcount;
+//	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+//	vbd.CPUAccessFlags = 0;
+//	vbd.MiscFlags = 0;
+//	D3D11_SUBRESOURCE_DATA vinitData;
+//	vinitData.pSysMem = &m_vecMeshVertices[0];
+//	HR(g_pD3DDevice->m_pDevice->CreateBuffer(&vbd, &vinitData, &m_pVertexBuffer));
+//
+//	//
+//	// Pack the indices of all the meshes into one index buffer.
+//	//
+//
+//	D3D11_BUFFER_DESC ibd;
+//	ibd.Usage = D3D11_USAGE_IMMUTABLE;
+//	ibd.ByteWidth = sizeof(UINT) * m_nMeshIndexCount;
+//	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+//	ibd.CPUAccessFlags = 0;
+//	ibd.MiscFlags = 0;
+//	D3D11_SUBRESOURCE_DATA iinitData;
+//	iinitData.pSysMem = &m_vecMeshIndices[0];
+//	HR(g_pD3DDevice->m_pDevice->CreateBuffer(&ibd, &iinitData, &m_pIndexBuffer));
+//}
