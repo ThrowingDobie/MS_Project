@@ -38,7 +38,7 @@ public:
 
 	bool HeightEdit();
 	bool TextureMap();
-	bool MouseRange();
+	bool GetIsMousePosChange();
 
 	void SetMouseRbutton(bool isClick);
 	bool GetMouseRbutton();
@@ -97,6 +97,8 @@ private:
 	DirectX::TextureType m_eTextureType;
 	DirectX::TextureUsingType m_eTextureUsingType;
 
+	bool m_isChangeMappingData;
+
 	// MouseMapping
 
 	DirectX::ST_PD_VERTEX m_pdVertex_Mouse;
@@ -115,6 +117,8 @@ public:
 	void SetMappingData();
 	void SetMouseMappingData();
 
+	bool GetIsChangeMappingData();
+
 private:
 	XMVECTOR GetNearPoint(std::vector<XMVECTOR> vecPoint);
 	XMVECTOR GetNearPointTest(std::vector<XMFLOAT3> vecPoint);
@@ -128,7 +132,7 @@ private:
 	cOctree* m_pOctree;
 	std::vector<cOctree*> m_vecOctree;
 	void CalPoint(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist);
-	XMFLOAT3 SetIndex(int nIndex, int nSize);
+	XMFLOAT3 GetPosByIndex(int nIndex, int nSize);
 	bool SelectTile(cOctree* pRoot, XMVECTOR vOrigin, XMVECTOR vDir, float fDist);
 	bool CulDataPicking(int nIndexFirst, int nRange, XMVECTOR vOrigin, XMVECTOR vDir);
 

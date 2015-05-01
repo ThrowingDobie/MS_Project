@@ -1431,13 +1431,10 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
 										{
 											float fGauss = ppdVertex->vecDepth[i];
 											BYTE test = fGauss*200.0f;
-											if (ppdVertex->eType == DirectX::TextureType::E_GRASS)
-											{
-												ptr[0] = test;
-												ptr[1] = test;
-												ptr[2] = test;
-												ptr[3] = test;
-											}
+											ptr[0] = test;
+											ptr[1] = test;
+											ptr[2] = test;
+											ptr[3] = test;
 										}
 
 										if (ppdVertex->eTextureUsingType == DirectX::TextureUsingType::E_MAPPINGTEXTURE)

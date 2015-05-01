@@ -104,12 +104,11 @@ void cMain::Update(float fDelta)
         {
             m_pTerrain->ChangeHeightData(m_pMouse->GetHeight());
         }
-		if (m_pMouse->TextureMap())
+		if (m_pMouse->GetIsChangeMappingData())
 		{
 			m_pMouse->SetMappingData();
 			m_pTerrain->SetMappingData(m_pMouse->GetMappingData());
 		}
-
     }
 }
 
@@ -134,7 +133,7 @@ void cMain::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_RBUTTONDOWN:
 		m_pMouse->SetMouseRbutton(true);
 		m_pMouse->OnMouseDown(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-		if (m_pMouse->MouseRange())
+		if (m_pMouse->GetIsMousePosChange())
 		{
 			m_pMouse->SetMouseMappingData();
 			m_pTerrain->SetMouseMappingData(m_pMouse->GetMouseMappingData());

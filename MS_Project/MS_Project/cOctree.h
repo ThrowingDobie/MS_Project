@@ -28,6 +28,6 @@ private:
 
 private:
 	void SetCorner(std::vector<int> vecCorner);
-	XMFLOAT3 SetIndex(int nIndex, int nSize);
+	XMFLOAT3 GetPosByIndex(int nIndex, int nSize);
 };
 

@@ -108,7 +108,7 @@ bool cOctree::AddChild()
 			+ ((inputCorner0[4] - inputCorner0[0]) / 2);
 		pChild0->m_vecCorner = inputCorner0;
 		pChild0->m_nCenter = inputCenter0;
-		pChild0->m_vCenter = SetIndex(pChild0->m_nCenter, 257);
+		pChild0->m_vCenter = GetPosByIndex(pChild0->m_nCenter, 257);
 		m_vecChild[0] = pChild0;
 
 		std::vector<int> inputCorner1;
@@ -127,7 +127,7 @@ bool cOctree::AddChild()
 			+ ((inputCorner1[4] - inputCorner1[0]) / 2);
 		pChild1->m_vecCorner = inputCorner1;
 		pChild1->m_nCenter = inputCenter1;
-		pChild1->m_vCenter = SetIndex(pChild1->m_nCenter, 257);
+		pChild1->m_vCenter = GetPosByIndex(pChild1->m_nCenter, 257);
 		m_vecChild[1] = pChild1;
 
 		std::vector<int> inputCorner2;
@@ -146,7 +146,7 @@ bool cOctree::AddChild()
 			+ ((inputCorner2[4] - inputCorner2[0]) / 2);
 		pChild2->m_vecCorner = inputCorner2;
 		pChild2->m_nCenter = inputCenter2;
-		pChild2->m_vCenter = SetIndex(pChild2->m_nCenter, 257);
+		pChild2->m_vCenter = GetPosByIndex(pChild2->m_nCenter, 257);
 		m_vecChild[2] = pChild2;
 
 		std::vector<int> inputCorner3;
@@ -165,7 +165,7 @@ bool cOctree::AddChild()
 			+ ((inputCorner3[4] - inputCorner3[0]) / 2);
 		pChild3->m_vecCorner = inputCorner3;
 		pChild3->m_nCenter = inputCenter3;
-		pChild3->m_vCenter = SetIndex(pChild3->m_nCenter, 257);
+		pChild3->m_vCenter = GetPosByIndex(pChild3->m_nCenter, 257);
 		m_vecChild[3] = pChild3;
 
 		std::vector<int> inputCorner4;
@@ -184,7 +184,7 @@ bool cOctree::AddChild()
 			+ ((inputCorner4[4] - inputCorner4[0]) / 2);
 		pChild4->m_vecCorner = inputCorner4;
 		pChild4->m_nCenter = inputCenter4;
-		pChild4->m_vCenter = SetIndex(pChild4->m_nCenter, 257);
+		pChild4->m_vCenter = GetPosByIndex(pChild4->m_nCenter, 257);
 		m_vecChild[4] = pChild4;
 
 		std::vector<int> inputCorner5;
@@ -203,7 +203,7 @@ bool cOctree::AddChild()
 			+ ((inputCorner5[4] - inputCorner5[0]) / 2);
 		pChild5->m_vecCorner = inputCorner5;
 		pChild5->m_nCenter = inputCenter5;
-		pChild5->m_vCenter = SetIndex(pChild5->m_nCenter, 257);
+		pChild5->m_vCenter = GetPosByIndex(pChild5->m_nCenter, 257);
 		m_vecChild[5] = pChild5;
 
 		std::vector<int> inputCorner6;
@@ -222,7 +222,7 @@ bool cOctree::AddChild()
 			+ ((inputCorner6[4] - inputCorner6[0]) / 2);
 		pChild6->m_vecCorner = inputCorner6;
 		pChild6->m_nCenter = inputCenter6;
-		pChild6->m_vCenter = SetIndex(pChild6->m_nCenter, 257);
+		pChild6->m_vCenter = GetPosByIndex(pChild6->m_nCenter, 257);
 		m_vecChild[6] = pChild6;
 
 		std::vector<int> inputCorner7;
@@ -241,7 +241,7 @@ bool cOctree::AddChild()
 			+ ((inputCorner7[4] - inputCorner7[0]) / 2);
 		pChild7->m_vecCorner = inputCorner7;
 		pChild7->m_nCenter = inputCenter7;
-		pChild7->m_vCenter = SetIndex(pChild7->m_nCenter, 257);
+		pChild7->m_vCenter = GetPosByIndex(pChild7->m_nCenter, 257);
 		m_vecChild[7] = pChild7;
 
 		return true;
@@ -285,7 +285,7 @@ std::vector<UINT> cOctree::GetIndex()
 	return vecIndex;
 }
 
-XMFLOAT3 cOctree::SetIndex(int nIndex, int nSize)
+XMFLOAT3 cOctree::GetPosByIndex(int nIndex, int nSize)
 {
 	XMFLOAT3 vPos;
 
