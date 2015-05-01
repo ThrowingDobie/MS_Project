@@ -1406,7 +1406,7 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
 					{
 						if (ptr + 4 <= pEndBits)
 						{
-							int nY = 1024 - row;
+							int nY = iWidth - row;
 							int nX = x;
 
 							if (ppdVertex->eTextureUsingType == DirectX::TextureUsingType::E_MOUSE)
