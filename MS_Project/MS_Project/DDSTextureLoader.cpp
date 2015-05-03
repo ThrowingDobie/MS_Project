@@ -1430,43 +1430,43 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
 										if (ppdVertex->eTextureUsingType == DirectX::TextureUsingType::E_MOUSE)
 										{
 											float fGauss = ppdVertex->vecDepth[i];
-											BYTE test = fGauss*200.0f;
-											ptr[0] = test;
-											ptr[1] = test;
-											ptr[2] = test;
-											ptr[3] = test;
+											BYTE byteValue = fGauss*200.0f;
+											ptr[0] = byteValue;
+											ptr[1] = byteValue;
+											ptr[2] = byteValue;
+											ptr[3] = byteValue;
 										}
 
 										if (ppdVertex->eTextureUsingType == DirectX::TextureUsingType::E_MAPPINGTEXTURE)
 										{
 											float fGauss = ppdVertex->vecDepth[i];
-											BYTE test = fGauss*20.0f;
+											BYTE byteValue = fGauss*20.0f;
 											if (ppdVertex->eType == DirectX::TextureType::E_GRASS)
 											{
-												if (ptr[0] >= test)
+												if (ptr[0] >= byteValue)
 												{
-													ptr[0] -= test; // blue
+													ptr[0] -= byteValue; // blue
 												}
-												if (ptr[1] >= test)
+												if (ptr[1] >= byteValue)
 												{
-													ptr[1] -= test; // blue
+													ptr[1] -= byteValue; // blue
 												}
-												if (ptr[2] >= test)
+												if (ptr[2] >= byteValue)
 												{
-													ptr[2] -= test; // blue
+													ptr[2] -= byteValue; // blue
 												}
-												if (ptr[3] >= test)
+												if (ptr[3] >= byteValue)
 												{
-													ptr[3] -= test; // blue
+													ptr[3] -= byteValue; // blue
 												}
 
 											}
 
 											else if (ppdVertex->eType == DirectX::TextureType::E_DARKDIRT)
 											{
-												if (ptr[2] >= 0 && ptr[2] < 255 - test)
+												if (ptr[2] >= 0 && ptr[2] < 255 - byteValue)
 												{
-													ptr[2] += test;
+													ptr[2] += byteValue;
 												}
 												else
 												{
@@ -1476,9 +1476,9 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
 
 											else if (ppdVertex->eType == DirectX::TextureType::E_STONE)
 											{
-												if (ptr[1] >= 0 && ptr[1] < 255 - test)
+												if (ptr[1] >= 0 && ptr[1] < 255 - byteValue)
 												{
-													ptr[1] += test;
+													ptr[1] += byteValue;
 												}
 												else
 												{
@@ -1488,9 +1488,9 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
 
 											else if (ppdVertex->eType == DirectX::TextureType::E_LIGHTDIRT)
 											{
-												if (ptr[0] >= 0 && ptr[0] < 255 - test)
+												if (ptr[0] >= 0 && ptr[0] < 255 - byteValue)
 												{
-													ptr[0] += test;
+													ptr[0] += byteValue;
 												}
 												else
 												{
@@ -1500,9 +1500,9 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
 
 											else if (ppdVertex->eType == DirectX::TextureType::E_SNOW)
 											{
-												if (ptr[3] >= 0 && ptr[3] < 255 - test)
+												if (ptr[3] >= 0 && ptr[3] < 255 - byteValue)
 												{
-													ptr[3] += test;
+													ptr[3] += byteValue;
 												}
 												else
 												{
